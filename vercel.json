@@ -1,13 +1,17 @@
 {
   "version": 2,
-  "rewrites": [
+  "cleanUrls": true,
+  "routes": [
     {
-      "source": "/rumah-tangga",
-      "destination": "/rumahtangga.html"
+      "src": "/rumah-tangga",
+      "dest": "/rumahtangga.html"
     },
     {
-      "source": "/api/(.*)",
-      "destination": "/server.js"
+      "src": "/api/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "handle": "filesystem"
     }
   ]
 }
