@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); // Impor modul path bawaan Node.js
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -11,6 +12,21 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 
 app.use(cors());
 app.use(express.json());
+
+// =============================================================
+// ROUTING FILE STATIS HTML (UNTUK VERCEL)
+// =============================================================
+app.get('/rumah-tangga', (req, res) => {
+    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
+});
+
+app.get('/rumahtangga.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // =============================================================
 // 1. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
