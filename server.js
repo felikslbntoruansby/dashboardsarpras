@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -14,25 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // -------------------------------------------------------------
-// 1. ROUTING HALAMAN HTML (UTAMAKAN RUTE KHUSUS DI ATAS STATIC)
-// -------------------------------------------------------------
-app.get('/rumah-tangga', (req, res) => {
-    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
-});
-
-app.get('/rumahtangga.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
-});
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Middleware static folder diletakkan setelah rute HTML khusus
-app.use(express.static(path.join(__dirname)));
-
-// -------------------------------------------------------------
-// 2. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
+// 1. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
 // -------------------------------------------------------------
 
 // API Peminjaman Ruangan
@@ -120,7 +101,7 @@ app.post('/api/maintenance', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 3. MODULE INVENTORY STOK BARANG SARPRAS (EXISTING)
+// 2. MODULE INVENTORY STOK BARANG SARPRAS (EXISTING)
 // -------------------------------------------------------------
 
 // Get seluruh data barang
@@ -320,15 +301,6 @@ app.get('/api/backup', async (req, res) => {
         res.send(JSON.stringify(data, null, 4));
     } catch (err) {
         res.status(500).json({ error: err.message });
-    }
-});
-
-// Catch-all route untuk menangani SPA / fallback static files
-app.get('*', (req, res) => {
-    if (req.path === '/rumah-tangga') {
-        res.sendFile(path.join(__dirname, 'rumahtangga.html'));
-    } else {
-        res.sendFile(path.join(__dirname, 'index.html'));
     }
 });
 
