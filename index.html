@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Sarpras Poltekbang</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (XLSX) CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- jsPDF & jsPDF-AutoTable CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-gray-100 p-4 md:p-8 font-sans text-gray-800">
+
+    <div class="max-w-6xl mx-auto space-y-6 md:space-y-8">
+        <!-- Header & Tombol Aksi -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-blue-900">Dashboard Monitoring Sarpras</h1>
+                <p class="text-sm md:text-base text-gray-600">Politeknik Penerbangan Surabaya</p>
+            </div>
+            <div class="flex gap-2 flex-wrap w-full md:w-auto">
+                <a href="/api/backup" target="_blank" class="flex-1 md:flex-none justify-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
+                    💾 Backup JSON
+                </a>
+                <button onclick="exportToExcel()" class="flex-1 md:flex-none justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
+                    📊 Excel
+                </button>
+                <button onclick="openModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm">
+                    + Master Barang
+                </button>
+            </div>
+        </div>
+
+        <!-- Section Grafik -->
+        <div class="bg-white p-4 md:p-6 rounded-lg shadow">
+            <h2 class="text-lg md:text-xl font-bold mb-4 text-gray-700">Grafik Ketersediaan Stok Akhir (Top 15)</h2>
+            <div style="position: relative; height: 30vh; width: 100%;">
+                <canvas id="stockChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Tabel Utama Inventaris -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-4 border-b flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
+                <div class="w-full md:w-1/3">
+                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari Kode atau Nama Barang..." class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div id="itemCount" class="text-xs md:text-sm font-semibold text-gray-600">
+                    Memuat data...
+                </div>
+            </div>
+
+            <!-- Wrapper Scroll Horizontal untuk HP -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-left border-collapse whitespace-nowrap">
+                    <thead class="bg-blue-900 text-white text-xs md:text-sm uppercase">
+                        <tr>
+                            <th class="py-3 px-4">Kode Barang</th>
+                            <th class="py-3 px-4">Nama Barang</th>
+                            <th class="py-3 px-4 text-center">Stok Awal</th>
+                            <th class="py-3 px-4 text-center">Masuk</th>
+                            <th class="py-3 px-4 text-center">Keluar</th>
+                            <th class="py-3 px-4 text-center">Stok Akhir</th>
+                            <th class="py-3 px-4 text-center">Kelola Stok</th>
+                            <th class="py-3 px-4 text-center">Aksi Master</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="text-gray-700 text-xs md:text-sm">
+                        <!-- Data dimuat via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between items-center p-4 border-t bg-gray-50 text-xs md:text-sm">
+                <button id="prevBtn" onclick="changePage(-1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-1 px-4 rounded disabled:cursor-not-allowed">Previous</button>
+                <span id="pageIndicator" class="font-semibold text-gray-700">Halaman 1</span>
+                <button id="nextBtn" onclick="changePage(1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-1 px-4 rounded disabled:cursor-not-allowed">Next</button>
+            </div>
+        </div>
+
+        <!-- Tabel Histori Catatan Transaksi -->
+        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                <h2 class="text-lg md:text-xl font-bold text-gray-800">📜 Histori Transaksi (Pengambilan & Penambahan)</h2>
+                
+                <!-- Filter Bulan, Tahun & Tombol Cetak PDF -->
+                <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
+                    <select id="filterMonth" onchange="loadLogs()" class="border p-2 rounded text-xs md:text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="1">Januari</option>
+                        <option value="2">Februari</option>
+                        <option value="3">Maret</option>
+                        <option value="4">April</option>
+                        <option value="5">Mei</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">Agustus</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+
+                    <select id="filterYear" onchange="loadLogs()" class="border p-2 rounded text-xs md:text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <!-- Diisi otomatis oleh JS -->
+                    </select>
+
+                    <button onclick="exportLogsToPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
+                        📄 Cetak PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-96">
+                <table class="min-w-full text-left border-collapse whitespace-nowrap text-xs md:text-sm">
+                    <thead class="bg-gray-800 text-white sticky top-0">
+                        <tr>
+                            <th class="py-2 px-3">Waktu & Tanggal</th>
+                            <th class="py-2 px-3">Kode & Barang</th>
+                            <th class="py-2 px-3 text-center">Jenis</th>
+                            <th class="py-2 px-3 text-center">Jumlah</th>
+                            <th class="py-2 px-3">Petugas / Pengambil</th>
+                            <th class="py-2 px-3">Catatan / Keperluan</th>
+                            <th class="py-2 px-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody" class="divide-y divide-gray-200">
+                        <tr><td colspan="7" class="text-center py-4 text-gray-500">Memuat histori...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Master Barang (Tambah/Edit) -->
+    <div id="itemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4 text-blue-900">Tambah Master Barang</h2>
+            <form id="itemForm" class="space-y-3">
+                <input type="hidden" id="itemId">
+                
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Kode Barang</label>
+                    <input type="text" id="itemCode" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="A001">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Nama Barang</label>
+                    <input type="text" id="itemName" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Stok Awal</label>
+                        <input type="number" id="stockInitial" min="0" value="0" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Masuk</label>
+                        <input type="number" id="stockIn" min="0" value="0" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">Keluar</label>
+                        <input type="number" id="stockOut" min="0" value="0" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModal()" class="bg-gray-400 hover:bg-gray-500 text-white py-1.5 px-4 rounded text-sm">Batal</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-4 rounded text-sm">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Form Transaksi (Masuk / Ambil Barang) -->
+    <div id="transModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 id="transModalTitle" class="text-xl font-bold mb-4 text-blue-900">Transaksi Barang</h2>
+            <form id="transForm" class="space-y-3">
+                <input type="hidden" id="transItemId">
+                <input type="hidden" id="transType">
+                
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Nama Barang</label>
+                    <input type="text" id="transItemName" disabled class="w-full border p-2 rounded text-sm bg-gray-100 font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Jumlah Barang</label>
+                    <input type="number" id="transQty" min="1" value="1" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Nama Petugas / Pengambil Barang</label>
+                    <input type="text" id="transPic" placeholder="Contoh: Budi (Bagian IT)" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Catatan / Keperluan</label>
+                    <textarea id="transNotes" placeholder="Contoh: Perbaikan AC Ruang 102" class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeTransModal()" class="bg-gray-400 hover:bg-gray-500 text-white py-1.5 px-4 rounded text-sm">Batal</button>
+                    <button type="submit" id="transSubmitBtn" class="bg-green-600 hover:bg-green-700 text-white py-1.5 px-4 rounded text-sm font-bold">Simpan Transaksi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let inventory = [];
+        let filteredInventory = [];
+        let currentLogsData = [];
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let stockChartInstance = null;
+
+        function initLogFilters() {
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1;
+            const currentYear = now.getFullYear();
+
+            const monthSelect = document.getElementById('filterMonth');
+            const yearSelect = document.getElementById('filterYear');
+
+            if (monthSelect && yearSelect) {
+                monthSelect.value = currentMonth;
+                yearSelect.innerHTML = '';
+                for (let y = currentYear - 2; y <= currentYear + 2; y++) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.innerText = y;
+                    if (y === currentYear) opt.selected = true;
+                    yearSelect.appendChild(opt);
+                }
+            }
+        }
+
+        function loadInventory() {
+            fetch('/api/inventory')
+                .then(res => res.json())
+                .then(data => {
+                    inventory = data;
+                    filteredInventory = [...inventory];
+                    renderData();
+                    loadLogs();
+                })
+                .catch(err => console.error("Gagal memuat data:", err));
+        }
+
+        function loadLogs() {
+            const month = document.getElementById('filterMonth')?.value;
+            const year = document.getElementById('filterYear')?.value;
+
+            let url = '/api/logs';
+            if (month && year) {
+                url += `?month=${month}&year=${year}`;
+            }
+
+            fetch(url)
+                .then(res => res.json())
+                .then(logs => {
+                    currentLogsData = logs || [];
+                    const tbody = document.getElementById('logTableBody');
+                    if (!currentLogsData || currentLogsData.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">Tidak ada riwayat transaksi pada bulan ini.</td></tr>`;
+                        return;
+                    }
+                    tbody.innerHTML = currentLogsData.map(log => {
+                        const date = new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+                        const isIN = log.type === 'IN';
+                        const badge = isIN ? `<span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded font-bold">PENAMBAHAN</span>` 
+                                           : `<span class="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded font-bold">PENGAMBILAN</span>`;
+                        
+                        return `
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 px-3 font-mono text-xs">${date}</td>
+                                <td class="py-2 px-3 font-semibold">${log.inventory ? log.inventory.code : '-'} - ${log.inventory ? log.inventory.name : 'Barang Dihapus'}</td>
+                                <td class="py-2 px-3 text-center">${badge}</td>
+                                <td class="py-2 px-3 text-center font-bold ${isIN ? 'text-green-600' : 'text-red-600'}">${isIN ? '+' : '-'}${log.quantity}</td>
+                                <td class="py-2 px-3 font-medium text-blue-900">${log.pic_name}</td>
+                                <td class="py-2 px-3 text-gray-600 text-xs">${log.notes}</td>
+                                <td class="py-2 px-3 text-center">
+                                    <button onclick="deleteLog(${log.id})" class="text-red-500 hover:text-red-700 hover:underline text-xs font-semibold">Hapus</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                })
+                .catch(err => console.error("Gagal memuat log:", err));
+        }
+
+        function deleteLog(logId) {
+            if(confirm("Apakah Anda yakin ingin menghapus catatan transaksi ini?")) {
+                fetch(`/api/logs/${logId}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(() => loadLogs())
+                    .catch(err => alert("Gagal menghapus log: " + err.message));
+            }
+        }
+
+        function exportLogsToPDF() {
+            if (!currentLogsData || currentLogsData.length === 0) {
+                alert("Tidak ada data histori transaksi untuk dicetak pada bulan ini.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+
+            const monthSelect = document.getElementById('filterMonth');
+            const monthText = monthSelect.options[monthSelect.selectedIndex].text;
+            const yearText = document.getElementById('filterYear').value;
+
+            // 1. Header KOP Surat / Judul Dokumen
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "normal");
+            doc.text(`LAPORAN HISTORI TRANSAKSI SARPRAS - BULAN ${monthText.toUpperCase()} ${yearText}`, 14, 22);
+            doc.setLineWidth(0.5);
+            doc.line(14, 25, 283, 25);
+
+            // 2. Menyiapkan Data Tabel untuk PDF (Termasuk Kolom Tanda Tangan)
+            const tableRows = currentLogsData.map((log, index) => {
+                const date = new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+                const typeText = log.type === 'IN' ? 'PENAMBAHAN' : 'PENGAMBILAN';
+                const qtyText = (log.type === 'IN' ? '+' : '-') + log.quantity;
+                const itemName = log.inventory ? `${log.inventory.code} - ${log.inventory.name}` : 'Barang Dihapus';
+
+                return [
+                    index + 1,
+                    date,
+                    itemName,
+                    typeText,
+                    qtyText,
+                    log.pic_name,
+                    log.notes,
+                    "" // Kolom Tempat Tanda Tangan / Paraf Basah
+                ];
+            });
+
+            // 3. Render Tabel Menggunakan jsPDF-AutoTable
+            doc.autoTable({
+                head: [['No', 'Waktu & Tanggal', 'Kode & Nama Barang', 'Jenis', 'Jumlah', 'Petugas / Pengambil', 'Catatan / Keperluan', 'Paraf / TTD']],
+                body: tableRows,
+                startY: 28,
+                theme: 'grid',
+                headStyles: { fillColor: [30, 58, 138], halign: 'center', fontStyle: 'bold' },
+                styles: { fontSize: 8, cellPadding: 3, verticalAlign: 'middle' },
+                columnStyles: {
+                    0: { halign: 'center', cellWidth: 10 },
+                    1: { cellWidth: 35 },
+                    2: { cellWidth: 55 },
+                    3: { halign: 'center', cellWidth: 28 },
+                    4: { halign: 'center', cellWidth: 18 },
+                    5: { cellWidth: 40 },
+                    6: { cellWidth: 55 },
+                    7: { cellWidth: 28, halign: 'center' }
+                }
+            });
+
+            // 4. Menambahkan Blok Tanda Tangan Penanggung Jawab di Bagian Bawah
+            const finalY = doc.lastAutoTable.finalY + 10;
+            
+            if (finalY > 155) {
+                doc.addPage();
+            }
+
+            const signY = finalY > 155 ? 30 : finalY;
+            const todayDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Surabaya, ${todayDate}`, 210, signY);
+            doc.text("Mengetahui,", 210, signY + 5);
+            doc.text("Koordinator Kegiatan Bidang Umum", 210, signY + 10);
+            
+            // Nama Pejabat (Tebal + Garis Bawah)
+            doc.setFont("helvetica", "bold");
+            const officialName = "Ajeng Herdinawati, S.Psi.";
+            doc.text(officialName, 210, signY + 30);
+            const textWidth = doc.getTextWidth(officialName);
+            doc.setLineWidth(0.5);
+            doc.line(210, signY + 31, 210 + textWidth, signY + 31);
+
+            // NIP Pejabat
+            doc.setFont("helvetica", "normal");
+            doc.text("NIP. 197909212006042001", 210, signY + 36);
+
+            // 5. Simpan File PDF
+            doc.save(`Laporan_Histori_Sarpras_${monthText}_${yearText}.pdf`);
+        }
+
+        function calculateFinalStock(item) {
+            return item.initial + item.inQty - item.outQty;
+        }
+
+        function filterData() {
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
+            filteredInventory = inventory.filter(item => 
+                item.code.toLowerCase().includes(query) || 
+                item.name.toLowerCase().includes(query)
+            );
+            currentPage = 1;
+            renderData();
+        }
+
+        function renderData() {
+            renderTable();
+            renderChart();
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById("tableBody");
+            tableBody.innerHTML = ""; 
+
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageData = filteredInventory.slice(start, end);
+
+            document.getElementById("itemCount").innerText = `Menampilkan ${filteredInventory.length} total data`;
+
+            if (pageData.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-gray-500 font-semibold">Data barang tidak ditemukan.</td></tr>`;
+                updatePaginationControls();
+                return;
+            }
+
+            pageData.forEach((item) => {
+                const finalStock = calculateFinalStock(item);
+                let rowClass = finalStock <= 0 ? "bg-red-50 hover:bg-red-100" : "hover:bg-gray-50";
+                let textClass = finalStock <= 0 ? "text-red-600" : (finalStock < 10 ? "text-orange-500" : "text-green-600");
+                let statusText = finalStock <= 0 ? " (HABIS)" : "";
+
+                tableBody.innerHTML += `
+                    <tr class="border-b ${rowClass}">
+                        <td class="py-3 px-4 font-mono text-sm">${item.code}</td>
+                        <td class="py-3 px-4 font-medium">${item.name} <span class="text-xs font-bold text-red-600">${statusText}</span></td>
+                        <td class="py-3 px-4 text-center">${item.initial}</td>
+                        <td class="py-3 px-4 text-center text-green-600 font-medium">+${item.inQty}</td>
+                        <td class="py-3 px-4 text-center text-red-600 font-medium">-${item.outQty}</td>
+                        <td class="py-3 px-4 text-center font-bold ${textClass}">${finalStock}</td>
+                        <td class="py-3 px-4 text-center space-x-1">
+                            <button onclick="openTransModal(${item.id}, '${item.name}', 'IN')" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded font-bold">+ Restok</button>
+                            <button onclick="openTransModal(${item.id}, '${item.name}', 'OUT')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-2 py-1 rounded font-bold">- Ambil</button>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="editItem(${item.id})" class="text-blue-500 hover:underline text-xs mr-2 font-semibold">Edit</button>
+                            <button onclick="deleteItem(${item.id})" class="text-red-500 hover:underline text-xs font-semibold">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            updatePaginationControls();
+        }
+
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(filteredInventory.length / rowsPerPage) || 1;
+            document.getElementById("pageIndicator").innerText = `Halaman ${currentPage} dari ${totalPages}`;
+            document.getElementById("prevBtn").disabled = (currentPage === 1);
+            document.getElementById("nextBtn").disabled = (currentPage >= totalPages);
+        }
+
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredInventory.length / rowsPerPage) || 1;
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderTable();
+            }
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            const chartItems = filteredInventory.slice(0, 15);
+            const labels = chartItems.map(item => item.name);
+            const data = chartItems.map(item => calculateFinalStock(item));
+            
+            const bgColors = data.map(stock => {
+                if (stock <= 0) return 'rgba(239, 68, 68, 0.8)';
+                if (stock < 10) return 'rgba(251, 146, 60, 0.8)';
+                return 'rgba(34, 197, 94, 0.8)';
+            });
+
+            if (stockChartInstance) stockChartInstance.destroy();
+
+            stockChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stok Akhir',
+                        data: data,
+                        backgroundColor: bgColors,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function openTransModal(id, name, type) {
+            document.getElementById("transItemId").value = id;
+            document.getElementById("transType").value = type;
+            document.getElementById("transItemName").value = name;
+            document.getElementById("transQty").value = 1;
+            document.getElementById("transPic").value = "";
+            document.getElementById("transNotes").value = "";
+            
+            const btn = document.getElementById("transSubmitBtn");
+            if (type === 'IN') {
+                document.getElementById("transModalTitle").innerText = "Penambahan Stok Barang";
+                btn.className = "bg-green-600 hover:bg-green-700 text-white py-1.5 px-4 rounded text-sm font-bold";
+                btn.innerText = "Simpan Penambahan";
+            } else {
+                document.getElementById("transModalTitle").innerText = "Pengambilan Barang";
+                btn.className = "bg-amber-600 hover:bg-amber-700 text-white py-1.5 px-4 rounded text-sm font-bold";
+                btn.innerText = "Simpan Pengambilan";
+            }
+            
+            document.getElementById("transModal").classList.remove("hidden");
+        }
+
+        function closeTransModal() {
+            document.getElementById("transModal").classList.add("hidden");
+        }
+
+        document.getElementById("transForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const payload = {
+                inventoryId: document.getElementById("transItemId").value,
+                type: document.getElementById("transType").value,
+                quantity: document.getElementById("transQty").value,
+                picName: document.getElementById("transPic").value,
+                notes: document.getElementById("transNotes").value
+            };
+
+            fetch('/api/inventory/transaction', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => {
+                if(!res.ok) return res.json().then(err => { throw new Error(err.error) });
+                return res.json();
+            })
+            .then(() => {
+                closeTransModal();
+                loadInventory();
+            })
+            .catch(err => alert("Gagal transaksi: " + err.message));
+        });
+
+        function exportToExcel() {
+            const excelData = inventory.map(item => ({
+                "Kode Barang": item.code,
+                "Nama Barang": item.name,
+                "Stok Awal": item.initial,
+                "Barang Masuk": item.inQty,
+                "Barang Keluar": item.outQty,
+                "Stok Akhir": calculateFinalStock(item)
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Stok Barang");
+            XLSX.writeFile(workbook, "STOK_BARANG_SARPRAS.xlsx");
+        }
+
+        function openModal() {
+            document.getElementById("itemForm").reset();
+            document.getElementById("itemId").value = "";
+            document.getElementById("modalTitle").innerText = "Tambah Master Barang";
+            document.getElementById("itemModal").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("itemModal").classList.add("hidden");
+        }
+
+        document.getElementById("itemForm").addEventListener("submit", function(e) {
+            e.preventDefault(); 
+            const id = document.getElementById("itemId").value;
+            const payload = {
+                code: document.getElementById("itemCode").value,
+                name: document.getElementById("itemName").value,
+                initial: parseInt(document.getElementById("stockInitial").value) || 0,
+                inQty: parseInt(document.getElementById("stockIn").value) || 0,
+                outQty: parseInt(document.getElementById("stockOut").value) || 0
+            };
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/inventory/${id}` : '/api/inventory';
+
+            fetch(url, { 
+                method: method, 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            })
+            .then(res => res.json())
+            .then(() => { 
+                closeModal(); 
+                loadInventory(); 
+            })
+            .catch(err => console.error("Gagal menyimpan:", err)); 
+        });
+
+        function editItem(id) { 
+            const item = inventory.find(i => i.id === id); 
+            if (item) { 
+                document.getElementById("itemId").value = item.id; 
+                document.getElementById("itemCode").value = item.code; 
+                document.getElementById("itemName").value = item.name; 
+                document.getElementById("stockInitial").value = item.initial; 
+                document.getElementById("stockIn").value = item.inQty; 
+                document.getElementById("stockOut").value = item.outQty; 
+                document.getElementById("modalTitle").innerText = "Edit Master Barang"; 
+                document.getElementById("itemModal").classList.remove("hidden"); 
+            } 
+        }
+
+        function deleteItem(id) { 
+            if(confirm("Apakah Anda yakin ingin menghapus barang ini?")) { 
+                fetch(`/api/inventory/${id}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(() => loadInventory())
+                    .catch(err => console.error("Gagal menghapus:", err));
+            }
+        }
+
+        initLogFilters();
+        loadInventory();
+    </script>
+</body>
+</html>

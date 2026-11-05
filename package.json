@@ -1,0 +1,16 @@
+{
+  "name": "sarpras-poltekbang",
+  "version": "1.0.0",
+  "description": "Aplikasi Monitoring Sapras Poltekbang Surabaya",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0"
+  }
+}

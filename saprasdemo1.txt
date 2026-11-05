@@ -1,0 +1,17 @@
+# 1. Inisialisasi Proyek & Install Dependencies
+npm init -y
+npm install express cors @supabase/supabase-js dotenv
+
+# 2. Eksekusi Seed Data (Memasukkan 150 Data ke Supabase)
+node seed.js
+
+# 3. Jalankan Server Lokal
+node server.js
+
+# 4. Perintah Upload ke GitHub (Sebelum Deploy ke Render.com)
+git init
+git add .
+git commit -m "Deploy Sapras Poltekbang"
+git branch -M main
+git remote add origin https://github.com/USERNAME_ANDA/sapras-poltekbang.git
+git push -u origin main
