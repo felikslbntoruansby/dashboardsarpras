@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/rumah-tangga",
-      "destination": "/rumahtangga.html"
+      "destination": "/rumahtangga"
     },
     {
       "source": "/api/(.*)",
