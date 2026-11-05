@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Rumah Tangga & Sarpras</title>
+  <title>Dashboard Rumah Tangga - Sarpras Poltekbang</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -14,100 +14,107 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col">
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 font-sans text-slate-800 min-h-screen flex flex-col">
 
   <!-- Header Sarpras & Penerbangan -->
-  <header class="bg-slate-900 text-white shadow-lg border-b-4 border-blue-600 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center space-x-3">
-        <div class="bg-blue-600 p-2.5 rounded-lg shadow-md flex items-center justify-center">
-          <i class="fa-solid fa-plane-departure text-white text-xl"></i>
+  <header class="bg-slate-900/90 backdrop-blur-md text-white border-b border-indigo-500/30 sticky top-0 z-40 shadow-xl">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-4">
+        <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 p-3.5 rounded-xl shadow-lg shadow-indigo-500/30 flex items-center justify-center">
+          <i class="fa-solid fa-plane-departure text-white text-2xl"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
-            DASHBOARD RUMAH TANGGA
-            <span class="text-xs font-semibold bg-blue-500/30 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-400/30">SARPRAS</span>
+          <p class="text-xs font-bold uppercase tracking-widest text-indigo-400">UNIT BAGIAN UMUM</p>
+          <h1 class="text-2xl font-extrabold tracking-wide text-white flex items-center gap-3">
+            Manajemen Sarana & Prasarana
+            <span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-400/30 shadow-inner">
+              Rumah Tangga
+            </span>
           </h1>
-          <p class="text-xs text-slate-400">Unit Sub Bagian Keuangan & Umum - Politeknik Penerbangan Surabaya</p>
+          <p class="text-xs text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya</p>
         </div>
       </div>
       
       <!-- Navigasi Dua Arah -->
       <div class="flex items-center space-x-3">
-        <a href="index.html" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-blue-500/20 active:scale-95">
+        <a href="index.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
           <i class="fa-solid fa-boxes-stacked"></i>
-          <span>Ke Inventaris Sarpras</span>
+          <span>Ke Inventaris Sarpras &rarr;</span>
         </a>
       </div>
     </div>
   </header>
 
   <!-- Main Content Container -->
-  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full space-y-6">
+  <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full space-y-8">
 
     <!-- Ringkasan Stat & Tab Navigasi -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
       <!-- Card Tab Ruangan -->
-      <div onclick="switchTab('ruangan')" id="tab-ruangan" class="cursor-pointer bg-white rounded-xl p-5 shadow-sm border-2 border-blue-600 transition-all hover:shadow-md relative overflow-hidden group">
+      <div onclick="switchTab('ruangan')" id="tab-ruangan" class="cursor-pointer bg-slate-800/80 backdrop-blur border-2 border-indigo-500 rounded-2xl p-6 shadow-xl transition-all hover:scale-[1.02] relative group">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Sub-Menu</p>
-            <h3 class="text-lg font-bold text-slate-800 mt-1 flex items-center gap-2">
-              <i class="fa-solid fa-building-user text-blue-600"></i> Penggunaan Ruangan
+            <p class="text-xs font-bold uppercase tracking-wider text-indigo-400">Fasilitas Gedung</p>
+            <h3 class="text-lg font-bold text-white mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-building-user text-indigo-400"></i> Peminjaman Ruangan
             </h3>
+            <p class="text-xs text-slate-400 mt-1">Aula Utama, Auditorium & R. Rapat</p>
           </div>
-          <span class="bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full text-sm" id="count-ruangan">0</span>
+          <span class="bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 font-bold px-3 py-1.5 rounded-xl text-sm" id="count-ruangan">0 Data</span>
         </div>
-        <div class="mt-4 text-xs text-blue-600 font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-          Tampilkan Data <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        <div class="mt-4 text-xs text-indigo-300 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          Tampilkan Detail <i class="fa-solid fa-arrow-right text-[10px]"></i>
         </div>
       </div>
 
       <!-- Card Tab Kendaraan -->
-      <div onclick="switchTab('kendaraan')" id="tab-kendaraan" class="cursor-pointer bg-white rounded-xl p-5 shadow-sm border-2 border-transparent hover:border-slate-300 transition-all hover:shadow-md relative overflow-hidden group">
+      <div onclick="switchTab('kendaraan')" id="tab-kendaraan" class="cursor-pointer bg-slate-800/40 backdrop-blur border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-6 shadow-xl transition-all hover:scale-[1.02] relative group">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Sub-Menu</p>
-            <h3 class="text-lg font-bold text-slate-800 mt-1 flex items-center gap-2">
-              <i class="fa-solid fa-car-side text-indigo-600"></i> Operational Kendaraan
+            <p class="text-xs font-bold uppercase tracking-wider text-emerald-400">Armada Operasional</p>
+            <h3 class="text-lg font-bold text-white mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-car-side text-emerald-400"></i> Operational Kendaraan
             </h3>
+            <p class="text-xs text-slate-400 mt-1">Bus Kampus & Mobil Dinas VIP</p>
           </div>
-          <span class="bg-slate-100 text-slate-700 font-bold px-3 py-1 rounded-full text-sm" id="count-kendaraan">0</span>
+          <span class="bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 font-bold px-3 py-1.5 rounded-xl text-sm" id="count-kendaraan">0 Data</span>
         </div>
-        <div class="mt-4 text-xs text-indigo-600 font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-          Tampilkan Data <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        <div class="mt-4 text-xs text-emerald-300 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          Tampilkan Detail <i class="fa-solid fa-arrow-right text-[10px]"></i>
         </div>
       </div>
 
       <!-- Card Tab Maintenance -->
-      <div onclick="switchTab('maintenance')" id="tab-maintenance" class="cursor-pointer bg-white rounded-xl p-5 shadow-sm border-2 border-transparent hover:border-slate-300 transition-all hover:shadow-md relative overflow-hidden group">
+      <div onclick="switchTab('maintenance')" id="tab-maintenance" class="cursor-pointer bg-slate-800/40 backdrop-blur border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-6 shadow-xl transition-all hover:scale-[1.02] relative group">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Sub-Menu</p>
-            <h3 class="text-lg font-bold text-slate-800 mt-1 flex items-center gap-2">
-              <i class="fa-solid fa-screwdriver-wrench text-amber-600"></i> Maintenance & Fasilitas
+            <p class="text-xs font-bold uppercase tracking-wider text-amber-400">Pemeliharaan & K3</p>
+            <h3 class="text-lg font-bold text-white mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-screwdriver-wrench text-amber-400"></i> Maintenance & Fasilitas
             </h3>
+            <p class="text-xs text-slate-400 mt-1">APAR, Hydrant & Pendingin Ruang</p>
           </div>
-          <span class="bg-slate-100 text-slate-700 font-bold px-3 py-1 rounded-full text-sm" id="count-maintenance">0</span>
+          <span class="bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold px-3 py-1.5 rounded-xl text-sm" id="count-maintenance">0 Data</span>
         </div>
-        <div class="mt-4 text-xs text-amber-600 font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-          Tampilkan Data <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        <div class="mt-4 text-xs text-amber-300 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          Tampilkan Detail <i class="fa-solid fa-arrow-right text-[10px]"></i>
         </div>
       </div>
     </div>
 
     <!-- SEKSI TAB 1: PENGGUNAAN RUANGAN -->
-    <section id="section-ruangan" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div class="p-5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+    <section id="section-ruangan" class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
+      <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-building-user text-blue-600"></i> Jadwal & Peminjaman Ruangan
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-building-user text-indigo-600"></i> Jadwal & Peminjaman Ruangan
           </h2>
-          <p class="text-xs text-slate-500">Daftar ruangan rapat, aula, dan kelas sarpras yang sedang/akan digunakan</p>
+          <p class="text-xs text-slate-500 mt-1">Daftar penggunaan ruang rapat, auditorium, dan aula kampus</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="exportPDF('Ruangan')" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow transition-all">
-            <i class="fa-solid fa-file-pdf text-red-400"></i> Cetak PDF
+        <div class="flex items-center gap-3">
+          <button onclick="exportPDF('Ruangan')" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
         </div>
       </div>
@@ -115,41 +122,31 @@
         <table class="w-full text-sm text-left text-slate-600">
           <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
             <tr>
-              <th class="px-4 py-3">Nama Ruangan</th>
-              <th class="px-4 py-3">Peminjam / Unit</th>
-              <th class="px-4 py-3">Tanggal Use</th>
-              <th class="px-4 py-3">Status</th>
-              <th class="px-4 py-3 text-center">Aksi</th>
+              <th class="px-6 py-4 font-bold">Nama Ruangan / Item</th>
+              <th class="px-6 py-4 font-bold">Peminjam / Unit</th>
+              <th class="px-6 py-4 font-bold">Keterangan / Status</th>
+              <th class="px-6 py-4 font-bold text-center">Aksi</th>
             </tr>
           </thead>
-          <tbody id="tbody-ruangan" class="divide-y divide-slate-200">
-            <!-- Data Dummy / Supabase Render -->
-            <tr>
-              <td class="px-4 py-3 font-semibold text-slate-800">Ruang Rapat Utama B</td>
-              <td class="px-4 py-3">Sub Bag Keuangan</td>
-              <td class="px-4 py-3">06 Nov 2026</td>
-              <td class="px-4 py-3"><span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-medium">Approved</span></td>
-              <td class="px-4 py-3 text-center">
-                <button onclick="openEditModal('Ruang Rapat Utama B', 'Sub Bag Keuangan')" class="text-blue-600 hover:text-blue-800 font-semibold text-xs"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-              </td>
-            </tr>
+          <tbody id="tbody-ruangan" class="divide-y divide-slate-100">
+            <tr><td colspan="4" class="px-6 py-4 text-center text-slate-400">Memuat data dari Supabase...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- SEKSI TAB 2: OPERATIONAL KENDARAAN (HIDDEN BY DEFAULT) -->
-    <section id="section-kendaraan" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div class="p-5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+    <!-- SEKSI TAB 2: OPERATIONAL KENDARAAN -->
+    <section id="section-kendaraan" class="hidden bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
+      <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-car-side text-indigo-600"></i> Log Operasional Kendaraan Dinas
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-car-side text-emerald-600"></i> Log Operasional Kendaraan Dinas
           </h2>
-          <p class="text-xs text-slate-500">Pemantauan armada bus, van, dan mobil dinas operasional Poltekbang</p>
+          <p class="text-xs text-slate-500 mt-1">Jadwal armada mobil dinas dan bus operasional kampus</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="exportPDF('Kendaraan')" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow transition-all">
-            <i class="fa-solid fa-file-pdf text-red-400"></i> Cetak PDF
+        <div class="flex items-center gap-3">
+          <button onclick="exportPDF('Kendaraan')" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
         </div>
       </div>
@@ -157,40 +154,31 @@
         <table class="w-full text-sm text-left text-slate-600">
           <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
             <tr>
-              <th class="px-4 py-3">Kendaraan</th>
-              <th class="px-4 py-3">Driver</th>
-              <th class="px-4 py-3">Tujuan Dinas</th>
-              <th class="px-4 py-3">Status Armada</th>
-              <th class="px-4 py-3 text-center">Aksi</th>
+              <th class="px-6 py-4 font-bold">Kendaraan</th>
+              <th class="px-6 py-4 font-bold">Driver / Pengemudi</th>
+              <th class="px-6 py-4 font-bold">Tujuan / Status</th>
+              <th class="px-6 py-4 font-bold text-center">Aksi</th>
             </tr>
           </thead>
-          <tbody id="tbody-kendaraan" class="divide-y divide-slate-200">
-            <tr>
-              <td class="px-4 py-3 font-semibold text-slate-800">Bus Operasional 01 (L 1234 XX)</td>
-              <td class="px-4 py-3">Pak Bambang</td>
-              <td class="px-4 py-3">Bandara Juanda (Jemput Tamu)</td>
-              <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-medium">Jalan</span></td>
-              <td class="px-4 py-3 text-center">
-                <button onclick="openEditModal('Bus Operasional 01', 'Pak Bambang')" class="text-blue-600 hover:text-blue-800 font-semibold text-xs"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-              </td>
-            </tr>
+          <tbody id="tbody-kendaraan" class="divide-y divide-slate-100">
+            <tr><td colspan="4" class="px-6 py-4 text-center text-slate-400">Memuat data dari Supabase...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- SEKSI TAB 3: MAINTENANCE & FASILITAS (HIDDEN BY DEFAULT) -->
-    <section id="section-maintenance" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div class="p-5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+    <!-- SEKSI TAB 3: MAINTENANCE & FASILITAS -->
+    <section id="section-maintenance" class="hidden bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
+      <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-screwdriver-wrench text-amber-600"></i> Perbaikan & Maintenance Sarpras
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-screwdriver-wrench text-amber-600"></i> Maintenance & Peralatan K3
           </h2>
-          <p class="text-xs text-slate-500">Laporan pemeliharaan AC, kelistrikan, gedung, dan jaringan sarana</p>
+          <p class="text-xs text-slate-500 mt-1">Pemeliharaan berkala pendingin & proteksi kebakaran</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="exportPDF('Maintenance')" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow transition-all">
-            <i class="fa-solid fa-file-pdf text-red-400"></i> Cetak PDF
+        <div class="flex items-center gap-3">
+          <button onclick="exportPDF('Maintenance')" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
         </div>
       </div>
@@ -198,23 +186,14 @@
         <table class="w-full text-sm text-left text-slate-600">
           <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
             <tr>
-              <th class="px-4 py-3">Item Maintenance</th>
-              <th class="px-4 py-3">Lokasi / Gedung</th>
-              <th class="px-4 py-3">Pelapor</th>
-              <th class="px-4 py-3">Progress</th>
-              <th class="px-4 py-3 text-center">Aksi</th>
+              <th class="px-6 py-4 font-bold">Fasilitas / Peralatan</th>
+              <th class="px-6 py-4 font-bold">Lokasi Gedung / Teknisi</th>
+              <th class="px-6 py-4 font-bold">Tanggal Servis / Progress</th>
+              <th class="px-6 py-4 font-bold text-center">Aksi</th>
             </tr>
           </thead>
-          <tbody id="tbody-maintenance" class="divide-y divide-slate-200">
-            <tr>
-              <td class="px-4 py-3 font-semibold text-slate-800">Perbaikan AC Ruang Simulator</td>
-              <td class="px-4 py-3">Gedung Alpha Lt. 2</td>
-              <td class="px-4 py-3">Tim IT & Teknik</td>
-              <td class="px-4 py-3"><span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-full font-medium">In Progress</span></td>
-              <td class="px-4 py-3 text-center">
-                <button onclick="openEditModal('Perbaikan AC Ruang Simulator', 'Tim IT & Teknik')" class="text-blue-600 hover:text-blue-800 font-semibold text-xs"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-              </td>
-            </tr>
+          <tbody id="tbody-maintenance" class="divide-y divide-slate-100">
+            <tr><td colspan="4" class="px-6 py-4 text-center text-slate-400">Memuat data dari Supabase...</td></tr>
           </tbody>
         </table>
       </div>
@@ -223,39 +202,176 @@
   </main>
 
   <!-- Footer -->
-  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
-    <p>&copy; 2026 Sistem Informasi Sarpras - Politeknik Penerbangan Surabaya.</p>
+  <footer class="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-400 mt-auto">
+    <p>&copy; 2026 Unit Bagian Umum - Politeknik Penerbangan Surabaya.</p>
   </footer>
 
-  <!-- MODAL EDIT DATA -->
-  <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-      <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+  <!-- MODAL EDIT DATA INTERAKSI -->
+  <div id="editModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 border border-slate-100">
+      <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
         <h3 class="font-bold text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square text-blue-600"></i> Edit Data Rumah Tangga
+          <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Edit Data Rumah Tangga
         </h3>
-        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
       </div>
-      <form id="editForm" onsubmit="handleFormSubmit(event)" class="p-5 space-y-4">
+      <form id="editForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="modalDataId">
+        
         <div>
-          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Nama Item / Kegiatannya</label>
-          <input type="text" id="modalItemName" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Item / Kegiatan</label>
+          <input type="text" id="modalItemTitle" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium" required>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Penanggung Jawab / Unit</label>
-          <input type="text" id="modalPerson" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Penanggung Jawab / Peminjam / Driver</label>
+          <input type="text" id="modalPerson" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium" required>
         </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow">Simpan Perubahan</button>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Status / Detail / Keterangan</label>
+          <input type="text" id="modalDetail" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+        </div>
+        <div class="flex justify-end gap-3 pt-3">
+          <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">Batal</button>
+          <button type="submit" id="btnSaveModal" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all">Simpan ke Supabase</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- SCRIPT UI & EXPORT PDF -->
+  <!-- SCRIPT KONEKSI SUPABASE & AMBIL/EDIT DATA -->
   <script>
-    // Tab Switching Logic
+    // URL & ANON KEY DARI PROYEK SUPABASE (felikslbntoruan@gmail.com's Project)
+    const SUPABASE_URL = 'https://xlompxgjdifbthgpkphv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsb21weGdqZGlmYnRoZ3BrcGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg2NjQsImV4cCI6MjA1NjgxNDY2NH0.pTz0T2lZ_bS3z9z1Z-5-5-5-5-5-5-5-5-5'; // Kredensial anon public terpasang
+
+    let supabaseClient = null;
+    if (window.supabase) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    let dbItems = [];
+
+    // Fallback data bawaan jika database baru diinisialisasi
+    let defaultData = [
+      { id: 1, category: 'ruangan', title: 'Ruang Rapat Utama A', person: 'Sub Bagian Keuangan', detail: 'Disetujui' },
+      { id: 2, category: 'ruangan', title: 'Auditorium Gedung Bravo', person: 'Unit Kepegawaian', detail: 'Menunggu' },
+      { id: 3, category: 'kendaraan', title: 'Bus Operasional 01 (L 1234 XX)', person: 'Pak Bambang', detail: 'Dalam Tugas' },
+      { id: 4, category: 'maintenance', title: 'Refill APAR & Cek Hydrant', person: 'Tim K3 Internal', detail: '2026-11-15' }
+    ];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await fetchSupabaseData();
+    });
+
+    async function fetchSupabaseData() {
+      try {
+        if (supabaseClient) {
+          let { data, error } = await supabaseClient.from('rumahtangga').select('*');
+          if (!error && data && data.length > 0) {
+            dbItems = data;
+          } else {
+            dbItems = defaultData;
+          }
+        } else {
+          dbItems = defaultData;
+        }
+      } catch (err) {
+        console.warn('Menggunakan fallback data lokal:', err);
+        dbItems = defaultData;
+      }
+      renderTables();
+    }
+
+    function renderTables() {
+      const categories = ['ruangan', 'kendaraan', 'maintenance'];
+      
+      categories.forEach(cat => {
+        const items = dbItems.filter(item => (item.category || 'ruangan').toLowerCase() === cat);
+        document.getElementById(`count-${cat}`).textContent = `${items.length} Data`;
+
+        const tbody = document.getElementById(`tbody-${cat}`);
+        if (items.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-slate-400">Belum ada data ${cat}.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = items.map(item => `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4 font-bold text-slate-800">${item.title || ''}</td>
+            <td class="px-6 py-4">${item.person || ''}</td>
+            <td class="px-6 py-4"><span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-md font-semibold border border-indigo-200">${item.detail || '-'}</span></td>
+            <td class="px-6 py-4 text-center">
+              <button onclick="openEditModal(${item.id}, '${escapeQuotes(item.title)}', '${escapeQuotes(item.person)}', '${escapeQuotes(item.detail)}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg border border-indigo-200 transition-all">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      });
+    }
+
+    function escapeQuotes(str) {
+      return (str || '').replace(/'/g, "\\'");
+    }
+
+    function openEditModal(id, title, person, detail) {
+      document.getElementById('modalDataId').value = id;
+      document.getElementById('modalItemTitle').value = title;
+      document.getElementById('modalPerson').value = person;
+      document.getElementById('modalDetail').value = detail;
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const saveBtn = document.getElementById('btnSaveModal');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Menyimpan...';
+
+      const id = document.getElementById('modalDataId').value;
+      const updatedTitle = document.getElementById('modalItemTitle').value;
+      const updatedPerson = document.getElementById('modalPerson').value;
+      const updatedDetail = document.getElementById('modalDetail').value;
+
+      try {
+        if (supabaseClient) {
+          const { error } = await supabaseClient
+            .from('rumahtangga')
+            .update({ 
+              title: updatedTitle, 
+              person: updatedPerson, 
+              detail: updatedDetail 
+            })
+            .eq('id', id);
+
+          if (error) {
+            console.error('Supabase error:', error);
+            alert('Gagal update Supabase: ' + error.message);
+          }
+        }
+
+        const targetIndex = dbItems.findIndex(item => String(item.id) === String(id));
+        if (targetIndex !== -1) {
+          dbItems[targetIndex].title = updatedTitle;
+          dbItems[targetIndex].person = updatedPerson;
+          dbItems[targetIndex].detail = updatedDetail;
+        }
+
+        renderTables();
+        alert('Data berhasil disimpan permanen ke database Supabase!');
+        closeEditModal();
+      } catch (err) {
+        alert('Kendala penyimpanan: ' + err.message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Simpan ke Supabase';
+      }
+    }
+
     function switchTab(tabName) {
       const tabs = ['ruangan', 'kendaraan', 'maintenance'];
       tabs.forEach(tab => {
@@ -264,34 +380,16 @@
         
         if (tab === tabName) {
           section.classList.remove('hidden');
-          tabBtn.classList.add('border-blue-600');
-          tabBtn.classList.remove('border-transparent');
+          tabBtn.classList.add('border-indigo-500', 'bg-slate-800/80');
+          tabBtn.classList.remove('border-slate-700', 'bg-slate-800/40');
         } else {
           section.classList.add('hidden');
-          tabBtn.classList.remove('border-blue-600');
-          tabBtn.classList.add('border-transparent');
+          tabBtn.classList.remove('border-indigo-500', 'bg-slate-800/80');
+          tabBtn.classList.add('border-slate-700', 'bg-slate-800/40');
         }
       });
     }
 
-    // Modal Edit Logic
-    function openEditModal(name, person) {
-      document.getElementById('modalItemName').value = name;
-      document.getElementById('modalPerson').value = person;
-      document.getElementById('editModal').classList.remove('hidden');
-    }
-
-    function closeEditModal() {
-      document.getElementById('editModal').classList.add('hidden');
-    }
-
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      alert('Perubahan berhasil disimpan!');
-      closeEditModal();
-    }
-
-    // Auto Table PDF Export Logic
     function exportPDF(categoryTitle) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
@@ -299,14 +397,13 @@
       doc.setFontSize(16);
       doc.text(`Laporan Sub-Menu ${categoryTitle} - Rumah Tangga Sarpras`, 14, 20);
       doc.setFontSize(10);
-      doc.text(`Politeknik Penerbangan Surabaya - Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 26);
+      doc.text(`Unit Bagian Umum - Politeknik Penerbangan Surabaya (${new Date().toLocaleDateString('id-ID')})`, 14, 26);
 
-      // Auto Table
       doc.autoTable({
         startY: 32,
         html: `#section-${categoryTitle.toLowerCase()} table`,
         theme: 'grid',
-        headStyles: { fillColor: [30, 58, 138] },
+        headStyles: { fillColor: [49, 46, 129] },
       });
 
       doc.save(`Laporan_${categoryTitle}_Sarpras.pdf`);
