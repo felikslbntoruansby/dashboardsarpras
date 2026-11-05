@@ -24,6 +24,9 @@
                 <p class="text-sm md:text-base text-gray-600">Politeknik Penerbangan Surabaya</p>
             </div>
             <div class="flex gap-2 flex-wrap w-full md:w-auto">
+                <a href="/rumah-tangga" class="flex-1 md:flex-none justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
+                    🏠 Rumah Tangga
+                </a>
                 <a href="/api/backup" target="_blank" class="flex-1 md:flex-none justify-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
                     💾 Backup JSON
                 </a>
@@ -55,7 +58,6 @@
                 </div>
             </div>
 
-            <!-- Wrapper Scroll Horizontal untuk HP -->
             <div class="overflow-x-auto">
                 <table class="min-w-full text-left border-collapse whitespace-nowrap">
                     <thead class="bg-blue-900 text-white text-xs md:text-sm uppercase">
@@ -86,9 +88,8 @@
         <!-- Tabel Histori Catatan Transaksi -->
         <div class="bg-white rounded-lg shadow p-4 md:p-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-                <h2 class="text-lg md:text-xl font-bold text-gray-800">📜 Histori Transaksi (Pengambilan & Penambahan)</h2>
+                <h2 class="text-lg md:text-xl font-bold text-gray-800">📋 Histori Transaksi (Pengambilan & Penambahan)</h2>
                 
-                <!-- Filter Bulan, Tahun & Tombol Cetak PDF -->
                 <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
                     <select id="filterMonth" onchange="loadLogs()" class="border p-2 rounded text-xs md:text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="1">Januari</option>
@@ -106,7 +107,6 @@
                     </select>
 
                     <select id="filterYear" onchange="loadLogs()" class="border p-2 rounded text-xs md:text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
-                        <!-- Diisi otomatis oleh JS -->
                     </select>
 
                     <button onclick="exportLogsToPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
@@ -136,7 +136,7 @@
         </div>
     </div>
 
-    <!-- Modal Master Barang (Tambah/Edit) -->
+    <!-- Modal Master Barang -->
     <div id="itemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h2 id="modalTitle" class="text-xl font-bold mb-4 text-blue-900">Tambah Master Barang</h2>
@@ -176,7 +176,7 @@
         </div>
     </div>
 
-    <!-- Modal Form Transaksi (Masuk / Ambil Barang) -->
+    <!-- Modal Form Transaksi -->
     <div id="transModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h2 id="transModalTitle" class="text-xl font-bold mb-4 text-blue-900">Transaksi Barang</h2>
@@ -313,7 +313,6 @@
             const monthText = monthSelect.options[monthSelect.selectedIndex].text;
             const yearText = document.getElementById('filterYear').value;
 
-            // 1. Header KOP Surat / Judul Dokumen
             doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
             doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
@@ -323,7 +322,6 @@
             doc.setLineWidth(0.5);
             doc.line(14, 25, 283, 25);
 
-            // 2. Menyiapkan Data Tabel untuk PDF (Termasuk Kolom Tanda Tangan)
             const tableRows = currentLogsData.map((log, index) => {
                 const date = new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
                 const typeText = log.type === 'IN' ? 'PENAMBAHAN' : 'PENGAMBILAN';
@@ -338,11 +336,10 @@
                     qtyText,
                     log.pic_name,
                     log.notes,
-                    "" // Kolom Tempat Tanda Tangan / Paraf Basah
+                    ""
                 ];
             });
 
-            // 3. Render Tabel Menggunakan jsPDF-AutoTable
             doc.autoTable({
                 head: [['No', 'Waktu & Tanggal', 'Kode & Nama Barang', 'Jenis', 'Jumlah', 'Petugas / Pengambil', 'Catatan / Keperluan', 'Paraf / TTD']],
                 body: tableRows,
@@ -362,7 +359,6 @@
                 }
             });
 
-            // 4. Menambahkan Blok Tanda Tangan Penanggung Jawab di Bagian Bawah
             const finalY = doc.lastAutoTable.finalY + 10;
             
             if (finalY > 155) {
@@ -378,7 +374,6 @@
             doc.text("Mengetahui,", 210, signY + 5);
             doc.text("Koordinator Kegiatan Bidang Umum", 210, signY + 10);
             
-            // Nama Pejabat (Tebal + Garis Bawah)
             doc.setFont("helvetica", "bold");
             const officialName = "Ajeng Herdinawati, S.Psi.";
             doc.text(officialName, 210, signY + 30);
@@ -386,11 +381,9 @@
             doc.setLineWidth(0.5);
             doc.line(210, signY + 31, 210 + textWidth, signY + 31);
 
-            // NIP Pejabat
             doc.setFont("helvetica", "normal");
             doc.text("NIP. 197909212006042001", 210, signY + 36);
 
-            // 5. Simpan File PDF
             doc.save(`Laporan_Histori_Sarpras_${monthText}_${yearText}.pdf`);
         }
 

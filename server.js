@@ -14,11 +14,11 @@ app.use(cors());
 app.use(express.json());
 
 // =============================================================
-// ROUTING FILE STATIS HTML & MIDDLEWARE EXPRESS
+// SERVE FILE STATIS HTML & ROUTING PERBAIKAN
 // =============================================================
-// Melayani semua file statis dari root directory
 app.use(express.static(path.join(__dirname)));
 
+// Route Halaman Utama Inventaris
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -27,6 +27,7 @@ app.get('/index.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Route Halaman Rumah Tangga
 app.get('/rumah-tangga', (req, res) => {
     res.sendFile(path.join(__dirname, 'rumahtangga.html'));
 });
@@ -36,10 +37,9 @@ app.get('/rumahtangga.html', (req, res) => {
 });
 
 // =============================================================
-// 1. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
+// 1. MODULE RUMAH TANGGA API
 // =============================================================
 
-// API Peminjaman Ruangan
 app.get('/api/peminjaman-ruangan', async (req, res) => {
     try {
         const { data, error } = await supabase
@@ -67,7 +67,6 @@ app.post('/api/peminjaman-ruangan', async (req, res) => {
     }
 });
 
-// API Peminjaman Kendaraan
 app.get('/api/peminjaman-kendaraan', async (req, res) => {
     try {
         const { data, error } = await supabase
@@ -95,7 +94,6 @@ app.post('/api/peminjaman-kendaraan', async (req, res) => {
     }
 });
 
-// API Maintenance AC & K3 (APAR / Hydrant)
 app.get('/api/maintenance', async (req, res) => {
     try {
         const { data, error } = await supabase
@@ -124,10 +122,9 @@ app.post('/api/maintenance', async (req, res) => {
 });
 
 // =============================================================
-// 2. MODULE INVENTORY STOK BARANG SARPRAS
+// 2. MODULE INVENTORY STOK BARANG API
 // =============================================================
 
-// Get seluruh data barang
 app.get('/api/inventory', async (req, res) => {
     try {
         const { data, error } = await supabase
@@ -153,7 +150,6 @@ app.get('/api/inventory', async (req, res) => {
     }
 });
 
-// Tambah Master Barang
 app.post('/api/inventory', async (req, res) => {
     try {
         const { code, name, initial, inQty, outQty } = req.body;
@@ -175,7 +171,6 @@ app.post('/api/inventory', async (req, res) => {
     }
 });
 
-// Edit Master Barang
 app.put('/api/inventory/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -200,7 +195,6 @@ app.put('/api/inventory/:id', async (req, res) => {
     }
 });
 
-// Hapus Master Barang
 app.delete('/api/inventory/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -212,7 +206,6 @@ app.delete('/api/inventory/:id', async (req, res) => {
     }
 });
 
-// API Transaksi Stok
 app.post('/api/inventory/transaction', async (req, res) => {
     try {
         const { inventoryId, type, quantity, picName, notes } = req.body;
@@ -270,7 +263,6 @@ app.post('/api/inventory/transaction', async (req, res) => {
     }
 });
 
-// Histori Log
 app.get('/api/logs', async (req, res) => {
     try {
         const { month, year } = req.query;
@@ -295,7 +287,6 @@ app.get('/api/logs', async (req, res) => {
     }
 });
 
-// Hapus Log
 app.delete('/api/logs/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -307,7 +298,6 @@ app.delete('/api/logs/:id', async (req, res) => {
     }
 });
 
-// Backup Data JSON
 app.get('/api/backup', async (req, res) => {
     try {
         const { data, error } = await supabase

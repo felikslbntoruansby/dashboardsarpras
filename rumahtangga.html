@@ -35,7 +35,7 @@
         </div>
       </div>
       
-      <!-- Navigasi Dua Arah: Diperbaiki Mengarah ke '/' -->
+      <!-- Navigasi Dua Arah -->
       <div class="flex items-center space-x-3">
         <a href="/" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
           <i class="fa-solid fa-boxes-stacked"></i>
@@ -240,8 +240,9 @@
 
   <!-- SCRIPT KONEKSI SUPABASE & AMBIL/EDIT DATA -->
   <script>
+    // URL & PUBLISHABLE KEY SUPABASE RESMI
     const SUPABASE_URL = 'https://xlompxgjdifbthgpkphv.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsb21weGdqZGlmYnRoZ3BrcGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg2NjQsImV4cCI6MjA1NjgxNDY2NH0.pTz0T2lZ_bS3z9z1Z-5-5-5-5-5-5-5-5-5';
+    const SUPABASE_ANON_KEY = 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
 
     let supabaseClient = null;
     if (window.supabase) {
