@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -14,23 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // =============================================================
-// 1. ROUTING HALAMAN UTAMA & RUMAH TANGGA
-// =============================================================
-
-app.get('/rumah-tangga', (req, res) => {
-    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
-});
-
-app.get('/rumahtangga.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
-});
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// =============================================================
-// 2. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
+// 1. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
 // =============================================================
 
 // API Peminjaman Ruangan
@@ -118,7 +101,7 @@ app.post('/api/maintenance', async (req, res) => {
 });
 
 // =============================================================
-// 3. MODULE INVENTORY STOK BARANG SARPRAS
+// 2. MODULE INVENTORY STOK BARANG SARPRAS
 // =============================================================
 
 // Get seluruh data barang
@@ -319,11 +302,6 @@ app.get('/api/backup', async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
-});
-
-// Fallback untuk semua rute yang tidak terdaftar
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 module.exports = app;
