@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Rumah Tangga & Sarpras</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- jsPDF & autoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header Sarpras & Penerbangan -->
+  <header class="bg-slate-900 text-white shadow-lg border-b-4 border-blue-600 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-blue-600 p-2.5 rounded-lg shadow-md flex items-center justify-center">
+          <i class="fa-solid fa-plane-departure text-white text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
+            DASHBOARD RUMAH TANGGA
+            <span class="text-xs font-semibold bg-blue-500/30 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-400/30">SARPRAS</span>
+          </h1>
+          <p class="text-xs text-slate-400">Unit Sub Bagian Keuangan & Umum - Politeknik Penerbangan Surabaya</p>
+        </div>
+      </div>
+      
+      <!-- Navigasi Dua Arah -->
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-blue-500/20 active:scale-95">
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span>Ke Inventaris Sarpras</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full space-y-6">
+
+    <!-- Ringkasan Stat & Tab Navigasi -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <!-- Card Tab Ruangan -->
+      <div onclick="switchTab('ruangan')" id="tab-ruangan" class="cursor-pointer bg-white rounded-xl p-5 shadow-sm border-2 border-blue-600 transition-all hover:shadow-md relative overflow-hidden group">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Sub-Menu</p>
+            <h3 class="text-lg font-bold text-slate-800 mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-building-user text-blue-600"></i> Penggunaan Ruangan
+            </h3>
+          </div>
+          <span class="bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full text-sm" id="count-ruangan">0</span>
+        </div>
+        <div class="mt-4 text-xs text-blue-600 font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          Tampilkan Data <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </div>
+      </div>
+
+      <!-- Card Tab Kendaraan -->
+      <div onclick="switchTab('kendaraan')" id="tab-kendaraan" class="cursor-pointer bg-white rounded-xl p-5 shadow-sm border-2 border-transparent hover:border-slate-300 transition-all hover:shadow-md relative overflow-hidden group">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Sub-Menu</p>
+            <h3 class="text-lg font-bold text-slate-800 mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-car-side text-indigo-600"></i> Operational Kendaraan
+            </h3>
+          </div>
+          <span class="bg-slate-100 text-slate-700 font-bold px-3 py-1 rounded-full text-sm" id="count-kendaraan">0</span>
+        </div>
+        <div class="mt-4 text-xs text-indigo-600 font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          Tampilkan Data <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </div>
+      </div>
+
+      <!-- Card Tab Maintenance -->
+      <div onclick="switchTab('maintenance')" id="tab-maintenance" class="cursor-pointer bg-white rounded-xl p-5 shadow-sm border-2 border-transparent hover:border-slate-300 transition-all hover:shadow-md relative overflow-hidden group">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Sub-Menu</p>
+            <h3 class="text-lg font-bold text-slate-800 mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-screwdriver-wrench text-amber-600"></i> Maintenance & Fasilitas
+            </h3>
+          </div>
+          <span class="bg-slate-100 text-slate-700 font-bold px-3 py-1 rounded-full text-sm" id="count-maintenance">0</span>
+        </div>
+        <div class="mt-4 text-xs text-amber-600 font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          Tampilkan Data <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEKSI TAB 1: PENGGUNAAN RUANGAN -->
+    <section id="section-ruangan" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-building-user text-blue-600"></i> Jadwal & Peminjaman Ruangan
+          </h2>
+          <p class="text-xs text-slate-500">Daftar ruangan rapat, aula, dan kelas sarpras yang sedang/akan digunakan</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportPDF('Ruangan')" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow transition-all">
+            <i class="fa-solid fa-file-pdf text-red-400"></i> Cetak PDF
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-slate-600">
+          <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3">Nama Ruangan</th>
+              <th class="px-4 py-3">Peminjam / Unit</th>
+              <th class="px-4 py-3">Tanggal Use</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-ruangan" class="divide-y divide-slate-200">
+            <!-- Data Dummy / Supabase Render -->
+            <tr>
+              <td class="px-4 py-3 font-semibold text-slate-800">Ruang Rapat Utama B</td>
+              <td class="px-4 py-3">Sub Bag Keuangan</td>
+              <td class="px-4 py-3">06 Nov 2026</td>
+              <td class="px-4 py-3"><span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-medium">Approved</span></td>
+              <td class="px-4 py-3 text-center">
+                <button onclick="openEditModal('Ruang Rapat Utama B', 'Sub Bag Keuangan')" class="text-blue-600 hover:text-blue-800 font-semibold text-xs"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SEKSI TAB 2: OPERATIONAL KENDARAAN (HIDDEN BY DEFAULT) -->
+    <section id="section-kendaraan" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-car-side text-indigo-600"></i> Log Operasional Kendaraan Dinas
+          </h2>
+          <p class="text-xs text-slate-500">Pemantauan armada bus, van, dan mobil dinas operasional Poltekbang</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportPDF('Kendaraan')" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow transition-all">
+            <i class="fa-solid fa-file-pdf text-red-400"></i> Cetak PDF
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-slate-600">
+          <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3">Kendaraan</th>
+              <th class="px-4 py-3">Driver</th>
+              <th class="px-4 py-3">Tujuan Dinas</th>
+              <th class="px-4 py-3">Status Armada</th>
+              <th class="px-4 py-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-kendaraan" class="divide-y divide-slate-200">
+            <tr>
+              <td class="px-4 py-3 font-semibold text-slate-800">Bus Operasional 01 (L 1234 XX)</td>
+              <td class="px-4 py-3">Pak Bambang</td>
+              <td class="px-4 py-3">Bandara Juanda (Jemput Tamu)</td>
+              <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-medium">Jalan</span></td>
+              <td class="px-4 py-3 text-center">
+                <button onclick="openEditModal('Bus Operasional 01', 'Pak Bambang')" class="text-blue-600 hover:text-blue-800 font-semibold text-xs"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SEKSI TAB 3: MAINTENANCE & FASILITAS (HIDDEN BY DEFAULT) -->
+    <section id="section-maintenance" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-screwdriver-wrench text-amber-600"></i> Perbaikan & Maintenance Sarpras
+          </h2>
+          <p class="text-xs text-slate-500">Laporan pemeliharaan AC, kelistrikan, gedung, dan jaringan sarana</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportPDF('Maintenance')" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow transition-all">
+            <i class="fa-solid fa-file-pdf text-red-400"></i> Cetak PDF
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-slate-600">
+          <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3">Item Maintenance</th>
+              <th class="px-4 py-3">Lokasi / Gedung</th>
+              <th class="px-4 py-3">Pelapor</th>
+              <th class="px-4 py-3">Progress</th>
+              <th class="px-4 py-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-maintenance" class="divide-y divide-slate-200">
+            <tr>
+              <td class="px-4 py-3 font-semibold text-slate-800">Perbaikan AC Ruang Simulator</td>
+              <td class="px-4 py-3">Gedung Alpha Lt. 2</td>
+              <td class="px-4 py-3">Tim IT & Teknik</td>
+              <td class="px-4 py-3"><span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-full font-medium">In Progress</span></td>
+              <td class="px-4 py-3 text-center">
+                <button onclick="openEditModal('Perbaikan AC Ruang Simulator', 'Tim IT & Teknik')" class="text-blue-600 hover:text-blue-800 font-semibold text-xs"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+    <p>&copy; 2026 Sistem Informasi Sarpras - Politeknik Penerbangan Surabaya.</p>
+  </footer>
+
+  <!-- MODAL EDIT DATA -->
+  <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-blue-600"></i> Edit Data Rumah Tangga
+        </h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="editForm" onsubmit="handleFormSubmit(event)" class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Nama Item / Kegiatannya</label>
+          <input type="text" id="modalItemName" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Penanggung Jawab / Unit</label>
+          <input type="text" id="modalPerson" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT UI & EXPORT PDF -->
+  <script>
+    // Tab Switching Logic
+    function switchTab(tabName) {
+      const tabs = ['ruangan', 'kendaraan', 'maintenance'];
+      tabs.forEach(tab => {
+        const section = document.getElementById(`section-${tab}`);
+        const tabBtn = document.getElementById(`tab-${tab}`);
+        
+        if (tab === tabName) {
+          section.classList.remove('hidden');
+          tabBtn.classList.add('border-blue-600');
+          tabBtn.classList.remove('border-transparent');
+        } else {
+          section.classList.add('hidden');
+          tabBtn.classList.remove('border-blue-600');
+          tabBtn.classList.add('border-transparent');
+        }
+      });
+    }
+
+    // Modal Edit Logic
+    function openEditModal(name, person) {
+      document.getElementById('modalItemName').value = name;
+      document.getElementById('modalPerson').value = person;
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      alert('Perubahan berhasil disimpan!');
+      closeEditModal();
+    }
+
+    // Auto Table PDF Export Logic
+    function exportPDF(categoryTitle) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text(`Laporan Sub-Menu ${categoryTitle} - Rumah Tangga Sarpras`, 14, 20);
+      doc.setFontSize(10);
+      doc.text(`Politeknik Penerbangan Surabaya - Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 26);
+
+      // Auto Table
+      doc.autoTable({
+        startY: 32,
+        html: `#section-${categoryTitle.toLowerCase()} table`,
+        theme: 'grid',
+        headStyles: { fillColor: [30, 58, 138] },
+      });
+
+      doc.save(`Laporan_${categoryTitle}_Sarpras.pdf`);
+    }
+  </script>
+</body>
+</html>
