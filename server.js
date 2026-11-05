@@ -12,17 +12,17 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.')); // Membuka static files dari root/public
+app.use(express.static(path.join(__dirname))); // Membuka static files langsung dari root directory
 
 // -------------------------------------------------------------
 // ROUTING HALAMAN HTML
 // -------------------------------------------------------------
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/rumah-tangga', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'rumahtangga.html'));
+    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
 });
 
 // -------------------------------------------------------------
@@ -318,9 +318,12 @@ app.post('/api/maintenance', async (req, res) => {
     }
 });
 
-// -------------------------------------------------------------
-// JALANKAN SERVER
-// -------------------------------------------------------------
-app.listen(PORT, () => {
-    console.log(`Server Node.js berjalan di http://localhost:${PORT}`);
-});
+// Export app untuk Vercel Serverless Function
+module.exports = app;
+
+// Jalankan server jika running secara lokal
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server Node.js berjalan di http://localhost:${PORT}`);
+    });
+}
