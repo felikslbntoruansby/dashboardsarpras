@@ -12,7 +12,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname))); // Membuka static files langsung dari root directory
+app.use(express.static(path.join(__dirname))); // Membuka static files dari root directory
 
 // -------------------------------------------------------------
 // ROUTING HALAMAN HTML
@@ -29,7 +29,7 @@ app.get('/rumah-tangga', (req, res) => {
 // MODULE 1: INVENTORY STOK BARANG SARPRAS (EXISTING)
 // -------------------------------------------------------------
 
-// 1. Get seluruh data barang (Maksimal 1000 baris)
+// 1. Get seluruh data barang
 app.get('/api/inventory', async (req, res) => {
     try {
         const { data, error } = await supabase
@@ -114,7 +114,7 @@ app.delete('/api/inventory/:id', async (req, res) => {
     }
 });
 
-// 5. API Transaksi (Restok / Ambil Barang + Log Catatan Petugas)
+// 5. API Transaksi Stok
 app.post('/api/inventory/transaction', async (req, res) => {
     try {
         const { inventoryId, type, quantity, picName, notes } = req.body;
@@ -172,11 +172,10 @@ app.post('/api/inventory/transaction', async (req, res) => {
     }
 });
 
-// 6. API Ambil Histori Log Transaksi
+// 6. Histori Log
 app.get('/api/logs', async (req, res) => {
     try {
         const { month, year } = req.query;
-        
         const now = new Date();
         const selectedMonth = month ? parseInt(month) : now.getMonth() + 1;
         const selectedYear = year ? parseInt(year) : now.getFullYear();
@@ -198,7 +197,7 @@ app.get('/api/logs', async (req, res) => {
     }
 });
 
-// 7. API Hapus Satu Catatan Log Transaksi
+// 7. Hapus Log
 app.delete('/api/logs/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -210,7 +209,7 @@ app.delete('/api/logs/:id', async (req, res) => {
     }
 });
 
-// 8. Backup Data (JSON format)
+// 8. Backup Data JSON
 app.get('/api/backup', async (req, res) => {
     try {
         const { data, error } = await supabase
@@ -253,7 +252,7 @@ app.post('/api/peminjaman-ruangan', async (req, res) => {
         const { nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status } = req.body;
         const { data, error } = await supabase
             .from('peminjaman_ruangan')
-            .insert([{ nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status }])
+            .insert([{ nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status: status || 'Diproses' }])
             .select();
         if (error) throw error;
         res.json({ message: "Peminjaman ruangan berhasil ditambahkan!", data });
@@ -281,7 +280,7 @@ app.post('/api/peminjaman-kendaraan', async (req, res) => {
         const { nama_driver, kendaraan, tgl_pinjam, tujuan, status } = req.body;
         const { data, error } = await supabase
             .from('peminjaman_kendaraan')
-            .insert([{ nama_driver, kendaraan, tgl_pinjam, tujuan, status }])
+            .insert([{ nama_driver, kendaraan, tgl_pinjam, tujuan, status: status || 'Diproses' }])
             .select();
         if (error) throw error;
         res.json({ message: "Peminjaman kendaraan berhasil ditambahkan!", data });
@@ -309,7 +308,7 @@ app.post('/api/maintenance', async (req, res) => {
         const { kategori, lokasi, tgl_service_terakhir, tgl_service_berikutnya, status } = req.body;
         const { data, error } = await supabase
             .from('maintenance_k3_ac')
-            .insert([{ kategori, lokasi, tgl_service_terakhir, tgl_service_berikutnya, status }])
+            .insert([{ kategori, lokasi, tgl_service_terakhir, tgl_service_berikutnya, status: status || 'Baik' }])
             .select();
         if (error) throw error;
         res.json({ message: "Data maintenance berhasil disimpan!", data });
@@ -318,12 +317,11 @@ app.post('/api/maintenance', async (req, res) => {
     }
 });
 
-// Export app untuk Vercel Serverless Function
+// Export untuk Serverless Vercel
 module.exports = app;
 
-// Jalankan server jika running secara lokal
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
-        console.log(`Server Node.js berjalan di http://localhost:${PORT}`);
+        console.log(`Server berjalan di http://localhost:${PORT}`);
     });
 }
