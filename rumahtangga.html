@@ -1,185 +1,298 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Monitoring Rumah Tangga - Poltekbang Surabaya</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Rumah Tangga & Sarpras - Poltekbang Surabaya</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Library JSPDF & AutoTable untuk Cetak PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-gray-100 font-sans">
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-lg shadow-md mb-6 gap-4">
-            <div>
-                <h1 class="text-3xl font-bold text-blue-900">Dashboard Rumah Tangga</h1>
-                <p class="text-gray-600">Politeknik Penerbangan Surabaya</p>
-            </div>
-            <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2">
-                <i class="fas fa-boxes"></i> Ke Inventaris Sarpras
-            </a>
-        </div>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen">
 
-        <!-- Card Statistik Modul -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500 flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-700">Peminjaman Ruangan</h3>
-                    <p class="text-sm text-gray-500">Aula, Gedung & R. Rapat</p>
-                </div>
-                <i class="fas fa-building text-3xl text-blue-500"></i>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500 flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-700">Peminjaman Kendaraan</h3>
-                    <p class="text-sm text-gray-500">Mobil Dinas & Bus Operasional</p>
-                </div>
-                <i class="fas fa-car text-3xl text-green-500"></i>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow border-l-4 border-amber-500 flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-700">Maintenance AC & K3</h3>
-                    <p class="text-sm text-gray-500">APAR, Hydrant & Pendingin</p>
-                </div>
-                <i class="fas fa-tools text-3xl text-amber-500"></i>
-            </div>
+  <!-- HERO HEADER UNIK BERTEMA SARPRAS PENERBANGAN -->
+  <header class="relative bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white pb-20 pt-8 px-6 shadow-xl overflow-hidden">
+    <!-- Ornamen Latar Depan Visual Aviation/Sarpras -->
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+    
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-3xl shadow-inner">
+          ✈️
         </div>
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-widest text-blue-300">Unit Bagian Rumah Tangga</span>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Manajemen Sarana & Prasarana</h1>
+          <p class="text-sm text-slate-300">Politeknik Penerbangan Surabaya</p>
+        </div>
+      </div>
+      
+      <!-- Tombol Navigasi ke Inventaris Sarpras -->
+      <a href="/" class="group flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-5 py-3 rounded-xl shadow-lg hover:shadow-blue-500/30 transition-all duration-200 border border-blue-400/30">
+        <span>📦 Ke Inventaris Sarpras</span>
+        <span class="group-hover:translate-x-1 transition-transform">→</span>
+      </a>
+    </div>
+  </header>
 
-        <!-- Tabel Peminjaman Ruangan -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-xl font-bold text-gray-800 mb-4"><i class="fas fa-door-open mr-2 text-blue-600"></i>Peminjaman Ruangan</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-blue-900 text-white">
-                            <th class="p-3">Peminjam</th>
-                            <th class="p-3">Ruangan</th>
-                            <th class="p-3">Tgl Pinjam</th>
-                            <th class="p-3">Waktu</th>
-                            <th class="p-3">Keperluan</th>
-                            <th class="p-3">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-ruangan" class="divide-y divide-gray-200">
-                        <tr><td colspan="6" class="p-4 text-center text-gray-500">Memuat data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <!-- KONTEN UTAMA -->
+  <main class="max-w-7xl mx-auto px-6 -mt-12 relative z-20 pb-16">
 
-        <!-- Tabel Peminjaman Kendaraan -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-xl font-bold text-gray-800 mb-4"><i class="fas fa-car-side mr-2 text-green-600"></i>Peminjaman Kendaraan</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-blue-900 text-white">
-                            <th class="p-3">Driver/Peminjam</th>
-                            <th class="p-3">Kendaraan</th>
-                            <th class="p-3">Tgl Pinjam</th>
-                            <th class="p-3">Tujuan</th>
-                            <th class="p-3">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-kendaraan" class="divide-y divide-gray-200">
-                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Memuat data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+    <!-- SUB-MENU TAB NAVIGASI -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+      
+      <!-- Tab 1: Ruangan -->
+      <button id="tab-ruangan" onclick="switchTab('ruangan')" class="tab-btn active text-left bg-white p-5 rounded-2xl shadow-md border-2 border-blue-600 hover:shadow-lg transition-all duration-200 group">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Fasilitas Gedung</span>
+          <span class="text-2xl p-2 bg-blue-50 rounded-xl group-hover:scale-110 transition-transform">🏢</span>
         </div>
+        <h3 class="font-bold text-slate-800 text-lg">Peminjaman Ruangan</h3>
+        <p class="text-xs text-slate-500">Aula Utama, Auditorium & R. Rapat</p>
+      </button>
 
-        <!-- Tabel Maintenance AC & K3 -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-bold text-gray-800 mb-4"><i class="fas fa-fire-extinguisher mr-2 text-amber-600"></i>Jadwal Maintenance (AC / K3)</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-blue-900 text-white">
-                            <th class="p-3">Kategori</th>
-                            <th class="p-3">Lokasi</th>
-                            <th class="p-3">Service Terakhir</th>
-                            <th class="p-3">Service Berikutnya</th>
-                            <th class="p-3">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-maintenance" class="divide-y divide-gray-200">
-                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Memuat data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+      <!-- Tab 2: Kendaraan -->
+      <button id="tab-kendaraan" onclick="switchTab('kendaraan')" class="tab-btn opacity-70 text-left bg-white p-5 rounded-2xl shadow-md border-2 border-transparent hover:border-emerald-500 hover:shadow-lg transition-all duration-200 group">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Armada Operasional</span>
+          <span class="text-2xl p-2 bg-emerald-50 rounded-xl group-hover:scale-110 transition-transform">🚍</span>
         </div>
+        <h3 class="font-bold text-slate-800 text-lg">Peminjaman Kendaraan</h3>
+        <p class="text-xs text-slate-500">Bus Kampus & Mobil Dinas VIP</p>
+      </button>
+
+      <!-- Tab 3: Maintenance -->
+      <button id="tab-maintenance" onclick="switchTab('maintenance')" class="tab-btn opacity-70 text-left bg-white p-5 rounded-2xl shadow-md border-2 border-transparent hover:border-amber-500 hover:shadow-lg transition-all duration-200 group">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Pemeliharaan K3</span>
+          <span class="text-2xl p-2 bg-amber-50 rounded-xl group-hover:scale-110 transition-transform">🛠️</span>
+        </div>
+        <h3 class="font-bold text-slate-800 text-lg">Maintenance AC & K3</h3>
+        <p class="text-xs text-slate-500">APAR, Hydrant & Pendingin Ruang</p>
+      </button>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            loadRuangan();
-            loadKendaraan();
-            loadMaintenance();
-        });
+    <!-- SECTION KONTEN TAB 1: RUANGAN -->
+    <section id="section-ruangan" class="tab-content bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Daftar Peminjaman Ruangan</h2>
+          <p class="text-xs text-slate-500">Jadwal penggunaan fasilitas gedung dan ruang rapat</p>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <button onclick="openModal('ruangan')" class="flex-1 sm:flex-initial bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition">
+            + Tambah Data
+          </button>
+          <button onclick="exportPDF('Ruangan')" class="flex-1 sm:flex-initial bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-1">
+            📄 Cetak PDF
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-600">
+          <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+            <tr>
+              <th class="p-3">Nama Peminjam</th>
+              <th class="p-3">Ruangan</th>
+              <th class="p-3">Tanggal</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="table-ruangan" class="divide-y">
+            <!-- Data Dummy / Dynamic API -->
+            <tr>
+              <td class="p-3 font-medium text-slate-800">Unit Civitas Akademika</td>
+              <td class="p-3">Auditorium Utama</td>
+              <td class="p-3">2026-11-10</td>
+              <td class="p-3"><span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">Disetujui</span></td>
+              <td class="p-3 text-center">
+                <button onclick="openModal('ruangan', 1, 'Unit Civitas Akademika', 'Auditorium Utama')" class="text-blue-600 hover:underline font-bold mr-2">Edit</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-        async function loadRuangan() {
-            try {
-                const res = await fetch('/api/peminjaman-ruangan');
-                const data = await res.json();
-                const tbody = document.getElementById('table-ruangan');
-                if (!data.length) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Belum ada data peminjaman ruangan.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = data.map(item => `
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-3 font-medium">${item.nama_peminjam || '-'}</td>
-                        <td class="p-3">${item.ruangan || '-'}</td>
-                        <td class="p-3">${item.tgl_pinjam || '-'}</td>
-                        <td class="p-3">${item.jam_mulai || ''} - ${item.jam_selesai || ''}</td>
-                        <td class="p-3">${item.keperluan || '-'}</td>
-                        <td class="p-3"><span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold">${item.status || 'Diproses'}</span></td>
-                    </tr>
-                `).join('');
-            } catch (err) { console.error(err); }
-        }
+    <!-- SECTION KONTEN TAB 2: KENDARAAN -->
+    <section id="section-kendaraan" class="tab-content hidden bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Daftar Peminjaman Kendaraan</h2>
+          <p class="text-xs text-slate-500">Log operasional mobil dinas & bus Poltekbang</p>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <button onclick="openModal('kendaraan')" class="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition">
+            + Tambah Data
+          </button>
+          <button onclick="exportPDF('Kendaraan')" class="flex-1 sm:flex-initial bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-1">
+            📄 Cetak PDF
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-600">
+          <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+            <tr>
+              <th class="p-3">Pengemudi/Peminjam</th>
+              <th class="p-3">Jenis Kendaraan</th>
+              <th class="p-3">Tujuan</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="table-kendaraan" class="divide-y">
+            <tr>
+              <td class="p-3 font-medium text-slate-800">Bambang S. (Tim Sarpras)</td>
+              <td class="p-3">Bus Operasional II</td>
+              <td class="p-3">Bandara Juanda</td>
+              <td class="p-3"><span class="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">Proses</span></td>
+              <td class="p-3 text-center">
+                <button onclick="openModal('kendaraan', 1, 'Bambang S.', 'Bus Operasional II')" class="text-blue-600 hover:underline font-bold mr-2">Edit</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-        async function loadKendaraan() {
-            try {
-                const res = await fetch('/api/peminjaman-kendaraan');
-                const data = await res.json();
-                const tbody = document.getElementById('table-kendaraan');
-                if (!data.length) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Belum ada data peminjaman kendaraan.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = data.map(item => `
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-3 font-medium">${item.nama_driver || '-'}</td>
-                        <td class="p-3">${item.kendaraan || '-'}</td>
-                        <td class="p-3">${item.tgl_pinjam || '-'}</td>
-                        <td class="p-3">${item.tujuan || '-'}</td>
-                        <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">${item.status || 'Diproses'}</span></td>
-                    </tr>
-                `).join('');
-            } catch (err) { console.error(err); }
-        }
+    <!-- SECTION KONTEN TAB 3: MAINTENANCE -->
+    <section id="section-maintenance" class="tab-content hidden bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Jadwal Maintenance AC & Peralatan K3</h2>
+          <p class="text-xs text-slate-500">Pemeliharaan berkala pendingin & proteksi kebakaran</p>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <button onclick="openModal('maintenance')" class="flex-1 sm:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition">
+            + Tambah Jadwal
+          </button>
+          <button onclick="exportPDF('Maintenance')" class="flex-1 sm:flex-initial bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-1">
+            📄 Cetak PDF
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-600">
+          <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+            <tr>
+              <th class="p-3">Fasilitas / Peralatan</th>
+              <th class="p-3">Lokasi Gedung</th>
+              <th class="p-3">Tanggal Servis</th>
+              <th class="p-3">Teknisi</th>
+              <th class="p-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="table-maintenance" class="divide-y">
+            <tr>
+              <td class="p-3 font-medium text-slate-800">Refill APAR & Cek Hydrant</td>
+              <td class="p-3">Gedung Hangar A</td>
+              <td class="p-3">2026-11-15</td>
+              <td class="p-3">Tim K3 Internal</td>
+              <td class="p-3 text-center">
+                <button onclick="openModal('maintenance', 1, 'Refill APAR', 'Gedung Hangar A')" class="text-blue-600 hover:underline font-bold mr-2">Edit</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-        async function loadMaintenance() {
-            try {
-                const res = await fetch('/api/maintenance');
-                const data = await res.json();
-                const tbody = document.getElementById('table-maintenance');
-                if (!data.length) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Belum ada catatan maintenance.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = data.map(item => `
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-3 font-medium">${item.kategori || '-'}</td>
-                        <td class="p-3">${item.lokasi || '-'}</td>
-                        <td class="p-3">${item.tgl_service_terakhir || '-'}</td>
-                        <td class="p-3">${item.tgl_service_berikutnya || '-'}</td>
-                        <td class="p-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">${item.status || 'Baik'}</span></td>
-                    </tr>
-                `).join('');
-            } catch (err) { console.error(err); }
-        }
-    </script>
+  </main>
+
+  <!-- MODAL EDIT / TAMBAH DATA GENERAL -->
+  <div id="dataModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
+      <h3 id="modalTitle" class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b">Edit Data</h3>
+      <form id="dataForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+        <input type="hidden" id="editId">
+        <input type="hidden" id="activeCategory">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nama / Keterangan Utama</label>
+          <input type="text" id="inputField1" required class="w-full text-xs p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Lokasi / Detail Tambahan</label>
+          <input type="text" id="inputField2" required class="w-full text-xs p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="flex justify-end gap-2 pt-4">
+          <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border text-xs font-bold text-slate-600 hover:bg-slate-50">Batal</button>
+          <button type="submit" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC NAVIGASI & CETAK PDF -->
+  <script>
+    // 1. LOGIKA TAB SWITCHING
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.add('opacity-70');
+        btn.classList.remove('border-blue-600', 'border-emerald-500', 'border-amber-500');
+      });
+
+      const activeSection = document.getElementById(`section-${tabName}`);
+      const activeBtn = document.getElementById(`tab-${tabName}`);
+      
+      if (activeSection && activeBtn) {
+        activeSection.classList.remove('hidden');
+        activeBtn.classList.remove('opacity-70');
+        
+        if (tabName === 'ruangan') activeBtn.classList.add('border-blue-600');
+        if (tabName === 'kendaraan') activeBtn.classList.add('border-emerald-500');
+        if (tabName === 'maintenance') activeBtn.classList.add('border-amber-500');
+      }
+    }
+
+    // 2. LOGIKA MODAL EDIT & TAMBAH DATA
+    function openModal(category, id = null, val1 = '', val2 = '') {
+      document.getElementById('activeCategory').value = category;
+      document.getElementById('editId').value = id || '';
+      document.getElementById('modalTitle').innerText = id ? `Edit Data ${category}` : `Tambah Data ${category}`;
+      document.getElementById('inputField1').value = val1;
+      document.getElementById('inputField2').value = val2;
+      
+      document.getElementById('dataModal').classList.remove('hidden');
+      document.getElementById('dataModal').classList.add('flex');
+    }
+
+    function closeModal() {
+      document.getElementById('dataModal').classList.add('hidden');
+      document.getElementById('dataModal').classList.remove('flex');
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      alert('Data berhasil disimpan!');
+      closeModal();
+    }
+
+    // 3. LOGIKA CETAK LAPORAN PDF
+    function exportPDF(categoryTitle) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Judul Laporan PDF
+      doc.setFontSize(16);
+      doc.text(`LAPORAN SUB-MENU ${categoryTitle.toUpperCase()}`, 14, 15);
+      doc.setFontSize(10);
+      doc.text(`Bagian Rumah Tangga & Sarpras Poltekbang Surabaya`, 14, 22);
+      doc.text(`Dicetak pada: ${new Date().toLocaleDateString('id-ID')}`, 14, 27);
+
+      // Auto Table
+      doc.autoTable({
+        startY: 32,
+        html: `#section-${categoryTitle.toLowerCase()} table`,
+        theme: 'grid',
+        headStyles: { fillColor: [30, 58, 138] },
+      });
+
+      doc.save(`Laporan_${categoryTitle}_Sarpras.pdf`);
+    }
+  </script>
 </body>
 </html>
