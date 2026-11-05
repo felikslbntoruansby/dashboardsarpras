@@ -3,6 +3,8 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/server.js" },
     { "source": "/rumah-tangga", "destination": "/rumahtangga.html" },
+    { "source": "/rumahtangga.html", "destination": "/rumahtangga.html" },
+    { "source": "/index.html", "destination": "/index.html" },
     { "source": "/", "destination": "/index.html" }
   ]
 }

@@ -35,9 +35,9 @@
         </div>
       </div>
       
-      <!-- Navigasi Dua Arah -->
+      <!-- Navigasi Dua Arah: Diperbaiki Mengarah ke '/' -->
       <div class="flex items-center space-x-3">
-        <a href="index.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
+        <a href="/" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
           <i class="fa-solid fa-boxes-stacked"></i>
           <span>Ke Inventaris Sarpras &rarr;</span>
         </a>
@@ -240,9 +240,8 @@
 
   <!-- SCRIPT KONEKSI SUPABASE & AMBIL/EDIT DATA -->
   <script>
-    // URL & ANON KEY DARI PROYEK SUPABASE (felikslbntoruan@gmail.com's Project)
     const SUPABASE_URL = 'https://xlompxgjdifbthgpkphv.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsb21weGdqZGlmYnRoZ3BrcGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg2NjQsImV4cCI6MjA1NjgxNDY2NH0.pTz0T2lZ_bS3z9z1Z-5-5-5-5-5-5-5-5-5'; // Kredensial anon public terpasang
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsb21weGdqZGlmYnRoZ3BrcGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg2NjQsImV4cCI6MjA1NjgxNDY2NH0.pTz0T2lZ_bS3z9z1Z-5-5-5-5-5-5-5-5-5';
 
     let supabaseClient = null;
     if (window.supabase) {
@@ -251,7 +250,6 @@
 
     let dbItems = [];
 
-    // Fallback data bawaan jika database baru diinisialisasi
     let defaultData = [
       { id: 1, category: 'ruangan', title: 'Ruang Rapat Utama A', person: 'Sub Bagian Keuangan', detail: 'Disetujui' },
       { id: 2, category: 'ruangan', title: 'Auditorium Gedung Bravo', person: 'Unit Kepegawaian', detail: 'Menunggu' },
