@@ -20,6 +20,10 @@ app.get('/rumah-tangga', (req, res) => {
     res.sendFile(path.join(__dirname, 'rumahtangga.html'));
 });
 
+app.get('/rumahtangga.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -316,6 +320,15 @@ app.get('/api/backup', async (req, res) => {
         res.send(JSON.stringify(data, null, 4));
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+// Catch-all route untuk menangani SPA / fallback static files
+app.get('*', (req, res) => {
+    if (req.path === '/rumah-tangga') {
+        res.sendFile(path.join(__dirname, 'rumahtangga.html'));
+    } else {
+        res.sendFile(path.join(__dirname, 'index.html'));
     }
 });
 
