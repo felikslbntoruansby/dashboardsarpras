@@ -14,18 +14,25 @@ app.use(cors());
 app.use(express.json());
 
 // =============================================================
-// ROUTING FILE STATIS HTML (DILAYANI VIA EXPRESS SERVERLESS)
+// ROUTING FILE STATIS HTML & MIDDLEWARE EXPRESS
 // =============================================================
+// Melayani semua file statis dari root directory
+app.use(express.static(path.join(__dirname)));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/index.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 app.get('/rumah-tangga', (req, res) => {
     res.sendFile(path.join(__dirname, 'rumahtangga.html'));
 });
 
 app.get('/rumahtangga.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'rumahtangga.html'));
-});
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // =============================================================
