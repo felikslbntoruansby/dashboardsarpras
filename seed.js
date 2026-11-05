@@ -3,7 +3,9 @@ const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-// Data 150 barang inventaris Sarpras Poltekbang
+// -------------------------------------------------------------
+// DATA 1: 150 BARANG INVENTARIS SARPRAS (EXISTING)
+// -------------------------------------------------------------
 const items = [
     {"code": "A001", "name": "Otomatis Closet", "initial": 15, "inQty": 0, "outQty": 0},
     {"code": "A002", "name": "Selang Fleksibel 40cm", "initial": 1, "inQty": 0, "outQty": 1},
@@ -157,7 +159,13 @@ const items = [
     {"code": "A150", "name": "Mesin Rumput Potong Gendong", "initial": 2, "inQty": 0, "outQty": 0}
 ];
 
+// -------------------------------------------------------------
+// FUNGSI UTAMA SEEDING
+// -------------------------------------------------------------
 async function seedData() {
+    console.log("🚀 Memulai pengisian data awal Supabase...");
+
+    // 1. Seed Inventory Stock Barang
     const formattedItems = items.map(item => ({
         code: item.code,
         name: item.name,
@@ -166,18 +174,36 @@ async function seedData() {
         out_qty: item.outQty
     }));
 
-    // Kosongkan tabel dulu jika ingin menimpa data lama agar tidak duplicate key error
     await supabase.from('inventory').delete().neq('id', 0);
+    const { error: errInventory } = await supabase.from('inventory').insert(formattedItems);
+    if (errInventory) console.error("❌ Gagal memasukkan 150 inventory:", errInventory.message);
+    else console.log("✅ Berhasil memasukkan 150 data barang inventaris!");
 
-    const { data, error } = await supabase
-        .from('inventory')
-        .insert(formattedItems);
+    // 2. Seed Data Peminjaman Ruangan
+    const { error: errRuangan } = await supabase.from('peminjaman_ruangan').insert([
+        { nama_peminjam: 'Budi Santoso', ruangan: 'Aula Utama', tgl_pinjam: '2026-03-25', jam_mulai: '08:00', jam_selesai: '12:00', keperluan: 'Rapat Koordinasi Sarpras', status: 'Diproses' },
+        { nama_peminjam: 'Dr. Ahmad', ruangan: 'Ruang Rapat Gedung A', tgl_pinjam: '2026-03-26', jam_mulai: '13:00', jam_selesai: '15:00', keperluan: 'Seminar Akademik', status: 'Disetujui' }
+    ]);
+    if (errRuangan) console.error("❌ Error Ruangan:", errRuangan.message);
+    else console.log("✅ Data Peminjaman Ruangan berhasil ditambahkan!");
 
-    if (error) {
-        console.error("Gagal memasukkan data:", error.message);
-    } else {
-        console.log("Berjaya memasukkan 150 data awal ke Supabase!");
-    }
+    // 3. Seed Data Peminjaman Kendaraan
+    const { error: errKendaraan } = await supabase.from('peminjaman_kendaraan').insert([
+        { nama_driver: 'Siti Aminah', kendaraan: 'Bus Operasional 01', tgl_pinjam: '2026-03-26', tujuan: 'Kunjungan Lapangan Juanda', status: 'Diproses' },
+        { nama_driver: 'Eko Prasetyo', kendaraan: 'Mobil Dinas Innova', tgl_pinjam: '2026-03-27', tujuan: 'Dinas Luar Kota', status: 'Disetujui' }
+    ]);
+    if (errKendaraan) console.error("❌ Error Kendaraan:", errKendaraan.message);
+    else console.log("✅ Data Peminjaman Kendaraan berhasil ditambahkan!");
+
+    // 4. Seed Data Maintenance AC & K3
+    const { error: errMaint } = await supabase.from('maintenance_k3_ac').insert([
+        { kategori: 'AC Split', lokasi: 'Gedung Rektorat Lt. 2', tgl_service_terakhir: '2026-01-10', tgl_service_berikutnya: '2026-04-10', status: 'Baik' },
+        { kategori: 'APAR Powder 6kg', lokasi: 'Koridor Hanggar A', tgl_service_terakhir: '2025-11-05', tgl_service_berikutnya: '2026-11-05', status: 'Baik' }
+    ]);
+    if (errMaint) console.error("❌ Error Maintenance:", errMaint.message);
+    else console.log("✅ Data Maintenance berhasil ditambahkan!");
+
+    console.log("🎉 Seeding seluruh data selesai!");
 }
 
 seedData();
