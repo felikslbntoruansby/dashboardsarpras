@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -13,27 +12,9 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 app.use(cors());
 app.use(express.json());
 
-// Serve static assets
-app.use(express.static(path.join(__dirname)));
-
-// -------------------------------------------------------------
-// 1. ROUTING HALAMAN HTML
-// -------------------------------------------------------------
-app.get('/rumah-tangga', (req, res) => {
-    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
-});
-
-app.get('/rumahtangga.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
-});
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// -------------------------------------------------------------
-// 2. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
-// -------------------------------------------------------------
+// =============================================================
+// 1. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
+// =============================================================
 
 // API Peminjaman Ruangan
 app.get('/api/peminjaman-ruangan', async (req, res) => {
@@ -119,9 +100,9 @@ app.post('/api/maintenance', async (req, res) => {
     }
 });
 
-// -------------------------------------------------------------
-// 3. MODULE INVENTORY STOK BARANG SARPRAS (EXISTING)
-// -------------------------------------------------------------
+// =============================================================
+// 2. MODULE INVENTORY STOK BARANG SARPRAS
+// =============================================================
 
 // Get seluruh data barang
 app.get('/api/inventory', async (req, res) => {
@@ -323,15 +304,8 @@ app.get('/api/backup', async (req, res) => {
     }
 });
 
-// Fallback jika rute tidak ditemukan
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 module.exports = app;
 
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`Server berjalan di http://localhost:${PORT}`);
-    });
-}
