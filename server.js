@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -12,8 +13,26 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 app.use(cors());
 app.use(express.json());
 
+// Serve static assets
+app.use(express.static(path.join(__dirname)));
+
 // -------------------------------------------------------------
-// 1. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
+// 1. ROUTING HALAMAN HTML
+// -------------------------------------------------------------
+app.get('/rumah-tangga', (req, res) => {
+    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
+});
+
+app.get('/rumahtangga.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'rumahtangga.html'));
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// -------------------------------------------------------------
+// 2. MODULE RUMAH TANGGA (PEMINJAMAN RUANGAN, KENDARAAN, AC & K3)
 // -------------------------------------------------------------
 
 // API Peminjaman Ruangan
@@ -101,7 +120,7 @@ app.post('/api/maintenance', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 2. MODULE INVENTORY STOK BARANG SARPRAS (EXISTING)
+// 3. MODULE INVENTORY STOK BARANG SARPRAS (EXISTING)
 // -------------------------------------------------------------
 
 // Get seluruh data barang
@@ -304,7 +323,11 @@ app.get('/api/backup', async (req, res) => {
     }
 });
 
-// Export untuk Serverless Vercel
+// Fallback jika rute tidak ditemukan
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 module.exports = app;
 
 if (process.env.NODE_ENV !== 'production') {

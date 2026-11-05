@@ -1,17 +1,15 @@
 {
   "version": 2,
-  "rewrites": [
+  "builds": [
     {
-      "source": "/rumah-tangga",
-      "destination": "/rumahtangga.html"
-    },
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
     {
-      "source": "/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/server.js"
+      "src": "/(.*)",
+      "dest": "/server.js"
     }
   ]
 }
