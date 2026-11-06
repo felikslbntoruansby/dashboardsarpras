@@ -7,9 +7,11 @@
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/server.js"
-    }
+    { "src": "/api/(.*)", "dest": "server.js" },
+    { "src": "/rumah-tangga", "dest": "rumahtangga.html" },
+    { "src": "/rumahtangga.html", "dest": "rumahtangga.html" },
+    { "src": "/login", "dest": "login.html" },
+    { "src": "/login.html", "dest": "login.html" },
+    { "src": "/(.*)", "dest": "index.html" }
   ]
 }
