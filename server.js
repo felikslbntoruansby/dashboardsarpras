@@ -8,10 +8,10 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Nomor WhatsApp Tujuan & Bot Pengirim Resmi Fonnte (082333206815)
+// Nomor WhatsApp Tujuan (Fonnte API)
 const TARGET_WA_PHONE = '082333206815';
 
-// Inisialisasi Supabase Backend
+// Sambungan ke Supabase Backend
 const supabaseUrl = process.env.SUPABASE_URL || 'https://xlompxgjdifbthgpkphv.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY || 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -19,14 +19,11 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 app.use(cors());
 app.use(express.json());
 
-// Helper Otomatisasi Notifikasi WhatsApp (Fonnte API)
+// Helper Notifikasi WhatsApp
 async function sendWhatsAppAlert(targetPhone, message) {
     try {
         const token = process.env.FONNTE_TOKEN;
-        if (!token) {
-            console.warn('FONNTE_TOKEN belum dikonfigurasi di Environment Variables');
-            return;
-        }
+        if (!token) return;
         await axios.post('https://api.fonnte.com/send', {
             target: targetPhone,
             message: message,
@@ -39,18 +36,20 @@ async function sendWhatsAppAlert(targetPhone, message) {
     }
 }
 
-// Serve Static Files untuk Lokal (Development)
+// Serve Static Assets & Direct File Routes
 app.use(express.static(path.join(__dirname)));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
+app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
+app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 
 // =============================================================
-// 1. MODULE RUMAH TANGGA API (WITH WA NOTIFICATION TO 082333206815)
+// 1. MODULE RUMAH TANGGA API (WA NOTIFICATION TO 082333206815)
 // =============================================================
 
-// Permohonan Ruangan
 app.post('/api/peminjaman-ruangan', async (req, res) => {
     try {
         const { nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status } = req.body;
@@ -69,7 +68,6 @@ app.post('/api/peminjaman-ruangan', async (req, res) => {
     }
 });
 
-// Permohonan Kendaraan Operasional
 app.post('/api/peminjaman-kendaraan', async (req, res) => {
     try {
         const { nama_driver, kendaraan, tgl_pinjam, tujuan, status } = req.body;
@@ -88,7 +86,6 @@ app.post('/api/peminjaman-kendaraan', async (req, res) => {
     }
 });
 
-// Backup Data JSON
 app.get('/api/backup', async (req, res) => {
     try {
         const { data: inv } = await supabase.from('inventory').select('*');
@@ -223,6 +220,9 @@ app.delete('/api/logs/:id', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+// Fallback jika rute tidak ditemukan
+app.use((req, res) => res.status(404).sendFile(path.join(__dirname, 'index.html')));
 
 module.exports = app;
 
