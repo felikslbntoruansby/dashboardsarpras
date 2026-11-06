@@ -15,22 +15,15 @@
     <!-- jsPDF & jsPDF-AutoTable CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    
-    <!-- PAKSA INITIALIZE TOKEN & ROLE OTOMATIS -->
-    <script>
-        localStorage.setItem('admin_token', 'session_active_token');
-        localStorage.setItem('admin_role', 'superadmin');
-    </script>
 </head>
 <body class="bg-gray-100 p-4 md:p-8 font-sans text-gray-800">
 
     <div class="max-w-6xl mx-auto space-y-6 md:space-y-8">
-        <!-- Header & Tombol Aksi -->
+        <!-- Header & Tombol Aksi (Logout & Badge Role Dihapus) -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-blue-900 flex items-center gap-2">
                     Dashboard Monitoring Sarpras
-                    <span id="userRoleBadge" class="text-xs px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 font-bold uppercase border border-indigo-200">ROLE: SUPERADMIN</span>
                 </h1>
                 <p class="text-sm md:text-base text-gray-600">Politeknik Penerbangan Surabaya</p>
             </div>
@@ -41,17 +34,14 @@
                 <button onclick="exportExecutiveSummaryPDF()" class="flex-1 md:flex-none justify-center bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
                     📄 Laporan Eksekutif PDF
                 </button>
-                <a href="/api/backup" target="_blank" class="role-superadmin flex-1 md:flex-none justify-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
+                <a href="/api/backup" target="_blank" class="flex-1 md:flex-none justify-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
                     💾 Backup JSON
                 </a>
                 <button onclick="exportToExcel()" class="flex-1 md:flex-none justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
                     📊 Excel
                 </button>
-                <button onclick="openModal()" class="role-superadmin w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm">
+                <button onclick="openModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm">
                     + Master Barang
-                </button>
-                <button onclick="handleLogout()" class="flex-1 md:flex-none justify-center bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
                 </button>
             </div>
         </div>
@@ -104,8 +94,8 @@
                             <th class="py-3 px-4 text-center">Masuk</th>
                             <th class="py-3 px-4 text-center">Keluar</th>
                             <th class="py-3 px-4 text-center">Stok Akhir</th>
-                            <th class="py-3 px-4 text-center role-write">Kelola Stok</th>
-                            <th class="py-3 px-4 text-center role-superadmin">Aksi Master</th>
+                            <th class="py-3 px-4 text-center">Kelola Stok</th>
+                            <th class="py-3 px-4 text-center">Aksi Master</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="text-gray-700 text-xs md:text-sm">
@@ -161,7 +151,7 @@
                             <th class="py-2 px-3 text-center">Jumlah</th>
                             <th class="py-2 px-3">Petugas / Pengambil</th>
                             <th class="py-2 px-3">Catatan / Keperluan</th>
-                            <th class="py-2 px-3 text-center role-superadmin">Aksi</th>
+                            <th class="py-2 px-3 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="logTableBody" class="divide-y divide-gray-200">
@@ -253,35 +243,10 @@
         let stockChartInstance = null;
         let fastMovingChartInstance = null;
 
-        const currentRole = 'superadmin';
-
         document.addEventListener("DOMContentLoaded", function() {
             initLogFilters();
-            applyRolePermissions();
             loadInventory();
         });
-
-        function applyRolePermissions() {
-            const badge = document.getElementById('userRoleBadge');
-            if (badge) badge.innerText = `ROLE: ${currentRole.toUpperCase()}`;
-
-            if (currentRole === 'viewer') {
-                document.querySelectorAll('.role-superadmin, .role-write').forEach(el => el.classList.add('hidden'));
-            } else if (currentRole === 'operator') {
-                document.querySelectorAll('.role-superadmin').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('.role-write').forEach(el => el.classList.remove('hidden'));
-            } else {
-                document.querySelectorAll('.role-superadmin, .role-write').forEach(el => el.classList.remove('hidden'));
-            }
-        }
-
-        function handleLogout() {
-            if (confirm("Apakah Anda yakin ingin keluar?")) {
-                localStorage.removeItem('admin_token');
-                localStorage.removeItem('admin_role');
-                window.location.href = '/login.html';
-            }
-        }
 
         function initLogFilters() {
             const now = new Date();
@@ -385,13 +350,12 @@
                                 <td class="py-2 px-3 text-center font-bold ${isIN ? 'text-green-600' : 'text-red-600'}">${isIN ? '+' : '-'}${log.quantity}</td>
                                 <td class="py-2 px-3 font-medium text-blue-900">${log.pic_name || '-'}</td>
                                 <td class="py-2 px-3 text-gray-600 text-xs">${log.notes || '-'}</td>
-                                <td class="py-2 px-3 text-center role-superadmin">
+                                <td class="py-2 px-3 text-center">
                                     <button onclick="deleteLog(${log.id})" class="text-red-500 hover:text-red-700 hover:underline text-xs font-semibold">Hapus</button>
                                 </td>
                             </tr>
                         `;
                     }).join('');
-                    applyRolePermissions();
                 })
                 .catch(err => console.error("Gagal memuat log:", err));
         }
@@ -403,6 +367,38 @@
                     .then(() => loadLogs())
                     .catch(err => alert("Gagal menghapus log: " + err.message));
             }
+        }
+
+        function exportLogsToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text("LAPORAN HISTORI TRANSAKSI INVENTARIS BARANG", 14, 22);
+            doc.line(14, 25, 283, 25);
+
+            const tableRows = currentLogsData.map((log, index) => {
+                const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                const itemCode = log.inventory ? log.inventory.code : '-';
+                const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
+                return [
+                    index + 1, date, `${itemCode} - ${itemName}`, log.type === 'IN' ? 'PENAMBAHAN' : 'PENGAMBILAN', log.quantity, log.pic_name || '-', log.notes || '-'
+                ];
+            });
+
+            doc.autoTable({
+                head: [['No', 'Waktu & Tanggal', 'Barang', 'Jenis Transaksi', 'Jumlah', 'Petugas/Pengambil', 'Catatan']],
+                body: tableRows,
+                startY: 28,
+                theme: 'grid',
+                headStyles: { fillColor: [30, 58, 138], halign: 'center' }
+            });
+
+            doc.save(`Laporan_Histori_Transaksi_${new Date().toISOString().split('T')[0]}.pdf`);
         }
 
         function exportExecutiveSummaryPDF() {
@@ -488,11 +484,11 @@
                         <td class="py-3 px-4 text-center text-green-600 font-medium">+${item.inQty || 0}</td>
                         <td class="py-3 px-4 text-center text-red-600 font-medium">-${item.outQty || 0}</td>
                         <td class="py-3 px-4 text-center font-bold ${textClass}">${finalStock}</td>
-                        <td class="py-3 px-4 text-center space-x-1 role-write">
+                        <td class="py-3 px-4 text-center space-x-1">
                             <button onclick="openTransModal(${item.id}, '${item.name}', 'IN')" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded font-bold">+ Restok</button>
                             <button onclick="openTransModal(${item.id}, '${item.name}', 'OUT')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-2 py-1 rounded font-bold">- Ambil</button>
                         </td>
-                        <td class="py-3 px-4 text-center role-superadmin">
+                        <td class="py-3 px-4 text-center">
                             <button onclick="editItem(${item.id})" class="text-blue-500 hover:underline text-xs mr-2 font-semibold">Edit</button>
                             <button onclick="deleteItem(${item.id})" class="text-red-500 hover:underline text-xs font-semibold">Hapus</button>
                         </td>
@@ -501,7 +497,6 @@
             });
 
             updatePaginationControls();
-            applyRolePermissions();
         }
 
         function updatePaginationControls() {
