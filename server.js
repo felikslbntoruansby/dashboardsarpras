@@ -7,7 +7,7 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Supabase Connection (Kunci Publik Langsung)
+// Sambungan ke Supabase Backend
 const supabaseUrl = process.env.SUPABASE_URL || 'https://xlompxgjdifbthgpkphv.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY || 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
 
@@ -19,79 +19,21 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Page Routing (Bebas Akses Tanpa Login)
+// Static Routing
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
 app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
 
-// API RUMAH TANGGA
-app.get('/api/peminjaman-ruangan', async (req, res) => {
-    try {
-        const { data, error } = await supabase.from('peminjaman_ruangan').select('*').order('id', { ascending: false });
-        if (error) return res.json([]);
-        res.json(data || []);
-    } catch (err) {
-        res.json([]);
-    }
-});
-
-app.post('/api/peminjaman-ruangan', async (req, res) => {
-    try {
-        const { nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan } = req.body;
-        const { data, error } = await supabase
-            .from('peminjaman_ruangan')
-            .insert([{ nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status: 'Diproses' }])
-            .select();
-        if (error) throw error;
-        res.json({ message: "Berhasil!", data });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-app.get('/api/peminjaman-kendaraan', async (req, res) => {
-    try {
-        const { data, error } = await supabase.from('peminjaman_kendaraan').select('*').order('id', { ascending: false });
-        if (error) return res.json([]);
-        res.json(data || []);
-    } catch (err) {
-        res.json([]);
-    }
-});
-
-app.post('/api/peminjaman-kendaraan', async (req, res) => {
-    try {
-        const { nama_driver, kendaraan, tgl_pinjam, tujuan } = req.body;
-        const { data, error } = await supabase
-            .from('peminjaman_kendaraan')
-            .insert([{ nama_driver, kendaraan, tgl_pinjam, tujuan, status: 'Diproses' }])
-            .select();
-        if (error) throw error;
-        res.json({ message: "Berhasil!", data });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-app.get('/api/backup', async (req, res) => {
-    try {
-        const { data: inv } = await supabase.from('inventory').select('*');
-        const { data: rgn } = await supabase.from('peminjaman_ruangan').select('*');
-        const { data: kdr } = await supabase.from('peminjaman_kendaraan').select('*');
-        res.setHeader('Content-disposition', 'attachment; filename=backup_sarpras.json');
-        res.setHeader('Content-type', 'application/json');
-        res.send(JSON.stringify({ inventory: inv || [], peminjaman_ruangan: rgn || [], peminjaman_kendaraan: kdr || [] }, null, 2));
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// API INVENTORY
+// API INVENTORY (Mapping Kolom Database Supabase ke Frontend)
 app.get('/api/inventory', async (req, res) => {
     try {
         const { data, error } = await supabase.from('inventory').select('*').order('id', { ascending: true });
-        if (error) return res.json([]);
+        if (error) {
+            console.error('Database query error:', error.message);
+            return res.status(500).json({ error: error.message });
+        }
+        
         const formattedData = (data || []).map(item => ({
             id: item.id,
             code: item.code || '-',
@@ -102,7 +44,7 @@ app.get('/api/inventory', async (req, res) => {
         }));
         res.json(formattedData);
     } catch (err) {
-        res.json([]);
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -201,6 +143,40 @@ app.delete('/api/logs/:id', async (req, res) => {
         const { error } = await supabase.from('inventory_logs').delete().eq('id', id);
         if (error) throw error;
         res.json({ message: "Dihapus!" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// API RUMAH TANGGA
+app.get('/api/peminjaman-ruangan', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('peminjaman_ruangan').select('*').order('id', { ascending: false });
+        if (error) return res.json([]);
+        res.json(data || []);
+    } catch (err) {
+        res.json([]);
+    }
+});
+
+app.get('/api/peminjaman-kendaraan', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('peminjaman_kendaraan').select('*').order('id', { ascending: false });
+        if (error) return res.json([]);
+        res.json(data || []);
+    } catch (err) {
+        res.json([]);
+    }
+});
+
+app.get('/api/backup', async (req, res) => {
+    try {
+        const { data: inv } = await supabase.from('inventory').select('*');
+        const { data: rgn } = await supabase.from('peminjaman_ruangan').select('*');
+        const { data: kdr } = await supabase.from('peminjaman_kendaraan').select('*');
+        res.setHeader('Content-disposition', 'attachment; filename=backup_sarpras.json');
+        res.setHeader('Content-type', 'application/json');
+        res.send(JSON.stringify({ inventory: inv || [], peminjaman_ruangan: rgn || [], peminjaman_kendaraan: kdr || [] }, null, 2));
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
