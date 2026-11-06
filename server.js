@@ -11,8 +11,10 @@ const PORT = process.env.PORT || 3000;
 // Nomor WhatsApp Tujuan & Bot Pengirim Resmi Fonnte (082333206815)
 const TARGET_WA_PHONE = '082333206815';
 
-// Sambungan ke Supabase Backend
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+// Inisialisasi Supabase Backend
+const supabaseUrl = process.env.SUPABASE_URL || 'https://xlompxgjdifbthgpkphv.supabase.co';
+const supabaseKey = process.env.SUPABASE_KEY || 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.use(cors());
 app.use(express.json());
@@ -20,7 +22,11 @@ app.use(express.json());
 // Helper Otomatisasi Notifikasi WhatsApp (Fonnte API)
 async function sendWhatsAppAlert(targetPhone, message) {
     try {
-        const token = process.env.FONNTE_TOKEN || 'DEFAULT_TOKEN';
+        const token = process.env.FONNTE_TOKEN;
+        if (!token) {
+            console.warn('FONNTE_TOKEN belum dikonfigurasi di Environment Variables');
+            return;
+        }
         await axios.post('https://api.fonnte.com/send', {
             target: targetPhone,
             message: message,
@@ -33,15 +39,12 @@ async function sendWhatsAppAlert(targetPhone, message) {
     }
 }
 
-// Serve Static Files
+// Serve Static Files untuk Lokal (Development)
 app.use(express.static(path.join(__dirname)));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
-app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
-app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 
 // =============================================================
 // 1. MODULE RUMAH TANGGA API (WITH WA NOTIFICATION TO 082333206815)
@@ -107,7 +110,7 @@ app.get('/api/inventory', async (req, res) => {
     try {
         const { data, error } = await supabase.from('inventory').select('*').order('id', { ascending: true });
         if (error) throw error;
-        const formattedData = data.map(item => ({
+        const formattedData = (data || []).map(item => ({
             id: item.id,
             code: item.code,
             name: item.name,
@@ -186,7 +189,6 @@ app.post('/api/inventory/transaction', async (req, res) => {
 
         const finalStockAfter = item.initial + updatedIn - updatedOut;
 
-        // Pemicu Notifikasi WA Alert Stok Minimum (< 10)
         if (finalStockAfter < 10) {
             const waMsg = `⚠️ *PERINGATAN STOK MINIMUM SARPRAS*\n\nBarang: *${item.name}*\nSisa Stok: *${finalStockAfter} unit*\n\nMohon lakukan perencanaan pengadaan barang.`;
             sendWhatsAppAlert(TARGET_WA_PHONE, waMsg);
