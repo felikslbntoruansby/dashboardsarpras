@@ -26,7 +26,7 @@
           <i class="fa-solid fa-plane-departure text-white text-2xl"></i>
         </div>
         <div>
-          <p class="text-xs font-bold uppercase tracking-widest text-indigo-400">UNIT BAGIAN UMUM</p>
+          <p class="text-xs font-bold uppercase tracking-widest text-indigo-400">BIDANG UMUM</p>
           <h1 class="text-2xl font-extrabold tracking-wide text-white flex items-center gap-3">
             Manajemen Sarana & Prasarana
             <span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-400/30 shadow-inner">
@@ -415,7 +415,7 @@
 
       try {
         if (id) {
-          // UPDATE
+          // UPDATE DATABASE SUPABASE
           if (supabaseClient) {
             await supabaseClient.from('rumahtangga').update({ title, person, detail }).eq('id', id);
           }
@@ -426,10 +426,11 @@
             dbItems[index].detail = detail;
           }
         } else {
-          // INSERT / TAMBAH MANUAL
+          // INSERT / TAMBAH MANUAL KE SUPABASE
           const newObj = { category, title, person, detail };
           if (supabaseClient) {
-            const { data } = await supabaseClient.from('rumahtangga').insert([newObj]).select();
+            const { data, error } = await supabaseClient.from('rumahtangga').insert([newObj]).select();
+            if (error) throw error;
             if (data && data[0]) newObj.id = data[0].id;
             else newObj.id = Date.now();
           } else {
@@ -454,11 +455,13 @@
       if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
         try {
           if (supabaseClient) {
-            await supabaseClient.from('rumahtangga').delete().eq('id', id);
+            const { error } = await supabaseClient.from('rumahtangga').delete().eq('id', id);
+            if (error) throw error;
           }
           dbItems = dbItems.filter(i => String(i.id) !== String(id));
           renderTables();
           renderCharts();
+          alert('Data berhasil dihapus dari database!');
         } catch (err) {
           alert('Gagal menghapus: ' + err.message);
         }
@@ -533,7 +536,7 @@
       doc.setFontSize(16);
       doc.text(`Laporan Sub-Menu ${categoryTitle} - Rumah Tangga Sarpras`, 14, 20);
       doc.setFontSize(10);
-      doc.text(` Bidang Umum - Politeknik Penerbangan Surabaya (${new Date().toLocaleDateString('id-ID')})`, 14, 26);
+      doc.text(`Bidang Umum - Politeknik Penerbangan Surabaya (${new Date().toLocaleDateString('id-ID')})`, 14, 26);
       doc.autoTable({
         startY: 32,
         html: `#section-${categoryTitle.toLowerCase()} table`,
