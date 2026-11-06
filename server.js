@@ -8,18 +8,27 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Nomor WhatsApp Tujuan (Fonnte API)
+// Nomor WhatsApp Tujuan Notifikasi (Fonnte API)
 const TARGET_WA_PHONE = '082333206815';
 
-// Sambungan ke Supabase Backend
+// Sambungan ke Supabase Backend (Membaca Environment Variable)
 const supabaseUrl = process.env.SUPABASE_URL || 'https://xlompxgjdifbthgpkphv.supabase.co';
-const supabaseKey = process.env.SUPABASE_KEY || 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SECRET_KEY;
+
+if (!supabaseKey) {
+    console.error('CRITICAL: SUPABASE_KEY belum dipasang di Environment Variables.');
+}
+
+const supabase = createClient(
+    supabaseUrl, 
+    supabaseKey || 'dummy_key_for_build', 
+    { auth: { persistSession: false } }
+);
 
 app.use(cors());
 app.use(express.json());
 
-// Helper Notifikasi WhatsApp
+// Helper Notifikasi WhatsApp via Fonnte API
 async function sendWhatsAppAlert(targetPhone, message) {
     try {
         const token = process.env.FONNTE_TOKEN;
@@ -93,7 +102,7 @@ app.get('/api/backup', async (req, res) => {
         const { data: kdr } = await supabase.from('peminjaman_kendaraan').select('*');
         res.setHeader('Content-disposition', 'attachment; filename=backup_sarpras.json');
         res.setHeader('Content-type', 'application/json');
-        res.send(JSON.stringify({ inventory: inv, peminjaman_ruangan: rgn, peminjaman_kendaraan: kdr }, null, 2));
+        res.send(JSON.stringify({ inventory: inv || [], peminjaman_ruangan: rgn || [], peminjaman_kendaraan: kdr || [] }, null, 2));
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -109,11 +118,11 @@ app.get('/api/inventory', async (req, res) => {
         if (error) throw error;
         const formattedData = (data || []).map(item => ({
             id: item.id,
-            code: item.code,
-            name: item.name,
-            initial: item.initial,
-            inQty: item.in_qty,
-            outQty: item.out_qty
+            code: item.code || '-',
+            name: item.name || 'Tanpa Nama',
+            initial: item.initial || 0,
+            inQty: item.in_qty || 0,
+            outQty: item.out_qty || 0
         }));
         res.json(formattedData);
     } catch (err) {
@@ -173,7 +182,7 @@ app.post('/api/inventory/transaction', async (req, res) => {
 
         let updatedIn = item.in_qty || 0;
         let updatedOut = item.out_qty || 0;
-        const currentAvailableStock = item.initial + updatedIn - updatedOut;
+        const currentAvailableStock = (item.initial || 0) + updatedIn - updatedOut;
 
         if (type === 'IN') {
             updatedIn += qty;
@@ -184,7 +193,7 @@ app.post('/api/inventory/transaction', async (req, res) => {
             updatedOut += qty;
         }
 
-        const finalStockAfter = item.initial + updatedIn - updatedOut;
+        const finalStockAfter = (item.initial || 0) + updatedIn - updatedOut;
 
         if (finalStockAfter < 10) {
             const waMsg = `⚠️ *PERINGATAN STOK MINIMUM SARPRAS*\n\nBarang: *${item.name}*\nSisa Stok: *${finalStockAfter} unit*\n\nMohon lakukan perencanaan pengadaan barang.`;
@@ -202,9 +211,16 @@ app.post('/api/inventory/transaction', async (req, res) => {
 
 app.get('/api/logs', async (req, res) => {
     try {
-        const { data, error } = await supabase.from('inventory_logs').select('*, inventory(code, name)').order('created_at', { ascending: false });
-        if (error) throw error;
-        res.json(data);
+        const { data, error } = await supabase
+            .from('inventory_logs')
+            .select('*, inventory!left(code, name)')
+            .order('id', { ascending: false });
+            
+        if (error) {
+            const { data: fallbackLogs } = await supabase.from('inventory_logs').select('*').order('id', { ascending: false });
+            return res.json(fallbackLogs || []);
+        }
+        res.json(data || []);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
