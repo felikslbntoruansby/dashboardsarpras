@@ -48,11 +48,11 @@
   <!-- Main Content Container -->
   <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full space-y-8">
 
-    <!-- SEKSI GRAFIK ANALYTICS INTERAKTIF -->
+    <!-- SEKSI GRAFIK ANALYTICS INTERAKTIF (Dua-duanya Bar Chart Berdasarkan Status) -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="bg-white p-6 rounded-2xl shadow-2xl border border-slate-100">
         <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-indigo-600"></i> Statistik Peminjaman Ruangan
+          <i class="fa-solid fa-chart-column text-indigo-600"></i> Status Peminjaman Ruangan
         </h2>
         <div style="position: relative; height: 30vh; width: 100%;">
           <canvas id="ruanganChart"></canvas>
@@ -271,38 +271,54 @@
       }
     }
 
-    // GRAFIK STATISTIK RUANGAN
+    // GRAFIK STATISTIK RUANGAN (STATUS BASED: DISETUJUI, DIPROSES, DITOLAK)
     function renderRuanganChart() {
-      const roomCounts = {};
+      const statusCounts = { 'Disetujui': 0, 'Diproses': 0, 'Ditolak': 0 };
+      
       ruanganData.forEach(item => {
-        const r = item.ruangan || 'Lainnya';
-        roomCounts[r] = (roomCounts[r] || 0) + 1;
+        const s = item.status || 'Diproses';
+        if (statusCounts[s] !== undefined) {
+          statusCounts[s] += 1;
+        } else {
+          statusCounts[s] = 1;
+        }
       });
 
-      const labels = Object.keys(roomCounts);
-      const values = Object.values(roomCounts);
+      const labels = Object.keys(statusCounts);
+      const values = Object.values(statusCounts);
+
+      // Pemetaan Warna Status
+      const backgroundColors = labels.map(status => {
+        if (status === 'Disetujui') return 'rgba(16, 185, 129, 0.85)'; // Hijau
+        if (status === 'Diproses') return 'rgba(245, 158, 11, 0.85)';  // Kuning
+        if (status === 'Ditolak') return 'rgba(239, 68, 68, 0.85)';   // Merah
+        return 'rgba(99, 102, 241, 0.85)';
+      });
 
       const ctx = document.getElementById('ruanganChart').getContext('2d');
       if (ruanganChartInstance) ruanganChartInstance.destroy();
 
       ruanganChartInstance = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'bar',
         data: {
-          labels: labels.length ? labels : ['Belum Ada Data'],
+          labels: labels,
           datasets: [{
-            data: values.length ? values : [1],
-            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6']
+            label: 'Jumlah Permohonan',
+            data: values,
+            backgroundColor: backgroundColors,
+            borderRadius: 6
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom' } }
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
         }
       });
     }
 
-    // GRAFIK STATISTIK KENDARAAN (WARNA DITYESUAIKAN DENGAN STATUS)
+    // GRAFIK STATISTIK KENDARAAN (STATUS BASED: DISETUJUI, DIPROSES, DITOLAK)
     function renderKendaraanChart() {
       const statusCounts = { 'Disetujui': 0, 'Diproses': 0, 'Ditolak': 0 };
       
@@ -318,10 +334,10 @@
       const labels = Object.keys(statusCounts);
       const values = Object.values(statusCounts);
 
-      // Pemetaan Warna per Status
+      // Pemetaan Warna Status
       const backgroundColors = labels.map(status => {
         if (status === 'Disetujui') return 'rgba(16, 185, 129, 0.85)'; // Hijau
-        if (status === 'Diproses') return 'rgba(245, 158, 11, 0.85)';  // Kuning / Amber
+        if (status === 'Diproses') return 'rgba(245, 158, 11, 0.85)';  // Kuning
         if (status === 'Ditolak') return 'rgba(239, 68, 68, 0.85)';   // Merah
         return 'rgba(99, 102, 241, 0.85)';
       });
