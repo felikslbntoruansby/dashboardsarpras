@@ -206,19 +206,26 @@
         if (!ruanganData || ruanganData.length === 0) {
           tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada peminjaman ruangan.</td></tr>`;
         } else {
-          tbody.innerHTML = ruanganData.map(item => `
-            <tr class="hover:bg-slate-50">
-              <td class="px-6 py-4 font-bold text-slate-900">${item.nama_peminjam || '-'}</td>
-              <td class="px-6 py-4 font-semibold text-indigo-600">${item.ruangan || '-'}</td>
-              <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'} (${item.jam_mulai || '-'} - ${item.jam_selesai || '-'})</td>
-              <td class="px-6 py-4 text-xs text-slate-600">${item.keperluan || '-'}</td>
-              <td class="px-6 py-4"><span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
-              <td class="px-6 py-4 text-center space-x-2">
-                <button onclick="editItem('ruangan', ${item.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
-                <button onclick="deleteItem('ruangan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
-              </td>
-            </tr>
-          `).join('');
+          tbody.innerHTML = ruanganData.map(item => {
+            let statusColor = 'bg-indigo-50 text-indigo-700';
+            if (item.status === 'Disetujui') statusColor = 'bg-emerald-50 text-emerald-700';
+            else if (item.status === 'Diproses') statusColor = 'bg-amber-50 text-amber-700';
+            else if (item.status === 'Ditolak') statusColor = 'bg-rose-50 text-rose-700';
+
+            return `
+              <tr class="hover:bg-slate-50">
+                <td class="px-6 py-4 font-bold text-slate-900">${item.nama_peminjam || '-'}</td>
+                <td class="px-6 py-4 font-semibold text-indigo-600">${item.ruangan || '-'}</td>
+                <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'} (${item.jam_mulai || '-'} - ${item.jam_selesai || '-'})</td>
+                <td class="px-6 py-4 text-xs text-slate-600">${item.keperluan || '-'}</td>
+                <td class="px-6 py-4"><span class="${statusColor} text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
+                <td class="px-6 py-4 text-center space-x-2">
+                  <button onclick="editItem('ruangan', ${item.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
+                  <button onclick="deleteItem('ruangan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
         }
         renderRuanganChart();
       } catch (err) {
@@ -237,19 +244,26 @@
         if (!kendaraanData || kendaraanData.length === 0) {
           tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada peminjaman kendaraan.</td></tr>`;
         } else {
-          tbody.innerHTML = kendaraanData.map(item => `
-            <tr class="hover:bg-slate-50">
-              <td class="px-6 py-4 font-bold text-slate-900">${item.nama_driver || '-'}</td>
-              <td class="px-6 py-4 font-semibold text-emerald-600">${item.kendaraan || '-'}</td>
-              <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'}</td>
-              <td class="px-6 py-4 text-xs text-slate-600">${item.tujuan || '-'}</td>
-              <td class="px-6 py-4"><span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
-              <td class="px-6 py-4 text-center space-x-2">
-                <button onclick="editItem('kendaraan', ${item.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
-                <button onclick="deleteItem('kendaraan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
-              </td>
-            </tr>
-          `).join('');
+          tbody.innerHTML = kendaraanData.map(item => {
+            let statusColor = 'bg-indigo-50 text-indigo-700';
+            if (item.status === 'Disetujui') statusColor = 'bg-emerald-50 text-emerald-700';
+            else if (item.status === 'Diproses') statusColor = 'bg-amber-50 text-amber-700';
+            else if (item.status === 'Ditolak') statusColor = 'bg-rose-50 text-rose-700';
+
+            return `
+              <tr class="hover:bg-slate-50">
+                <td class="px-6 py-4 font-bold text-slate-900">${item.nama_driver || '-'}</td>
+                <td class="px-6 py-4 font-semibold text-emerald-600">${item.kendaraan || '-'}</td>
+                <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'}</td>
+                <td class="px-6 py-4 text-xs text-slate-600">${item.tujuan || '-'}</td>
+                <td class="px-6 py-4"><span class="${statusColor} text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
+                <td class="px-6 py-4 text-center space-x-2">
+                  <button onclick="editItem('kendaraan', ${item.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
+                  <button onclick="deleteItem('kendaraan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
         }
         renderKendaraanChart();
       } catch (err) {
@@ -257,6 +271,7 @@
       }
     }
 
+    // GRAFIK STATISTIK RUANGAN
     function renderRuanganChart() {
       const roomCounts = {};
       ruanganData.forEach(item => {
@@ -287,15 +302,29 @@
       });
     }
 
+    // GRAFIK STATISTIK KENDARAAN (WARNA DITYESUAIKAN DENGAN STATUS)
     function renderKendaraanChart() {
-      const statusCounts = {};
+      const statusCounts = { 'Disetujui': 0, 'Diproses': 0, 'Ditolak': 0 };
+      
       kendaraanData.forEach(item => {
         const s = item.status || 'Diproses';
-        statusCounts[s] = (statusCounts[s] || 0) + 1;
+        if (statusCounts[s] !== undefined) {
+          statusCounts[s] += 1;
+        } else {
+          statusCounts[s] = 1;
+        }
       });
 
       const labels = Object.keys(statusCounts);
       const values = Object.values(statusCounts);
+
+      // Pemetaan Warna per Status
+      const backgroundColors = labels.map(status => {
+        if (status === 'Disetujui') return 'rgba(16, 185, 129, 0.85)'; // Hijau
+        if (status === 'Diproses') return 'rgba(245, 158, 11, 0.85)';  // Kuning / Amber
+        if (status === 'Ditolak') return 'rgba(239, 68, 68, 0.85)';   // Merah
+        return 'rgba(99, 102, 241, 0.85)';
+      });
 
       const ctx = document.getElementById('kendaraanChart').getContext('2d');
       if (kendaraanChartInstance) kendaraanChartInstance.destroy();
@@ -303,22 +332,24 @@
       kendaraanChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: labels.length ? labels : ['Belum Ada Data'],
+          labels: labels,
           datasets: [{
             label: 'Jumlah Transaksi',
-            data: values.length ? values : [0],
-            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+            data: values,
+            backgroundColor: backgroundColors,
             borderRadius: 6
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
           scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
         }
       });
     }
 
+    // CETAK PDF HISTORICAL
     function exportToPDF(category) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
