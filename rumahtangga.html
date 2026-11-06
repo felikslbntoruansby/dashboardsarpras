@@ -15,6 +15,13 @@
   <!-- jsPDF & autoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- PROTEKSI SESI LOGIN ADMIN -->
+  <script>
+    if (!localStorage.getItem('admin_token')) {
+      window.location.href = '/login.html';
+    }
+  </script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 font-sans text-slate-800 min-h-screen flex flex-col">
 
@@ -37,12 +44,15 @@
         </div>
       </div>
       
-      <!-- Navigasi Dua Arah -->
+      <!-- Navigasi Dua Arah & Logout -->
       <div class="flex items-center space-x-3">
         <a href="/" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
           <i class="fa-solid fa-boxes-stacked"></i>
           <span>Ke Inventaris Sarpras &rarr;</span>
         </a>
+        <button onclick="handleLogout()" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
       </div>
     </div>
   </header>
@@ -295,6 +305,14 @@
     let ruanganChartInstance = null;
     let armadaChartInstance = null;
 
+    function handleLogout() {
+      if (confirm("Apakah Anda yakin ingin keluar?")) {
+        localStorage.removeItem('admin_token');
+        if (supabaseClient) supabaseClient.auth.signOut();
+        window.location.href = '/login.html';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       await fetchSupabaseData();
     });
@@ -415,7 +433,6 @@
 
       try {
         if (id) {
-          // UPDATE DATABASE SUPABASE
           if (supabaseClient) {
             await supabaseClient.from('rumahtangga').update({ title, person, detail }).eq('id', id);
           }
@@ -426,7 +443,6 @@
             dbItems[index].detail = detail;
           }
         } else {
-          // INSERT / TAMBAH MANUAL KE SUPABASE
           const newObj = { category, title, person, detail };
           if (supabaseClient) {
             const { data, error } = await supabaseClient.from('rumahtangga').insert([newObj]).select();
@@ -469,7 +485,6 @@
     }
 
     function renderCharts() {
-      // 1. Chart Ruangan
       const ruanganItems = dbItems.filter(i => (i.category || 'ruangan').toLowerCase() === 'ruangan');
       const approved = ruanganItems.filter(i => (i.detail || '').toLowerCase().includes('setuju')).length;
       const pending = ruanganItems.length - approved;
@@ -488,7 +503,6 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#cbd5e1' } } } }
       });
 
-      // 2. Chart Armada & Maintenance
       const kendaraanCount = dbItems.filter(i => (i.category || '').toLowerCase() === 'kendaraan').length;
       const maintenanceCount = dbItems.filter(i => (i.category || '').toLowerCase() === 'maintenance').length;
 
