@@ -6,12 +6,8 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "server.js" },
-    { "src": "/rumah-tangga", "dest": "rumahtangga.html" },
-    { "src": "/rumahtangga.html", "dest": "rumahtangga.html" },
-    { "src": "/login", "dest": "login.html" },
-    { "src": "/login.html", "dest": "login.html" },
-    { "src": "/(.*)", "dest": "index.html" }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/server.js" },
+    { "source": "/rumah-tangga", "destination": "/rumahtangga.html" }
   ]
 }
