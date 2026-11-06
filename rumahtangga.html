@@ -8,8 +8,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- FullCalendar CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- jsPDF & AutoTable CDN untuk Cetak PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 font-sans text-slate-800 min-h-screen flex flex-col">
 
@@ -45,12 +48,24 @@
   <!-- Main Content Container -->
   <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full space-y-8">
 
-    <!-- DASHBOARD KALENDER VISUAL -->
-    <div class="bg-white rounded-2xl p-6 shadow-2xl border border-slate-100">
-      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-calendar-days text-indigo-600"></i> Kalender Visual Peminjaman Ruangan
-      </h2>
-      <div id="calendar" class="min-h-[400px]"></div>
+    <!-- SEKSI GRAFIK ANALYTICS (PENGGANTI KALENDER) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white p-6 rounded-2xl shadow-2xl border border-slate-100">
+        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-indigo-600"></i> Statistik Peminjaman Ruangan
+        </h2>
+        <div style="position: relative; height: 30vh; width: 100%;">
+          <canvas id="ruanganChart"></canvas>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-2xl border border-slate-100">
+        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-column text-emerald-600"></i> Status Operasional Kendaraan
+        </h2>
+        <div style="position: relative; height: 30vh; width: 100%;">
+          <canvas id="kendaraanChart"></canvas>
+        </div>
+      </div>
     </div>
 
     <!-- Ringkasan Stat & Tab Navigasi -->
@@ -85,12 +100,17 @@
       <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-building-user text-indigo-600"></i> Jadwal & Peminjaman Ruangan
+            <i class="fa-solid fa-building-user text-indigo-600"></i> Log Historical Peminjaman Ruangan
           </h2>
         </div>
-        <button onclick="openModal('ruangan')" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
-          <i class="fa-solid fa-plus"></i> + Tambah Permohonan Ruangan
-        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="exportToPDF('ruangan')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+          </button>
+          <button onclick="openModal('ruangan')" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+            <i class="fa-solid fa-plus"></i> + Tambah Permohonan Ruangan
+          </button>
+        </div>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-slate-600">
@@ -101,10 +121,11 @@
               <th class="px-6 py-4 font-bold">Tanggal & Waktu</th>
               <th class="px-6 py-4 font-bold">Keperluan</th>
               <th class="px-6 py-4 font-bold">Status</th>
+              <th class="px-6 py-4 font-bold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbody-ruangan" class="divide-y divide-slate-100">
-            <tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>
+            <tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -113,8 +134,15 @@
     <!-- TAB 2: OPERATIONAL KENDARAAN -->
     <section id="section-kendaraan" class="hidden bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
       <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
-        <h2 class="text-xl font-bold text-slate-800">Log Operasional Kendaraan Dinas</h2>
-        <button onclick="openModal('kendaraan')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">+ Tambah Kendaraan</button>
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-car-side text-emerald-600"></i> Log Historical Operasional Kendaraan
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="exportToPDF('kendaraan')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+          </button>
+          <button onclick="openModal('kendaraan')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">+ Tambah Kendaraan</button>
+        </div>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-slate-600">
@@ -125,10 +153,11 @@
               <th class="px-6 py-4 font-bold">Tanggal</th>
               <th class="px-6 py-4 font-bold">Tujuan</th>
               <th class="px-6 py-4 font-bold">Status</th>
+              <th class="px-6 py-4 font-bold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbody-kendaraan" class="divide-y divide-slate-100">
-            <tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>
+            <tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -136,12 +165,13 @@
 
   </main>
 
-  <!-- MODAL TAMBAH DATA -->
+  <!-- MODAL FORM TAMBAH / EDIT DATA -->
   <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
     <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md">
       <h3 id="modalTitle" class="text-xl font-bold text-slate-900 mb-4">Input Data</h3>
       <form id="genericForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
         <input type="hidden" id="formCategory">
+        <input type="hidden" id="editId">
         <div id="formFields" class="space-y-3"></div>
         <div class="flex justify-end gap-2 pt-4">
           <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
@@ -152,7 +182,10 @@
   </div>
 
   <script>
-    let calendarInstance = null;
+    let ruanganData = [];
+    let kendaraanData = [];
+    let ruanganChartInstance = null;
+    let kendaraanChartInstance = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       loadAllData();
@@ -165,25 +198,29 @@
     async function loadRuanganData() {
       try {
         const res = await fetch('/api/peminjaman-ruangan');
-        const data = await res.json();
+        ruanganData = await res.json();
         
-        document.getElementById('count-ruangan').innerText = `${data.length} Data`;
+        document.getElementById('count-ruangan').innerText = `${ruanganData.length} Data`;
         const tbody = document.getElementById('tbody-ruangan');
 
-        if (!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">Belum ada peminjaman ruangan.</td></tr>`;
+        if (!ruanganData || ruanganData.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada peminjaman ruangan.</td></tr>`;
         } else {
-          tbody.innerHTML = data.map(item => `
+          tbody.innerHTML = ruanganData.map(item => `
             <tr class="hover:bg-slate-50">
               <td class="px-6 py-4 font-bold text-slate-900">${item.nama_peminjam || '-'}</td>
               <td class="px-6 py-4 font-semibold text-indigo-600">${item.ruangan || '-'}</td>
               <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'} (${item.jam_mulai || '-'} - ${item.jam_selesai || '-'})</td>
               <td class="px-6 py-4 text-xs text-slate-600">${item.keperluan || '-'}</td>
               <td class="px-6 py-4"><span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
+              <td class="px-6 py-4 text-center space-x-2">
+                <button onclick="editItem('ruangan', ${item.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
+                <button onclick="deleteItem('ruangan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
+              </td>
             </tr>
           `).join('');
         }
-        renderCalendar(data);
+        renderRuanganChart();
       } catch (err) {
         console.error("Gagal muat data ruangan:", err);
       }
@@ -192,48 +229,136 @@
     async function loadKendaraanData() {
       try {
         const res = await fetch('/api/peminjaman-kendaraan');
-        const data = await res.json();
+        kendaraanData = await res.json();
 
-        document.getElementById('count-kendaraan').innerText = `${data.length} Data`;
+        document.getElementById('count-kendaraan').innerText = `${kendaraanData.length} Data`;
         const tbody = document.getElementById('tbody-kendaraan');
 
-        if (!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">Belum ada peminjaman kendaraan.</td></tr>`;
+        if (!kendaraanData || kendaraanData.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada peminjaman kendaraan.</td></tr>`;
         } else {
-          tbody.innerHTML = data.map(item => `
+          tbody.innerHTML = kendaraanData.map(item => `
             <tr class="hover:bg-slate-50">
               <td class="px-6 py-4 font-bold text-slate-900">${item.nama_driver || '-'}</td>
               <td class="px-6 py-4 font-semibold text-emerald-600">${item.kendaraan || '-'}</td>
               <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'}</td>
               <td class="px-6 py-4 text-xs text-slate-600">${item.tujuan || '-'}</td>
               <td class="px-6 py-4"><span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
+              <td class="px-6 py-4 text-center space-x-2">
+                <button onclick="editItem('kendaraan', ${item.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
+                <button onclick="deleteItem('kendaraan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
+              </td>
             </tr>
           `).join('');
         }
+        renderKendaraanChart();
       } catch (err) {
         console.error("Gagal muat data kendaraan:", err);
       }
     }
 
-    function renderCalendar(ruanganList) {
-      const calendarEl = document.getElementById('calendar');
-      if (!calendarEl) return;
-
-      const events = (ruanganList || []).map(i => ({
-        id: i.id,
-        title: `${i.ruangan} (${i.nama_peminjam})`,
-        start: i.tgl_pinjam,
-        backgroundColor: (i.status || '').toLowerCase().includes('setuju') ? '#10b981' : '#6366f1'
-      }));
-
-      if (calendarInstance) calendarInstance.destroy();
-
-      calendarInstance = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-        events: events
+    // GRAFIK STATISTIK RUANGAN
+    function renderRuanganChart() {
+      const roomCounts = {};
+      ruanganData.forEach(item => {
+        const r = item.ruangan || 'Lainnya';
+        roomCounts[r] = (roomCounts[r] || 0) + 1;
       });
-      calendarInstance.render();
+
+      const labels = Object.keys(roomCounts);
+      const values = Object.values(roomCounts);
+
+      const ctx = document.getElementById('ruanganChart').getContext('2d');
+      if (ruanganChartInstance) ruanganChartInstance.destroy();
+
+      ruanganChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels.length ? labels : ['Belum Ada Data'],
+          datasets: [{
+            data: values.length ? values : [1],
+            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+
+    // GRAFIK STATISTIK KENDARAAN
+    function renderKendaraanChart() {
+      const statusCounts = {};
+      kendaraanData.forEach(item => {
+        const s = item.status || 'Diproses';
+        statusCounts[s] = (statusCounts[s] || 0) + 1;
+      });
+
+      const labels = Object.keys(statusCounts);
+      const values = Object.values(statusCounts);
+
+      const ctx = document.getElementById('kendaraanChart').getContext('2d');
+      if (kendaraanChartInstance) kendaraanChartInstance.destroy();
+
+      kendaraanChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels.length ? labels : ['Belum Ada Data'],
+          datasets: [{
+            label: 'Jumlah Transaksi',
+            data: values.length ? values : [0],
+            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+    }
+
+    // FUNGSI CETAK PDF HISTORICAL
+    function exportToPDF(category) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+
+      if (category === 'ruangan') {
+        doc.text("LOG HISTORICAL PEMINJAMAN RUANGAN (RUMAH TANGGA)", 14, 22);
+        doc.line(14, 25, 196, 25);
+        const rows = ruanganData.map((item, i) => [
+          i + 1, item.nama_peminjam || '-', item.ruangan || '-', `${item.tgl_pinjam} (${item.jam_mulai || ''}-${item.jam_selesai || ''})`, item.keperluan || '-', item.status || 'Diproses'
+        ]);
+        doc.autoTable({
+          head: [['No', 'Peminjam', 'Ruangan', 'Tanggal & Jam', 'Keperluan', 'Status']],
+          body: rows,
+          startY: 28,
+          headStyles: { fillColor: [99, 102, 241] }
+        });
+        doc.save(`Historical_Peminjaman_Ruangan_${new Date().toISOString().split('T')[0]}.pdf`);
+      } else {
+        doc.text("LOG HISTORICAL OPERASIONAL KENDARAAN (RUMAH TANGGA)", 14, 22);
+        doc.line(14, 25, 196, 25);
+        const rows = kendaraanData.map((item, i) => [
+          i + 1, item.nama_driver || '-', item.kendaraan || '-', item.tgl_pinjam || '-', item.tujuan || '-', item.status || 'Diproses'
+        ]);
+        doc.autoTable({
+          head: [['No', 'Driver', 'Kendaraan', 'Tanggal', 'Tujuan', 'Status']],
+          body: rows,
+          startY: 28,
+          headStyles: { fillColor: [16, 185, 129] }
+        });
+        doc.save(`Historical_Operasional_Kendaraan_${new Date().toISOString().split('T')[0]}.pdf`);
+      }
     }
 
     function switchTab(tabName) {
@@ -249,29 +374,46 @@
         : 'cursor-pointer bg-slate-800/40 backdrop-blur border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-6 shadow-xl transition-all';
     }
 
-    function openModal(category) {
+    function openModal(category, editObj = null) {
       document.getElementById('formCategory').value = category;
+      document.getElementById('editId').value = editObj ? editObj.id : '';
       const fields = document.getElementById('formFields');
       
       if (category === 'ruangan') {
-        document.getElementById('modalTitle').innerText = "Permohonan Peminjaman Ruangan";
+        document.getElementById('modalTitle').innerText = editObj ? "Edit Permohonan Ruangan" : "Permohonan Peminjaman Ruangan";
         fields.innerHTML = `
-          <div><label class="block text-xs font-bold mb-1">Nama Peminjam</label><input type="text" id="nama_peminjam" required class="w-full border p-2 rounded text-sm"></div>
-          <div><label class="block text-xs font-bold mb-1">Nama Ruangan</label><input type="text" id="ruangan" required class="w-full border p-2 rounded text-sm" placeholder="Contoh: Aula Utama"></div>
-          <div><label class="block text-xs font-bold mb-1">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" required class="w-full border p-2 rounded text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1">Nama Peminjam</label><input type="text" id="nama_peminjam" value="${editObj ? editObj.nama_peminjam : ''}" required class="w-full border p-2 rounded text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1">Nama Ruangan</label><input type="text" id="ruangan" value="${editObj ? editObj.ruangan : ''}" required class="w-full border p-2 rounded text-sm" placeholder="Contoh: Aula Utama"></div>
+          <div><label class="block text-xs font-bold mb-1">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border p-2 rounded text-sm"></div>
           <div class="grid grid-cols-2 gap-2">
-            <div><label class="block text-xs font-bold mb-1">Jam Mulai</label><input type="time" id="jam_mulai" class="w-full border p-2 rounded text-sm"></div>
-            <div><label class="block text-xs font-bold mb-1">Jam Selesai</label><input type="time" id="jam_selesai" class="w-full border p-2 rounded text-sm"></div>
+            <div><label class="block text-xs font-bold mb-1">Jam Mulai</label><input type="time" id="jam_mulai" value="${editObj ? editObj.jam_mulai : ''}" class="w-full border p-2 rounded text-sm"></div>
+            <div><label class="block text-xs font-bold mb-1">Jam Selesai</label><input type="time" id="jam_selesai" value="${editObj ? editObj.jam_selesai : ''}" class="w-full border p-2 rounded text-sm"></div>
           </div>
-          <div><label class="block text-xs font-bold mb-1">Keperluan</label><textarea id="keperluan" class="w-full border p-2 rounded text-sm"></textarea></div>
+          <div><label class="block text-xs font-bold mb-1">Keperluan</label><textarea id="keperluan" class="w-full border p-2 rounded text-sm">${editObj ? editObj.keperluan : ''}</textarea></div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Status</label>
+            <select id="statusSelect" class="w-full border p-2 rounded text-sm">
+              <option value="Diproses" ${editObj && editObj.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
+              <option value="Disetujui" ${editObj && editObj.status === 'Disetujui' ? 'selected' : ''}>Disetujui</option>
+              <option value="Ditolak" ${editObj && editObj.status === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
+            </select>
+          </div>
         `;
       } else if (category === 'kendaraan') {
-        document.getElementById('modalTitle').innerText = "Permohonan Peminjaman Kendaraan";
+        document.getElementById('modalTitle').innerText = editObj ? "Edit Permohonan Kendaraan" : "Permohonan Peminjaman Kendaraan";
         fields.innerHTML = `
-          <div><label class="block text-xs font-bold mb-1">Nama Driver / Pengemudi</label><input type="text" id="nama_driver" required class="w-full border p-2 rounded text-sm"></div>
-          <div><label class="block text-xs font-bold mb-1">Kendaraan</label><input type="text" id="kendaraan" required class="w-full border p-2 rounded text-sm" placeholder="Contoh: Bus Operasional 01"></div>
-          <div><label class="block text-xs font-bold mb-1">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" required class="w-full border p-2 rounded text-sm"></div>
-          <div><label class="block text-xs font-bold mb-1">Tujuan Dinas</label><input type="text" id="tujuan" required class="w-full border p-2 rounded text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1">Nama Driver / Pengemudi</label><input type="text" id="nama_driver" value="${editObj ? editObj.nama_driver : ''}" required class="w-full border p-2 rounded text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1">Kendaraan</label><input type="text" id="kendaraan" value="${editObj ? editObj.kendaraan : ''}" required class="w-full border p-2 rounded text-sm" placeholder="Contoh: Bus Operasional 01"></div>
+          <div><label class="block text-xs font-bold mb-1">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border p-2 rounded text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1">Tujuan Dinas</label><input type="text" id="tujuan" value="${editObj ? editObj.tujuan : ''}" required class="w-full border p-2 rounded text-sm"></div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Status</label>
+            <select id="statusSelect" class="w-full border p-2 rounded text-sm">
+              <option value="Diproses" ${editObj && editObj.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
+              <option value="Disetujui" ${editObj && editObj.status === 'Disetujui' ? 'selected' : ''}>Disetujui</option>
+              <option value="Ditolak" ${editObj && editObj.status === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
+            </select>
+          </div>
         `;
       }
       document.getElementById('dataModal').classList.remove('hidden');
@@ -281,9 +423,35 @@
       document.getElementById('dataModal').classList.add('hidden');
     }
 
+    function editItem(category, id) {
+      if (category === 'ruangan') {
+        const item = ruanganData.find(i => i.id === id);
+        if (item) openModal('ruangan', item);
+      } else {
+        const item = kendaraanData.find(i => i.id === id);
+        if (item) openModal('kendaraan', item);
+      }
+    }
+
+    async function deleteItem(category, id) {
+      if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+        const url = category === 'ruangan' ? `/api/peminjaman-ruangan/${id}` : `/api/peminjaman-kendaraan/${id}`;
+        try {
+          const res = await fetch(url, { method: 'DELETE' });
+          if (res.ok) {
+            if (category === 'ruangan') loadRuanganData();
+            else loadKendaraanData();
+          }
+        } catch (err) {
+          alert("Gagal menghapus: " + err.message);
+        }
+      }
+    }
+
     async function handleFormSubmit(e) {
       e.preventDefault();
       const category = document.getElementById('formCategory').value;
+      const editId = document.getElementById('editId').value;
 
       if (category === 'ruangan') {
         const payload = {
@@ -292,11 +460,15 @@
           tgl_pinjam: document.getElementById('tgl_pinjam').value,
           jam_mulai: document.getElementById('jam_mulai').value,
           jam_selesai: document.getElementById('jam_selesai').value,
-          keperluan: document.getElementById('keperluan').value
+          keperluan: document.getElementById('keperluan').value,
+          status: document.getElementById('statusSelect').value
         };
 
-        const res = await fetch('/api/peminjaman-ruangan', {
-          method: 'POST',
+        const method = editId ? 'PUT' : 'POST';
+        const url = editId ? `/api/peminjaman-ruangan/${editId}` : '/api/peminjaman-ruangan';
+
+        const res = await fetch(url, {
+          method: method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
@@ -309,11 +481,15 @@
           nama_driver: document.getElementById('nama_driver').value,
           kendaraan: document.getElementById('kendaraan').value,
           tgl_pinjam: document.getElementById('tgl_pinjam').value,
-          tujuan: document.getElementById('tujuan').value
+          tujuan: document.getElementById('tujuan').value,
+          status: document.getElementById('statusSelect').value
         };
 
-        const res = await fetch('/api/peminjaman-kendaraan', {
-          method: 'POST',
+        const method = editId ? 'PUT' : 'POST';
+        const url = editId ? `/api/peminjaman-kendaraan/${editId}` : '/api/peminjaman-kendaraan';
+
+        const res = await fetch(url, {
+          method: method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
