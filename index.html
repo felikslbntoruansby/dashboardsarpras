@@ -29,20 +29,26 @@
         <!-- Header & Tombol Aksi -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-blue-900">Dashboard Monitoring Sarpras</h1>
+                <h1 class="text-2xl md:text-3xl font-bold text-blue-900 flex items-center gap-2">
+                    Dashboard Monitoring Sarpras
+                    <span id="userRoleBadge" class="text-xs px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 font-bold uppercase border border-indigo-200"></span>
+                </h1>
                 <p class="text-sm md:text-base text-gray-600">Politeknik Penerbangan Surabaya</p>
             </div>
             <div class="flex gap-2 flex-wrap w-full md:w-auto">
                 <a href="/rumah-tangga" class="flex-1 md:flex-none justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
-                    🏠 Rumah Tangga
+                    🏢 Rumah Tangga
                 </a>
-                <a href="/api/backup" target="_blank" class="flex-1 md:flex-none justify-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
+                <button onclick="exportExecutiveSummaryPDF()" class="flex-1 md:flex-none justify-center bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
+                    📄 Laporan Eksekutif PDF
+                </button>
+                <a href="/api/backup" target="_blank" class="role-superadmin flex-1 md:flex-none justify-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
                     💾 Backup JSON
                 </a>
                 <button onclick="exportToExcel()" class="flex-1 md:flex-none justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
                     📊 Excel
                 </button>
-                <button onclick="openModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm">
+                <button onclick="openModal()" class="role-superadmin w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm">
                     + Master Barang
                 </button>
                 <button onclick="handleLogout()" class="flex-1 md:flex-none justify-center bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
@@ -62,11 +68,19 @@
             </div>
         </div>
 
-        <!-- Section Grafik -->
-        <div class="bg-white p-4 md:p-6 rounded-lg shadow">
-            <h2 class="text-lg md:text-xl font-bold mb-4 text-gray-700">Grafik Ketersediaan Stok Akhir (Top 15)</h2>
-            <div style="position: relative; height: 30vh; width: 100%;">
-                <canvas id="stockChart"></canvas>
+        <!-- Section Grafik Analytics (2 Column Grid) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-4 md:p-6 rounded-lg shadow">
+                <h2 class="text-base md:text-lg font-bold mb-4 text-gray-700">Grafik Stok Akhir Barang (Top 15)</h2>
+                <div style="position: relative; height: 28vh; width: 100%;">
+                    <canvas id="stockChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-4 md:p-6 rounded-lg shadow">
+                <h2 class="text-base md:text-lg font-bold mb-4 text-gray-700">Analytics Fast-Moving Items (Sering Keluar)</h2>
+                <div style="position: relative; height: 28vh; width: 100%;">
+                    <canvas id="fastMovingChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -91,8 +105,8 @@
                             <th class="py-3 px-4 text-center">Masuk</th>
                             <th class="py-3 px-4 text-center">Keluar</th>
                             <th class="py-3 px-4 text-center">Stok Akhir</th>
-                            <th class="py-3 px-4 text-center">Kelola Stok</th>
-                            <th class="py-3 px-4 text-center">Aksi Master</th>
+                            <th class="py-3 px-4 text-center role-write">Kelola Stok</th>
+                            <th class="py-3 px-4 text-center role-superadmin">Aksi Master</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="text-gray-700 text-xs md:text-sm">
@@ -111,7 +125,7 @@
         <!-- Tabel Histori Catatan Transaksi -->
         <div class="bg-white rounded-lg shadow p-4 md:p-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-                <h2 class="text-lg md:text-xl font-bold text-gray-800">📋 Histori Transaksi (Pengambilan & Penambahan)</h2>
+                <h2 class="text-lg md:text-xl font-bold text-gray-800">📜 Histori Transaksi (Pengambilan & Penambahan)</h2>
                 
                 <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
                     <select id="filterMonth" onchange="loadLogs()" class="border p-2 rounded text-xs md:text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
@@ -148,7 +162,7 @@
                             <th class="py-2 px-3 text-center">Jumlah</th>
                             <th class="py-2 px-3">Petugas / Pengambil</th>
                             <th class="py-2 px-3">Catatan / Keperluan</th>
-                            <th class="py-2 px-3 text-center">Aksi</th>
+                            <th class="py-2 px-3 text-center role-superadmin">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="logTableBody" class="divide-y divide-gray-200">
@@ -238,10 +252,27 @@
         let currentPage = 1;
         const rowsPerPage = 10;
         let stockChartInstance = null;
+        let fastMovingChartInstance = null;
+
+        const currentRole = localStorage.getItem('admin_role') || 'viewer';
+
+        function applyRolePermissions() {
+            document.getElementById('userRoleBadge').innerText = `Role: ${currentRole.toUpperCase()}`;
+
+            if (currentRole === 'viewer') {
+                document.querySelectorAll('.role-superadmin, .role-write').forEach(el => el.classList.add('hidden'));
+            } else if (currentRole === 'operator') {
+                document.querySelectorAll('.role-superadmin').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.role-write').forEach(el => el.classList.remove('hidden'));
+            } else {
+                document.querySelectorAll('.role-superadmin, .role-write').forEach(el => el.classList.remove('hidden'));
+            }
+        }
 
         function handleLogout() {
             if (confirm("Apakah Anda yakin ingin keluar?")) {
                 localStorage.removeItem('admin_token');
+                localStorage.removeItem('admin_role');
                 window.location.href = '/login.html';
             }
         }
@@ -276,6 +307,7 @@
                     checkStockAlerts();
                     renderData();
                     loadLogs();
+                    renderFastMovingChart();
                 })
                 .catch(err => console.error("Gagal memuat data:", err));
         }
@@ -294,22 +326,41 @@
             }
         }
 
+        function renderFastMovingChart() {
+            const sortedByOut = [...inventory].sort((a, b) => b.outQty - a.outQty).slice(0, 5);
+            const labels = sortedByOut.map(i => i.name);
+            const dataValues = sortedByOut.map(i => i.outQty);
+
+            const ctx = document.getElementById('fastMovingChart').getContext('2d');
+            if (fastMovingChartInstance) fastMovingChartInstance.destroy();
+
+            fastMovingChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Terpakai (Unit)',
+                        data: dataValues,
+                        backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
         function loadLogs() {
-            const month = document.getElementById('filterMonth')?.value;
-            const year = document.getElementById('filterYear')?.value;
-
-            let url = '/api/logs';
-            if (month && year) {
-                url += `?month=${month}&year=${year}`;
-            }
-
-            fetch(url)
+            fetch('/api/logs')
                 .then(res => res.json())
                 .then(logs => {
                     currentLogsData = logs || [];
                     const tbody = document.getElementById('logTableBody');
                     if (!currentLogsData || currentLogsData.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">Tidak ada riwayat transaksi pada bulan ini.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">Tidak ada riwayat transaksi.</td></tr>`;
                         return;
                     }
                     tbody.innerHTML = currentLogsData.map(log => {
@@ -326,12 +377,13 @@
                                 <td class="py-2 px-3 text-center font-bold ${isIN ? 'text-green-600' : 'text-red-600'}">${isIN ? '+' : '-'}${log.quantity}</td>
                                 <td class="py-2 px-3 font-medium text-blue-900">${log.pic_name}</td>
                                 <td class="py-2 px-3 text-gray-600 text-xs">${log.notes}</td>
-                                <td class="py-2 px-3 text-center">
+                                <td class="py-2 px-3 text-center role-superadmin">
                                     <button onclick="deleteLog(${log.id})" class="text-red-500 hover:text-red-700 hover:underline text-xs font-semibold">Hapus</button>
                                 </td>
                             </tr>
                         `;
                     }).join('');
+                    applyRolePermissions();
                 })
                 .catch(err => console.error("Gagal memuat log:", err));
         }
@@ -345,91 +397,38 @@
             }
         }
 
-        function exportLogsToPDF() {
-            if (!currentLogsData || currentLogsData.length === 0) {
-                alert("Tidak ada data histori transaksi untuk dicetak pada bulan ini.");
-                return;
-            }
-
+        function exportExecutiveSummaryPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape');
-
-            const monthSelect = document.getElementById('filterMonth');
-            const monthText = monthSelect.options[monthSelect.selectedIndex].text;
-            const yearText = document.getElementById('filterYear').value;
 
             doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
             doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
-            doc.setFontSize(11);
+            doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text(`LAPORAN HISTORI TRANSAKSI SARPRAS - BULAN ${monthText.toUpperCase()} ${yearText}`, 14, 22);
-            doc.setLineWidth(0.5);
+            doc.text("LAPORAN EKSEKUTIF GABUNGAN MONITORING SARPRAS & STOK BARANG", 14, 22);
             doc.line(14, 25, 283, 25);
 
-            const tableRows = currentLogsData.map((log, index) => {
-                const date = new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-                const typeText = log.type === 'IN' ? 'PENAMBAHAN' : 'PENGAMBILAN';
-                const qtyText = (log.type === 'IN' ? '+' : '-') + log.quantity;
-                const itemName = log.inventory ? `${log.inventory.code} - ${log.inventory.name}` : 'Barang Dihapus';
-
-                return [
-                    index + 1,
-                    date,
-                    itemName,
-                    typeText,
-                    qtyText,
-                    log.pic_name,
-                    log.notes,
-                    ""
-                ];
-            });
+            const tableRows = inventory.map((item, index) => [
+                index + 1, item.code, item.name, item.initial, item.inQty, item.outQty, calculateFinalStock(item)
+            ]);
 
             doc.autoTable({
-                head: [['No', 'Waktu & Tanggal', 'Kode & Nama Barang', 'Jenis', 'Jumlah', 'Petugas / Pengambil', 'Catatan / Keperluan', 'Paraf / TTD']],
+                head: [['No', 'Kode Barang', 'Nama Barang', 'Stok Awal', 'Barang Masuk', 'Barang Keluar', 'Stok Akhir']],
                 body: tableRows,
                 startY: 28,
                 theme: 'grid',
-                headStyles: { fillColor: [30, 58, 138], halign: 'center', fontStyle: 'bold' },
-                styles: { fontSize: 8, cellPadding: 3, verticalAlign: 'middle' },
-                columnStyles: {
-                    0: { halign: 'center', cellWidth: 10 },
-                    1: { cellWidth: 35 },
-                    2: { cellWidth: 55 },
-                    3: { halign: 'center', cellWidth: 28 },
-                    4: { halign: 'center', cellWidth: 18 },
-                    5: { cellWidth: 40 },
-                    6: { cellWidth: 55 },
-                    7: { cellWidth: 28, halign: 'center' }
-                }
+                headStyles: { fillColor: [30, 58, 138], halign: 'center' }
             });
 
-            const finalY = doc.lastAutoTable.finalY + 10;
-            
-            if (finalY > 155) {
-                doc.addPage();
-            }
-
-            const signY = finalY > 155 ? 30 : finalY;
-            const todayDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Surabaya, ${todayDate}`, 210, signY);
-            doc.text("Mengetahui,", 210, signY + 5);
-            doc.text("Koordinator Kegiatan Bidang Umum", 210, signY + 10);
-            
+            const finalY = doc.lastAutoTable.finalY + 15;
+            doc.text(`Surabaya, ${new Date().toLocaleDateString('id-ID')}`, 210, finalY);
+            doc.text("Koordinator Kegiatan Bidang Umum", 210, finalY + 5);
             doc.setFont("helvetica", "bold");
-            const officialName = "Ajeng Herdinawati, S.Psi.";
-            doc.text(officialName, 210, signY + 30);
-            const textWidth = doc.getTextWidth(officialName);
-            doc.setLineWidth(0.5);
-            doc.line(210, signY + 31, 210 + textWidth, signY + 31);
+            doc.text("Ajeng Herdinawati, S.Psi.", 210, finalY + 25);
+            doc.text("NIP. 197909212006042001", 210, finalY + 30);
 
-            doc.setFont("helvetica", "normal");
-            doc.text("NIP. 197909212006042001", 210, signY + 36);
-
-            doc.save(`Laporan_Histori_Sarpras_${monthText}_${yearText}.pdf`);
+            doc.save(`Laporan_Eksekutif_Sarpras_${new Date().toISOString().split('T')[0]}.pdf`);
         }
 
         function calculateFinalStock(item) {
@@ -481,11 +480,11 @@
                         <td class="py-3 px-4 text-center text-green-600 font-medium">+${item.inQty}</td>
                         <td class="py-3 px-4 text-center text-red-600 font-medium">-${item.outQty}</td>
                         <td class="py-3 px-4 text-center font-bold ${textClass}">${finalStock}</td>
-                        <td class="py-3 px-4 text-center space-x-1">
+                        <td class="py-3 px-4 text-center space-x-1 role-write">
                             <button onclick="openTransModal(${item.id}, '${item.name}', 'IN')" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded font-bold">+ Restok</button>
                             <button onclick="openTransModal(${item.id}, '${item.name}', 'OUT')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-2 py-1 rounded font-bold">- Ambil</button>
                         </td>
-                        <td class="py-3 px-4 text-center">
+                        <td class="py-3 px-4 text-center role-superadmin">
                             <button onclick="editItem(${item.id})" class="text-blue-500 hover:underline text-xs mr-2 font-semibold">Edit</button>
                             <button onclick="deleteItem(${item.id})" class="text-red-500 hover:underline text-xs font-semibold">Hapus</button>
                         </td>
@@ -494,6 +493,7 @@
             });
 
             updatePaginationControls();
+            applyRolePermissions();
         }
 
         function updatePaginationControls() {
@@ -677,6 +677,7 @@
 
         initLogFilters();
         loadInventory();
+        applyRolePermissions();
     </script>
 </body>
 </html>
