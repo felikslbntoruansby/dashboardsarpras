@@ -48,7 +48,7 @@
   <!-- Main Content Container -->
   <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full space-y-8">
 
-    <!-- SEKSI GRAFIK ANALYTICS (PENGGANTI KALENDER) -->
+    <!-- SEKSI GRAFIK ANALYTICS INTERAKTIF -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="bg-white p-6 rounded-2xl shadow-2xl border border-slate-100">
         <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -95,7 +95,7 @@
       </div>
     </div>
 
-    <!-- TAB 1: PENGGUNAAN RUANGAN -->
+    <!-- TAB 1: LOG HISTORICAL PENGGUNAAN RUANGAN -->
     <section id="section-ruangan" class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
       <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -131,7 +131,7 @@
       </div>
     </section>
 
-    <!-- TAB 2: OPERATIONAL KENDARAAN -->
+    <!-- TAB 2: LOG HISTORICAL OPERATIONAL KENDARAAN -->
     <section id="section-kendaraan" class="hidden bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
       <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -257,7 +257,6 @@
       }
     }
 
-    // GRAFIK STATISTIK RUANGAN
     function renderRuanganChart() {
       const roomCounts = {};
       ruanganData.forEach(item => {
@@ -288,7 +287,6 @@
       });
     }
 
-    // GRAFIK STATISTIK KENDARAAN
     function renderKendaraanChart() {
       const statusCounts = {};
       kendaraanData.forEach(item => {
@@ -321,7 +319,6 @@
       });
     }
 
-    // FUNGSI CETAK PDF HISTORICAL
     function exportToPDF(category) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
@@ -434,16 +431,18 @@
     }
 
     async function deleteItem(category, id) {
-      if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+      if (confirm("Apakah Anda yakin ingin menghapus data ini dari database?")) {
         const url = category === 'ruangan' ? `/api/peminjaman-ruangan/${id}` : `/api/peminjaman-kendaraan/${id}`;
         try {
           const res = await fetch(url, { method: 'DELETE' });
           if (res.ok) {
-            if (category === 'ruangan') loadRuanganData();
-            else loadKendaraanData();
+            if (category === 'ruangan') await loadRuanganData();
+            else await loadKendaraanData();
+          } else {
+            alert("Gagal menghapus data dari database.");
           }
         } catch (err) {
-          alert("Gagal menghapus: " + err.message);
+          alert("Error: " + err.message);
         }
       }
     }
@@ -474,7 +473,9 @@
         });
         if (res.ok) {
           closeModal();
-          loadRuanganData();
+          await loadRuanganData();
+        } else {
+          alert("Gagal menyimpan data ke database.");
         }
       } else if (category === 'kendaraan') {
         const payload = {
@@ -495,7 +496,9 @@
         });
         if (res.ok) {
           closeModal();
-          loadKendaraanData();
+          await loadKendaraanData();
+        } else {
+          alert("Gagal menyimpan data ke database.");
         }
       }
     }
