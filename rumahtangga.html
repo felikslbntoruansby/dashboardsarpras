@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- jsPDF & autoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -47,6 +49,27 @@
 
   <!-- Main Content Container -->
   <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full space-y-8">
+
+    <!-- SEKSI DASHBOARD ANALYTICS BARU -->
+    <div class="bg-slate-800/60 backdrop-blur border border-indigo-500/30 rounded-2xl p-6 shadow-2xl">
+      <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-chart-pie text-indigo-400"></i> Analytics Statistik Penggunaan & Operasional
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+          <p class="text-xs font-bold text-slate-400 uppercase mb-2">Statistik Peminjaman Ruangan (Berdasarkan Status)</p>
+          <div class="h-48 relative">
+            <canvas id="ruanganChart"></canvas>
+          </div>
+        </div>
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+          <p class="text-xs font-bold text-slate-400 uppercase mb-2">Statistik Armada & Maintenance</p>
+          <div class="h-48 relative">
+            <canvas id="armadaChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Ringkasan Stat & Tab Navigasi -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -112,7 +135,11 @@
           </h2>
           <p class="text-xs text-slate-500 mt-1">Daftar penggunaan ruang rapat, auditorium, dan aula kampus</p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <input type="text" onkeyup="filterTableRealtime('ruangan', this.value)" placeholder="🔍 Cari Ruangan / Peminjam..." class="px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+          <button onclick="openFormModal('ruangan')" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+            <i class="fa-solid fa-plus"></i> + Tambah Data Ruangan
+          </button>
           <button onclick="exportPDF('Ruangan')" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
@@ -144,7 +171,11 @@
           </h2>
           <p class="text-xs text-slate-500 mt-1">Jadwal armada mobil dinas dan bus operasional kampus</p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <input type="text" onkeyup="filterTableRealtime('kendaraan', this.value)" placeholder="🔍 Cari Kendaraan / Driver..." class="px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+          <button onclick="openFormModal('kendaraan')" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+            <i class="fa-solid fa-plus"></i> + Tambah Data Kendaraan
+          </button>
           <button onclick="exportPDF('Kendaraan')" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
@@ -176,7 +207,11 @@
           </h2>
           <p class="text-xs text-slate-500 mt-1">Pemeliharaan berkala pendingin & proteksi kebakaran</p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <input type="text" onkeyup="filterTableRealtime('maintenance', this.value)" placeholder="🔍 Cari Fasilitas / Lokasi..." class="px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-amber-500 outline-none">
+          <button onclick="openFormModal('maintenance')" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+            <i class="fa-solid fa-plus"></i> + Tambah Data Maintenance
+          </button>
           <button onclick="exportPDF('Maintenance')" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
@@ -206,20 +241,21 @@
     <p>&copy; 2026 Unit Bagian Umum - Politeknik Penerbangan Surabaya.</p>
   </footer>
 
-  <!-- MODAL EDIT DATA INTERAKSI -->
+  <!-- MODAL EDIT / TAMBAH DATA -->
   <div id="editModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 border border-slate-100">
       <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-        <h3 class="font-bold text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Edit Data Rumah Tangga
+        <h3 id="modalHeaderTitle" class="font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Form Data Rumah Tangga
         </h3>
         <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
       </div>
       <form id="editForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
         <input type="hidden" id="modalDataId">
+        <input type="hidden" id="modalCategory" value="ruangan">
         
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Item / Kegiatan</label>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Item / Ruangan / Kendaraan</label>
           <input type="text" id="modalItemTitle" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium" required>
         </div>
         <div>
@@ -232,15 +268,14 @@
         </div>
         <div class="flex justify-end gap-3 pt-3">
           <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">Batal</button>
-          <button type="submit" id="btnSaveModal" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all">Simpan ke Supabase</button>
+          <button type="submit" id="btnSaveModal" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all">Simpan Data</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- SCRIPT KONEKSI SUPABASE & AMBIL/EDIT DATA -->
+  <!-- SCRIPT KONEKSI SUPABASE, GRAPHICS, FILTER & CRUD -->
   <script>
-    // URL & PUBLISHABLE KEY SUPABASE RESMI
     const SUPABASE_URL = 'https://xlompxgjdifbthgpkphv.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
 
@@ -250,13 +285,15 @@
     }
 
     let dbItems = [];
-
     let defaultData = [
       { id: 1, category: 'ruangan', title: 'Ruang Rapat Utama A', person: 'Sub Bagian Keuangan', detail: 'Disetujui' },
       { id: 2, category: 'ruangan', title: 'Auditorium Gedung Bravo', person: 'Unit Kepegawaian', detail: 'Menunggu' },
       { id: 3, category: 'kendaraan', title: 'Bus Operasional 01 (L 1234 XX)', person: 'Pak Bambang', detail: 'Dalam Tugas' },
       { id: 4, category: 'maintenance', title: 'Refill APAR & Cek Hydrant', person: 'Tim K3 Internal', detail: '2026-11-15' }
     ];
+
+    let ruanganChartInstance = null;
+    let armadaChartInstance = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
       await fetchSupabaseData();
@@ -279,13 +316,15 @@
         dbItems = defaultData;
       }
       renderTables();
+      renderCharts();
     }
 
-    function renderTables() {
+    function renderTables(filteredData = null) {
       const categories = ['ruangan', 'kendaraan', 'maintenance'];
+      const dataToRender = filteredData || dbItems;
       
       categories.forEach(cat => {
-        const items = dbItems.filter(item => (item.category || 'ruangan').toLowerCase() === cat);
+        const items = dataToRender.filter(item => (item.category || 'ruangan').toLowerCase() === cat);
         document.getElementById(`count-${cat}`).textContent = `${items.length} Data`;
 
         const tbody = document.getElementById(`tbody-${cat}`);
@@ -299,9 +338,12 @@
             <td class="px-6 py-4 font-bold text-slate-800">${item.title || ''}</td>
             <td class="px-6 py-4">${item.person || ''}</td>
             <td class="px-6 py-4"><span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-md font-semibold border border-indigo-200">${item.detail || '-'}</span></td>
-            <td class="px-6 py-4 text-center">
-              <button onclick="openEditModal(${item.id}, '${escapeQuotes(item.title)}', '${escapeQuotes(item.person)}', '${escapeQuotes(item.detail)}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg border border-indigo-200 transition-all">
+            <td class="px-6 py-4 text-center flex items-center justify-center gap-2">
+              <button onclick="openFormModal('${cat}', ${item.id}, '${escapeQuotes(item.title)}', '${escapeQuotes(item.person)}', '${escapeQuotes(item.detail)}')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg border border-indigo-200 transition-all">
                 <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+              <button onclick="deleteData(${item.id})" class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-lg border border-rose-200 transition-all">
+                <i class="fa-solid fa-trash"></i>
               </button>
             </td>
           </tr>
@@ -309,15 +351,49 @@
       });
     }
 
-    function escapeQuotes(str) {
-      return (str || '').replace(/'/g, "\\'");
+    function filterTableRealtime(category, keyword) {
+      const term = keyword.toLowerCase().trim();
+      const filtered = dbItems.filter(item => {
+        const isCatMatch = (item.category || 'ruangan').toLowerCase() === category;
+        const isTitleMatch = (item.title || '').toLowerCase().includes(term);
+        const isPersonMatch = (item.person || '').toLowerCase().includes(term);
+        const isDetailMatch = (item.detail || '').toLowerCase().includes(term);
+        return isCatMatch && (isTitleMatch || isPersonMatch || isDetailMatch);
+      });
+
+      const tbody = document.getElementById(`tbody-${category}`);
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-slate-400">Data '${keyword}' tidak ditemukan.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-6 py-4 font-bold text-slate-800">${item.title || ''}</td>
+          <td class="px-6 py-4">${item.person || ''}</td>
+          <td class="px-6 py-4"><span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-md font-semibold border border-indigo-200">${item.detail || '-'}</span></td>
+          <td class="px-6 py-4 text-center flex items-center justify-center gap-2">
+            <button onclick="openFormModal('${category}', ${item.id}, '${escapeQuotes(item.title)}', '${escapeQuotes(item.person)}', '${escapeQuotes(item.detail)}')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg border border-indigo-200 transition-all">
+              <i class="fa-solid fa-pen-to-square"></i> Edit
+            </button>
+            <button onclick="deleteData(${item.id})" class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-lg border border-rose-200 transition-all">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
     }
 
-    function openEditModal(id, title, person, detail) {
-      document.getElementById('modalDataId').value = id;
+    function openFormModal(category, id = null, title = '', person = '', detail = '') {
+      document.getElementById('modalDataId').value = id || '';
+      document.getElementById('modalCategory').value = category;
       document.getElementById('modalItemTitle').value = title;
       document.getElementById('modalPerson').value = person;
       document.getElementById('modalDetail').value = detail;
+      
+      const headerTitle = document.getElementById('modalHeaderTitle');
+      headerTitle.innerHTML = id ? `<i class="fa-solid fa-pen-to-square text-indigo-600"></i> Edit Data ${category.toUpperCase()}` : `<i class="fa-solid fa-plus text-indigo-600"></i> Tambah Data ${category.toUpperCase()}`;
+
       document.getElementById('editModal').classList.remove('hidden');
     }
 
@@ -332,43 +408,105 @@
       saveBtn.textContent = 'Menyimpan...';
 
       const id = document.getElementById('modalDataId').value;
-      const updatedTitle = document.getElementById('modalItemTitle').value;
-      const updatedPerson = document.getElementById('modalPerson').value;
-      const updatedDetail = document.getElementById('modalDetail').value;
+      const category = document.getElementById('modalCategory').value;
+      const title = document.getElementById('modalItemTitle').value;
+      const person = document.getElementById('modalPerson').value;
+      const detail = document.getElementById('modalDetail').value;
 
       try {
-        if (supabaseClient) {
-          const { error } = await supabaseClient
-            .from('rumahtangga')
-            .update({ 
-              title: updatedTitle, 
-              person: updatedPerson, 
-              detail: updatedDetail 
-            })
-            .eq('id', id);
-
-          if (error) {
-            console.error('Supabase error:', error);
-            alert('Gagal update Supabase: ' + error.message);
+        if (id) {
+          // UPDATE
+          if (supabaseClient) {
+            await supabaseClient.from('rumahtangga').update({ title, person, detail }).eq('id', id);
           }
-        }
-
-        const targetIndex = dbItems.findIndex(item => String(item.id) === String(id));
-        if (targetIndex !== -1) {
-          dbItems[targetIndex].title = updatedTitle;
-          dbItems[targetIndex].person = updatedPerson;
-          dbItems[targetIndex].detail = updatedDetail;
+          const index = dbItems.findIndex(i => String(i.id) === String(id));
+          if (index !== -1) {
+            dbItems[index].title = title;
+            dbItems[index].person = person;
+            dbItems[index].detail = detail;
+          }
+        } else {
+          // INSERT / TAMBAH MANUAL
+          const newObj = { category, title, person, detail };
+          if (supabaseClient) {
+            const { data } = await supabaseClient.from('rumahtangga').insert([newObj]).select();
+            if (data && data[0]) newObj.id = data[0].id;
+            else newObj.id = Date.now();
+          } else {
+            newObj.id = Date.now();
+          }
+          dbItems.unshift(newObj);
         }
 
         renderTables();
-        alert('Data berhasil disimpan permanen ke database Supabase!');
+        renderCharts();
+        alert('Data berhasil disimpan ke database Supabase!');
         closeEditModal();
       } catch (err) {
         alert('Kendala penyimpanan: ' + err.message);
       } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = 'Simpan ke Supabase';
+        saveBtn.textContent = 'Simpan Data';
       }
+    }
+
+    async function deleteData(id) {
+      if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+        try {
+          if (supabaseClient) {
+            await supabaseClient.from('rumahtangga').delete().eq('id', id);
+          }
+          dbItems = dbItems.filter(i => String(i.id) !== String(id));
+          renderTables();
+          renderCharts();
+        } catch (err) {
+          alert('Gagal menghapus: ' + err.message);
+        }
+      }
+    }
+
+    function renderCharts() {
+      // 1. Chart Ruangan
+      const ruanganItems = dbItems.filter(i => (i.category || 'ruangan').toLowerCase() === 'ruangan');
+      const approved = ruanganItems.filter(i => (i.detail || '').toLowerCase().includes('setuju')).length;
+      const pending = ruanganItems.length - approved;
+
+      const ctxRuangan = document.getElementById('ruanganChart').getContext('2d');
+      if (ruanganChartInstance) ruanganChartInstance.destroy();
+      ruanganChartInstance = new Chart(ctxRuangan, {
+        type: 'doughnut',
+        data: {
+          labels: ['Disetujui', 'Menunggu / Lainnya'],
+          datasets: [{
+            data: [approved, pending],
+            backgroundColor: ['#6366f1', '#334155']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#cbd5e1' } } } }
+      });
+
+      // 2. Chart Armada & Maintenance
+      const kendaraanCount = dbItems.filter(i => (i.category || '').toLowerCase() === 'kendaraan').length;
+      const maintenanceCount = dbItems.filter(i => (i.category || '').toLowerCase() === 'maintenance').length;
+
+      const ctxArmada = document.getElementById('armadaChart').getContext('2d');
+      if (armadaChartInstance) armadaChartInstance.destroy();
+      armadaChartInstance = new Chart(ctxArmada, {
+        type: 'bar',
+        data: {
+          labels: ['Operasional Kendaraan', 'Maintenance & K3'],
+          datasets: [{
+            label: 'Jumlah Unit/Servis',
+            data: [kendaraanCount, maintenanceCount],
+            backgroundColor: ['#10b981', '#f59e0b']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#cbd5e1' } }, x: { ticks: { color: '#cbd5e1' } } } }
+      });
+    }
+
+    function escapeQuotes(str) {
+      return (str || '').replace(/'/g, "\\'");
     }
 
     function switchTab(tabName) {
@@ -392,19 +530,16 @@
     function exportPDF(categoryTitle) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-
       doc.setFontSize(16);
       doc.text(`Laporan Sub-Menu ${categoryTitle} - Rumah Tangga Sarpras`, 14, 20);
       doc.setFontSize(10);
       doc.text(`Unit Bagian Umum - Politeknik Penerbangan Surabaya (${new Date().toLocaleDateString('id-ID')})`, 14, 26);
-
       doc.autoTable({
         startY: 32,
         html: `#section-${categoryTitle.toLowerCase()} table`,
         theme: 'grid',
         headStyles: { fillColor: [49, 46, 129] },
       });
-
       doc.save(`Laporan_${categoryTitle}_Sarpras.pdf`);
     }
   </script>
