@@ -16,146 +16,172 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-gray-100 p-4 md:p-8 font-sans text-gray-800">
+<body class="bg-slate-900 font-sans text-slate-100 p-4 md:p-8 min-h-screen">
 
-    <div class="max-w-6xl mx-auto space-y-6 md:space-y-8">
-        <!-- Header & Tombol Aksi (Logout & Badge Role Dihapus) -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
+        
+        <!-- Header Utama -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-xl backdrop-blur-md">
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-blue-900 flex items-center gap-2">
-                    Dashboard Monitoring Sarpras
+                <h1 class="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-3">
+                    <i class="fa-solid fa-boxes-stacked text-blue-500"></i> Dashboard Monitoring Inventaris Sarpras
                 </h1>
-                <p class="text-sm md:text-base text-gray-600">Politeknik Penerbangan Surabaya</p>
+                <p class="text-sm text-slate-400 mt-1">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase Data</p>
             </div>
             <div class="flex gap-2 flex-wrap w-full md:w-auto">
-                <a href="/rumah-tangga" class="flex-1 md:flex-none justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
-                    📘 Rumah Tangga
+                <a href="/rumah-tangga" class="flex-1 md:flex-none justify-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-building-user"></i> Rumah Tangga
                 </a>
-                <button onclick="exportExecutiveSummaryPDF()" class="flex-1 md:flex-none justify-center bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
-                    📄 Laporan Eksekutif PDF
+                <button onclick="exportExecutiveSummaryPDF()" class="flex-1 md:flex-none justify-center bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-file-pdf"></i> Laporan Eksekutif PDF
                 </button>
-                <a href="/api/backup" target="_blank" class="flex-1 md:flex-none justify-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
-                    💾 Backup JSON
+                <a href="/api/backup" target="_blank" class="flex-1 md:flex-none justify-center bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-database"></i> Backup JSON
                 </a>
-                <button onclick="exportToExcel()" class="flex-1 md:flex-none justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
-                    📊 Excel
+                <button onclick="exportToExcel()" class="flex-1 md:flex-none justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-file-excel"></i> Excel
                 </button>
-                <button onclick="openModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm">
+                <button onclick="openModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm transition active:scale-95">
                     + Master Barang
                 </button>
             </div>
         </div>
 
         <!-- SPANDUK ALERT STOK MINIMUM -->
-        <div id="stockAlertBanner" class="hidden bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-md">
+        <div id="stockAlertBanner" class="hidden bg-amber-500/10 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-lg backdrop-blur">
             <div class="flex items-center">
-                <div class="py-1"><i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl mr-3"></i></div>
+                <div class="py-1"><i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mr-3"></i></div>
                 <div>
-                    <p class="font-bold text-amber-800 text-sm">Peringatan Stok Minimum Barang!</p>
-                    <p id="stockAlertList" class="text-xs text-amber-700 mt-0.5">Memuat daftar barang...</p>
+                    <p class="font-bold text-amber-400 text-sm">Peringatan Stok Kritis Minimum Barang!</p>
+                    <p id="stockAlertList" class="text-xs text-amber-300/80 mt-0.5">Memuat daftar barang...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Section Grafik Analytics -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white p-4 md:p-6 rounded-lg shadow">
-                <h2 class="text-base md:text-lg font-bold mb-4 text-gray-700">Grafik Stok Akhir Barang (Top 15)</h2>
-                <div style="position: relative; height: 28vh; width: 100%;">
+        <!-- SEKSI 1: BI SCORECARDS / KPI STATS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Jenis Barang</p>
+                <h3 class="text-3xl font-black text-blue-400 mt-2" id="kpi-total-items">0</h3>
+                <p class="text-[11px] text-slate-500 mt-1">Item Terdaftar di Master</p>
+            </div>
+            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Akumulasi Stok</p>
+                <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-total-stock">0</h3>
+                <p class="text-[11px] text-emerald-500/80 mt-1">Unit Siap Pakai</p>
+            </div>
+            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Barang Keluar (Terpakai)</p>
+                <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-total-out">0</h3>
+                <p class="text-[11px] text-rose-500/80 mt-1">Total Distribusi Unit</p>
+            </div>
+            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Barang Kritis (< 5 Unit)</p>
+                <h3 class="text-3xl font-black text-amber-400 mt-2" id="kpi-kritis-count">0</h3>
+                <p class="text-[11px] text-amber-500/80 mt-1">Perlu Restok Segera</p>
+            </div>
+        </div>
+
+        <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK MULTI-DIMENSI -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Combo Chart (Bar + Line) Stok vs Distribusi -->
+            <div class="lg:col-span-2 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-column text-blue-400"></i> Analisis Stok Akhir vs Keluar (Top 15 Barang)
+                </h2>
+                <div style="position: relative; height: 32vh; width: 100%;">
                     <canvas id="stockChart"></canvas>
                 </div>
             </div>
-            <div class="bg-white p-4 md:p-6 rounded-lg shadow">
-                <h2 class="text-base md:text-lg font-bold mb-4 text-gray-700">Analytics Fast-Moving Items (Sering Keluar)</h2>
-                <div style="position: relative; height: 28vh; width: 100%;">
-                    <canvas id="fastMovingChart"></canvas>
+
+            <!-- Doughnut Chart Distribusi Kesehatan Stok -->
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-emerald-400"></i> Distribusi Status Kesehatan Stok
+                </h2>
+                <div style="position: relative; height: 32vh; width: 100%;">
+                    <canvas id="healthPieChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Tabel Utama Inventaris -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="p-4 border-b flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
+        <!-- SEKSI 3: FAST-MOVING ITEMS (BAR CHART HORIZONTAL) -->
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+            <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-fire text-amber-400"></i> Analytics Fast-Moving Items (Barang Paling Sering Diambil)
+            </h2>
+            <div style="position: relative; height: 26vh; width: 100%;">
+                <canvas id="fastMovingChart"></canvas>
+            </div>
+        </div>
+
+        <!-- TABEL UTAMA MASTER INVENTARIS -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
+            <div class="p-5 border-b border-slate-700 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-slate-800/90">
                 <div class="w-full md:w-1/3">
-                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari Kode atau Nama Barang..." class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="🔍 Cari Kode atau Nama Barang..." class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div id="itemCount" class="text-xs md:text-sm font-semibold text-gray-600">
+                <div id="itemCount" class="text-xs md:text-sm font-semibold text-slate-400">
                     Memuat data...
                 </div>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="min-w-full text-left border-collapse whitespace-nowrap">
-                    <thead class="bg-blue-900 text-white text-xs md:text-sm uppercase">
+                    <thead class="bg-slate-900 text-slate-300 text-xs uppercase font-bold border-b border-slate-700">
                         <tr>
-                            <th class="py-3 px-4">Kode Barang</th>
-                            <th class="py-3 px-4">Nama Barang</th>
-                            <th class="py-3 px-4 text-center">Stok Awal</th>
-                            <th class="py-3 px-4 text-center">Masuk</th>
-                            <th class="py-3 px-4 text-center">Keluar</th>
-                            <th class="py-3 px-4 text-center">Stok Akhir</th>
-                            <th class="py-3 px-4 text-center">Kelola Stok</th>
-                            <th class="py-3 px-4 text-center">Aksi Master</th>
+                            <th class="py-4 px-5">Kode Barang</th>
+                            <th class="py-4 px-5">Nama Barang</th>
+                            <th class="py-4 px-5 text-center">Stok Awal</th>
+                            <th class="py-4 px-5 text-center">Masuk</th>
+                            <th class="py-4 px-5 text-center">Keluar</th>
+                            <th class="py-4 px-5 text-center">Stok Akhir</th>
+                            <th class="py-4 px-5 text-center">Kelola Stok</th>
+                            <th class="py-4 px-5 text-center">Aksi Master</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="text-gray-700 text-xs md:text-sm">
-                        <tr><td colspan="8" class="text-center py-4 text-gray-500">Memuat data inventaris...</td></tr>
+                    <tbody id="tableBody" class="text-slate-300 text-xs md:text-sm divide-y divide-slate-700/50">
+                        <tr><td colspan="8" class="text-center py-6 text-slate-500">Memuat data inventaris...</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="flex justify-between items-center p-4 border-t bg-gray-50 text-xs md:text-sm">
-                <button id="prevBtn" onclick="changePage(-1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-1 px-4 rounded disabled:cursor-not-allowed">Previous</button>
-                <span id="pageIndicator" class="font-semibold text-gray-700">Halaman 1</span>
-                <button id="nextBtn" onclick="changePage(1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-1 px-4 rounded disabled:cursor-not-allowed">Next</button>
+            <div class="flex justify-between items-center p-4 border-t border-slate-700 bg-slate-900/50 text-xs md:text-sm">
+                <button id="prevBtn" onclick="changePage(-1)" class="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Previous</button>
+                <span id="pageIndicator" class="font-semibold text-slate-400">Halaman 1</span>
+                <button id="nextBtn" onclick="changePage(1)" class="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Next</button>
             </div>
         </div>
 
-        <!-- Tabel Histori Catatan Transaksi -->
-        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+        <!-- TABEL HISTORI TRANSAKSI -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 md:p-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-                <h2 class="text-lg md:text-xl font-bold text-gray-800">📜 Histori Transaksi (Pengambilan & Penambahan)</h2>
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-purple-400"></i> Histori Transaksi (Penambahan & Pengambilan)
+                </h2>
                 
                 <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
-                    <select id="filterMonth" onchange="loadLogs()" class="border p-2 rounded text-xs md:text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
-                        <option value="1">Januari</option>
-                        <option value="2">Februari</option>
-                        <option value="3">Maret</option>
-                        <option value="4">April</option>
-                        <option value="5">Mei</option>
-                        <option value="6">Juni</option>
-                        <option value="7">Juli</option>
-                        <option value="8">Agustus</option>
-                        <option value="9">September</option>
-                        <option value="10">Oktober</option>
-                        <option value="11" selected>November</option>
-                        <option value="12">Desember</option>
-                    </select>
-
-                    <select id="filterYear" onchange="loadLogs()" class="border p-2 rounded text-xs md:text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </select>
-
-                    <button onclick="exportLogsToPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded shadow text-xs md:text-sm flex items-center gap-1">
-                        📄 Cetak PDF
+                    <button onclick="exportLogsToPDF()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow text-xs md:text-sm flex items-center gap-2 transition">
+                        <i class="fa-solid fa-file-pdf"></i> Cetak PDF Histori
                     </button>
                 </div>
             </div>
 
             <div class="overflow-x-auto max-h-96">
                 <table class="min-w-full text-left border-collapse whitespace-nowrap text-xs md:text-sm">
-                    <thead class="bg-gray-800 text-white sticky top-0">
+                    <thead class="bg-slate-900 text-slate-300 sticky top-0 border-b border-slate-700">
                         <tr>
-                            <th class="py-2 px-3">Waktu & Tanggal</th>
-                            <th class="py-2 px-3">Kode & Barang</th>
-                            <th class="py-2 px-3 text-center">Jenis</th>
-                            <th class="py-2 px-3 text-center">Jumlah</th>
-                            <th class="py-2 px-3">Petugas / Pengambil</th>
-                            <th class="py-2 px-3">Catatan / Keperluan</th>
-                            <th class="py-2 px-3 text-center">Aksi</th>
+                            <th class="py-3 px-4">Waktu & Tanggal</th>
+                            <th class="py-3 px-4">Kode & Barang</th>
+                            <th class="py-3 px-4 text-center">Jenis</th>
+                            <th class="py-3 px-4 text-center">Jumlah</th>
+                            <th class="py-3 px-4">Petugas / Pengambil</th>
+                            <th class="py-3 px-4">Catatan / Keperluan</th>
+                            <th class="py-3 px-4 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="logTableBody" class="divide-y divide-gray-200">
-                        <tr><td colspan="7" class="text-center py-4 text-gray-500">Memuat histori...</td></tr>
+                    <tbody id="logTableBody" class="divide-y divide-slate-700/50">
+                        <tr><td colspan="7" class="text-center py-4 text-slate-500">Memuat histori...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -163,72 +189,72 @@
     </div>
 
     <!-- Modal Master Barang -->
-    <div id="itemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 id="modalTitle" class="text-xl font-bold mb-4 text-blue-900">Tambah Master Barang</h2>
+    <div id="itemModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4 text-white">Tambah Master Barang</h2>
             <form id="itemForm" class="space-y-3">
                 <input type="hidden" id="itemId">
                 
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Kode Barang</label>
-                    <input type="text" id="itemCode" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="A001">
+                    <label class="block text-xs font-semibold mb-1 text-slate-300">Kode Barang</label>
+                    <input type="text" id="itemCode" required class="w-full border border-slate-600 bg-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="A001">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Nama Barang</label>
-                    <input type="text" id="itemName" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-xs font-semibold mb-1 text-slate-300">Nama Barang</label>
+                    <input type="text" id="itemName" required class="w-full border border-slate-600 bg-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <div class="grid grid-cols-3 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold mb-1">Stok Awal</label>
-                        <input type="number" id="stockInitial" min="0" value="0" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-semibold mb-1 text-slate-300">Stok Awal</label>
+                        <input type="number" id="stockInitial" min="0" value="0" required class="w-full border border-slate-600 bg-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold mb-1">Masuk</label>
-                        <input type="number" id="stockIn" min="0" value="0" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-semibold mb-1 text-slate-300">Masuk</label>
+                        <input type="number" id="stockIn" min="0" value="0" required class="w-full border border-slate-600 bg-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold mb-1">Keluar</label>
-                        <input type="number" id="stockOut" min="0" value="0" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-semibold mb-1 text-slate-300">Keluar</label>
+                        <input type="number" id="stockOut" min="0" value="0" required class="w-full border border-slate-600 bg-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-3">
-                    <button type="button" onclick="closeModal()" class="bg-gray-400 hover:bg-gray-500 text-white py-1.5 px-4 rounded text-sm">Batal</button>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-4 rounded text-sm">Simpan</button>
+                    <button type="button" onclick="closeModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 py-2 px-4 rounded-xl text-xs font-bold">Batal</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-xl text-xs font-bold shadow">Simpan Data</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Modal Form Transaksi -->
-    <div id="transModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 id="transModalTitle" class="text-xl font-bold mb-4 text-blue-900">Transaksi Barang</h2>
+    <div id="transModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
+            <h2 id="transModalTitle" class="text-xl font-bold mb-4 text-white">Transaksi Barang</h2>
             <form id="transForm" class="space-y-3">
                 <input type="hidden" id="transItemId">
                 <input type="hidden" id="transType">
                 
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Nama Barang</label>
-                    <input type="text" id="transItemName" disabled class="w-full border p-2 rounded text-sm bg-gray-100 font-bold">
+                    <label class="block text-xs font-semibold mb-1 text-slate-300">Nama Barang</label>
+                    <input type="text" id="transItemName" disabled class="w-full border border-slate-700 bg-slate-900/60 p-2.5 rounded-xl text-sm font-bold text-slate-400">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Jumlah Barang</label>
-                    <input type="number" id="transQty" min="1" value="1" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-xs font-semibold mb-1 text-slate-300">Jumlah Barang</label>
+                    <input type="number" id="transQty" min="1" value="1" required class="w-full border border-slate-600 bg-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Nama Petugas / Pengambil Barang</label>
-                    <input type="text" id="transPic" placeholder="Contoh: Budi (Bagian IT)" required class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-xs font-semibold mb-1 text-slate-300">Nama Petugas / Pengambil Barang</label>
+                    <input type="text" id="transPic" placeholder="Contoh: Budi (Bagian IT)" required class="w-full border border-slate-600 bg-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Catatan / Keperluan</label>
-                    <textarea id="transNotes" placeholder="Contoh: Perbaikan AC Ruang 102" class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <label class="block text-xs font-semibold mb-1 text-slate-300">Catatan / Keperluan</label>
+                    <textarea id="transNotes" placeholder="Contoh: Perbaikan AC Ruang 102" class="w-full border border-slate-600 bg-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
                 <div class="flex justify-end gap-2 pt-3">
-                    <button type="button" onclick="closeTransModal()" class="bg-gray-400 hover:bg-gray-500 text-white py-1.5 px-4 rounded text-sm">Batal</button>
-                    <button type="submit" id="transSubmitBtn" class="bg-green-600 hover:bg-green-700 text-white py-1.5 px-4 rounded text-sm font-bold">Simpan Transaksi</button>
+                    <button type="button" onclick="closeTransModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 py-2 px-4 rounded-xl text-xs font-bold">Batal</button>
+                    <button type="submit" id="transSubmitBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-4 rounded-xl text-xs font-bold shadow">Simpan Transaksi</button>
                 </div>
             </form>
         </div>
@@ -241,29 +267,12 @@
         let currentPage = 1;
         const rowsPerPage = 10;
         let stockChartInstance = null;
+        let healthPieChartInstance = null;
         let fastMovingChartInstance = null;
 
         document.addEventListener("DOMContentLoaded", function() {
-            initLogFilters();
             loadInventory();
         });
-
-        function initLogFilters() {
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const yearSelect = document.getElementById('filterYear');
-
-            if (yearSelect) {
-                yearSelect.innerHTML = '';
-                for (let y = currentYear - 2; y <= currentYear + 2; y++) {
-                    const opt = document.createElement('option');
-                    opt.value = y;
-                    opt.innerText = y;
-                    if (y === currentYear) opt.selected = true;
-                    yearSelect.appendChild(opt);
-                }
-            }
-        }
 
         function loadInventory() {
             fetch('/api/inventory')
@@ -271,19 +280,34 @@
                 .then(data => {
                     inventory = Array.isArray(data) ? data : [];
                     filteredInventory = [...inventory];
+                    updateKpis();
                     checkStockAlerts();
                     renderData();
                     loadLogs();
+                    renderHealthPieChart();
                     renderFastMovingChart();
                 })
                 .catch(err => {
                     console.error("Gagal memuat data:", err);
-                    document.getElementById("tableBody").innerHTML = `<tr><td colspan="8" class="text-center py-6 text-red-500 font-semibold">Gagal memuat data dari API backend.</td></tr>`;
+                    document.getElementById("tableBody").innerHTML = `<tr><td colspan="8" class="text-center py-6 text-rose-500 font-semibold">Gagal memuat data dari API backend.</td></tr>`;
                 });
         }
 
+        function updateKpis() {
+            document.getElementById('kpi-total-items').innerText = inventory.length;
+            
+            const totalStock = inventory.reduce((sum, item) => sum + calculateFinalStock(item), 0);
+            document.getElementById('kpi-total-stock').innerText = totalStock.toLocaleString('id-ID');
+
+            const totalOut = inventory.reduce((sum, item) => sum + (item.outQty || 0), 0);
+            document.getElementById('kpi-total-out').innerText = totalOut.toLocaleString('id-ID');
+
+            const kritisCount = inventory.filter(item => calculateFinalStock(item) < 5).length;
+            document.getElementById('kpi-kritis-count').innerText = kritisCount;
+        }
+
         function checkStockAlerts() {
-            const lowStockItems = inventory.filter(item => calculateFinalStock(item) < 10);
+            const lowStockItems = inventory.filter(item => calculateFinalStock(item) < 5);
             const banner = document.getElementById('stockAlertBanner');
             const listText = document.getElementById('stockAlertList');
 
@@ -296,8 +320,86 @@
             }
         }
 
+        // 1. Combo Chart Stock vs Out
+        function renderChart() {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            const chartItems = filteredInventory.slice(0, 15);
+            const labels = chartItems.map(item => item.name);
+            const stockData = chartItems.map(item => calculateFinalStock(item));
+            const outData = chartItems.map(item => item.outQty || 0);
+
+            if (stockChartInstance) stockChartInstance.destroy();
+
+            stockChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Terpakai (Out)',
+                            data: outData,
+                            borderColor: '#f59e0b',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.3
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Stok Akhir',
+                            data: stockData,
+                            backgroundColor: stockData.map(s => s <= 0 ? '#ef4444' : (s < 10 ? '#f59e0b' : '#10b981')),
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                    }
+                }
+            });
+        }
+
+        // 2. Health Stock Pie Chart
+        function renderHealthPieChart() {
+            let aman = 0, warning = 0, kritis = 0;
+            inventory.forEach(item => {
+                const s = calculateFinalStock(item);
+                if (s <= 0 || s < 5) kritis++;
+                else if (s < 15) warning++;
+                else aman++;
+            });
+
+            const ctx = document.getElementById('healthPieChart').getContext('2d');
+            if (healthPieChartInstance) healthPieChartInstance.destroy();
+
+            healthPieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aman (>15)', 'Perlu Perhatian (5-15)', 'Kritis (<5)'],
+                    datasets: [{
+                        data: [aman, warning, kritis],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: '#1e293b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
+                }
+            });
+        }
+
+        // 3. Fast-Moving Horizontal Bar Chart
         function renderFastMovingChart() {
-            const sortedByOut = [...inventory].sort((a, b) => (b.outQty || 0) - (a.outQty || 0)).slice(0, 5);
+            const sortedByOut = [...inventory].sort((a, b) => (b.outQty || 0) - (a.outQty || 0)).slice(0, 7);
             const labels = sortedByOut.map(i => i.name);
             const dataValues = sortedByOut.map(i => i.outQty || 0);
 
@@ -311,14 +413,19 @@
                     datasets: [{
                         label: 'Total Terpakai (Unit)',
                         data: dataValues,
-                        backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                        borderRadius: 4
+                        backgroundColor: 'rgba(99, 102, 241, 0.85)',
+                        borderRadius: 6
                     }]
                 },
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                    }
                 }
             });
         }
@@ -330,28 +437,28 @@
                     currentLogsData = Array.isArray(logs) ? logs : [];
                     const tbody = document.getElementById('logTableBody');
                     if (!currentLogsData || currentLogsData.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">Tidak ada riwayat transaksi.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-slate-500">Tidak ada riwayat transaksi.</td></tr>`;
                         return;
                     }
                     tbody.innerHTML = currentLogsData.map(log => {
                         const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
                         const isIN = log.type === 'IN';
-                        const badge = isIN ? `<span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded font-bold">PENAMBAHAN</span>` 
-                                           : `<span class="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded font-bold">PENGAMBILAN</span>`;
+                        const badge = isIN ? `<span class="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-1 rounded-md font-bold border border-emerald-500/30">PENAMBAHAN</span>` 
+                                           : `<span class="bg-rose-500/20 text-rose-300 text-xs px-2.5 py-1 rounded-md font-bold border border-rose-500/30">PENGAMBILAN</span>`;
                         
                         const itemCode = log.inventory ? log.inventory.code : '-';
                         const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
 
                         return `
-                            <tr class="hover:bg-gray-50">
-                                <td class="py-2 px-3 font-mono text-xs">${date}</td>
-                                <td class="py-2 px-3 font-semibold">${itemCode} - ${itemName}</td>
-                                <td class="py-2 px-3 text-center">${badge}</td>
-                                <td class="py-2 px-3 text-center font-bold ${isIN ? 'text-green-600' : 'text-red-600'}">${isIN ? '+' : '-'}${log.quantity}</td>
-                                <td class="py-2 px-3 font-medium text-blue-900">${log.pic_name || '-'}</td>
-                                <td class="py-2 px-3 text-gray-600 text-xs">${log.notes || '-'}</td>
-                                <td class="py-2 px-3 text-center">
-                                    <button onclick="deleteLog(${log.id})" class="text-red-500 hover:text-red-700 hover:underline text-xs font-semibold">Hapus</button>
+                            <tr class="hover:bg-slate-700/40">
+                                <td class="py-3 px-4 font-mono text-xs">${date}</td>
+                                <td class="py-3 px-4 font-semibold text-slate-200">${itemCode} - ${itemName}</td>
+                                <td class="py-3 px-4 text-center">${badge}</td>
+                                <td class="py-3 px-4 text-center font-bold ${isIN ? 'text-emerald-400' : 'text-rose-400'}">${isIN ? '+' : '-'}${log.quantity}</td>
+                                <td class="py-3 px-4 font-medium text-blue-300">${log.pic_name || '-'}</td>
+                                <td class="py-3 px-4 text-slate-400 text-xs">${log.notes || '-'}</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button onclick="deleteLog(${log.id})" class="text-rose-400 hover:text-rose-300 hover:underline text-xs font-semibold">Hapus</button>
                                 </td>
                             </tr>
                         `;
@@ -361,10 +468,12 @@
         }
 
         function deleteLog(logId) {
-            if(confirm("Apakah Anda yakin ingin menghapus catatan transaksi ini?")) {
+            if(confirm("Apakah Anda yakin ingin menghapus catatan transaksi ini dari database?")) {
                 fetch(`/api/logs/${logId}`, { method: 'DELETE' })
                     .then(res => res.json())
-                    .then(() => loadLogs())
+                    .then(() => {
+                        loadInventory();
+                    })
                     .catch(err => alert("Gagal menghapus log: " + err.message));
             }
         }
@@ -465,32 +574,32 @@
             document.getElementById("itemCount").innerText = `Menampilkan ${filteredInventory.length} total data`;
 
             if (pageData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-gray-500 font-semibold">Data barang tidak ditemukan.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500 font-semibold">Data barang tidak ditemukan.</td></tr>`;
                 updatePaginationControls();
                 return;
             }
 
             pageData.forEach((item) => {
                 const finalStock = calculateFinalStock(item);
-                let rowClass = finalStock <= 0 ? "bg-red-50 hover:bg-red-100" : "hover:bg-gray-50";
-                let textClass = finalStock <= 0 ? "text-red-600" : (finalStock < 10 ? "text-orange-500" : "text-green-600");
+                let rowClass = finalStock <= 0 ? "bg-rose-500/10 hover:bg-rose-500/20" : "hover:bg-slate-700/40";
+                let textClass = finalStock <= 0 ? "text-rose-400 font-bold" : (finalStock < 10 ? "text-amber-400 font-bold" : "text-emerald-400 font-bold");
                 let statusText = finalStock <= 0 ? " (HABIS)" : "";
 
                 tableBody.innerHTML += `
-                    <tr class="border-b ${rowClass}">
-                        <td class="py-3 px-4 font-mono text-sm">${item.code || '-'}</td>
-                        <td class="py-3 px-4 font-medium">${item.name || '-'} <span class="text-xs font-bold text-red-600">${statusText}</span></td>
-                        <td class="py-3 px-4 text-center">${item.initial || 0}</td>
-                        <td class="py-3 px-4 text-center text-green-600 font-medium">+${item.inQty || 0}</td>
-                        <td class="py-3 px-4 text-center text-red-600 font-medium">-${item.outQty || 0}</td>
-                        <td class="py-3 px-4 text-center font-bold ${textClass}">${finalStock}</td>
-                        <td class="py-3 px-4 text-center space-x-1">
-                            <button onclick="openTransModal(${item.id}, '${item.name}', 'IN')" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded font-bold">+ Restok</button>
-                            <button onclick="openTransModal(${item.id}, '${item.name}', 'OUT')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-2 py-1 rounded font-bold">- Ambil</button>
+                    <tr class="border-b border-slate-700/50 ${rowClass}">
+                        <td class="py-3 px-5 font-mono text-xs">${item.code || '-'}</td>
+                        <td class="py-3 px-5 font-medium text-slate-200">${item.name || '-'} <span class="text-xs text-rose-400">${statusText}</span></td>
+                        <td class="py-3 px-5 text-center">${item.initial || 0}</td>
+                        <td class="py-3 px-5 text-center text-emerald-400 font-medium">+${item.inQty || 0}</td>
+                        <td class="py-3 px-5 text-center text-rose-400 font-medium">-${item.outQty || 0}</td>
+                        <td class="py-3 px-5 text-center ${textClass}">${finalStock}</td>
+                        <td class="py-3 px-5 text-center space-x-1">
+                            <button onclick="openTransModal(${item.id}, '${item.name}', 'IN')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2.5 py-1 rounded-lg font-bold shadow">+ Restok</button>
+                            <button onclick="openTransModal(${item.id}, '${item.name}', 'OUT')" class="bg-amber-600 hover:bg-amber-500 text-white text-xs px-2.5 py-1 rounded-lg font-bold shadow">- Ambil</button>
                         </td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="editItem(${item.id})" class="text-blue-500 hover:underline text-xs mr-2 font-semibold">Edit</button>
-                            <button onclick="deleteItem(${item.id})" class="text-red-500 hover:underline text-xs font-semibold">Hapus</button>
+                        <td class="py-3 px-5 text-center">
+                            <button onclick="editItem(${item.id})" class="text-blue-400 hover:underline text-xs mr-2 font-semibold">Edit</button>
+                            <button onclick="deleteItem(${item.id})" class="text-rose-400 hover:underline text-xs font-semibold">Hapus</button>
                         </td>
                     </tr>
                 `;
@@ -515,41 +624,6 @@
             }
         }
 
-        function renderChart() {
-            const ctx = document.getElementById('stockChart').getContext('2d');
-            const chartItems = filteredInventory.slice(0, 15);
-            const labels = chartItems.map(item => item.name);
-            const data = chartItems.map(item => calculateFinalStock(item));
-            
-            const bgColors = data.map(stock => {
-                if (stock <= 0) return 'rgba(239, 68, 68, 0.8)';
-                if (stock < 10) return 'rgba(251, 146, 60, 0.8)';
-                return 'rgba(34, 197, 94, 0.8)';
-            });
-
-            if (stockChartInstance) stockChartInstance.destroy();
-
-            stockChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Stok Akhir',
-                        data: data,
-                        backgroundColor: bgColors,
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
         function openTransModal(id, name, type) {
             document.getElementById("transItemId").value = id;
             document.getElementById("transType").value = type;
@@ -561,11 +635,11 @@
             const btn = document.getElementById("transSubmitBtn");
             if (type === 'IN') {
                 document.getElementById("transModalTitle").innerText = "Penambahan Stok Barang";
-                btn.className = "bg-green-600 hover:bg-green-700 text-white py-1.5 px-4 rounded text-sm font-bold";
+                btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-4 rounded-xl text-xs font-bold shadow";
                 btn.innerText = "Simpan Penambahan";
             } else {
                 document.getElementById("transModalTitle").innerText = "Pengambilan Barang";
-                btn.className = "bg-amber-600 hover:bg-amber-700 text-white py-1.5 px-4 rounded text-sm font-bold";
+                btn.className = "bg-amber-600 hover:bg-amber-500 text-white py-2 px-4 rounded-xl text-xs font-bold shadow";
                 btn.innerText = "Simpan Pengambilan";
             }
             
@@ -670,7 +744,7 @@
         }
 
         function deleteItem(id) { 
-            if(confirm("Apakah Anda yakin ingin menghapus barang ini?")) { 
+            if(confirm("Apakah Anda yakin ingin menghapus barang ini dari database?")) { 
                 fetch(`/api/inventory/${id}`, { method: 'DELETE' })
                     .then(res => res.json())
                     .then(() => loadInventory())
