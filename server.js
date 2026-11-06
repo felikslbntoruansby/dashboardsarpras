@@ -59,6 +59,21 @@ app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.ht
 // 1. MODULE RUMAH TANGGA API (WA NOTIFICATION TO 082333206815)
 // =============================================================
 
+// GET Data Peminjaman Ruangan
+app.get('/api/peminjaman-ruangan', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('peminjaman_ruangan')
+            .select('*')
+            .order('id', { ascending: false });
+        if (error) throw error;
+        res.json(data || []);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST Tambah Peminjaman Ruangan
 app.post('/api/peminjaman-ruangan', async (req, res) => {
     try {
         const { nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status } = req.body;
@@ -77,6 +92,21 @@ app.post('/api/peminjaman-ruangan', async (req, res) => {
     }
 });
 
+// GET Data Peminjaman Kendaraan
+app.get('/api/peminjaman-kendaraan', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('peminjaman_kendaraan')
+            .select('*')
+            .order('id', { ascending: false });
+        if (error) throw error;
+        res.json(data || []);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST Tambah Peminjaman Kendaraan
 app.post('/api/peminjaman-kendaraan', async (req, res) => {
     try {
         const { nama_driver, kendaraan, tgl_pinjam, tujuan, status } = req.body;
