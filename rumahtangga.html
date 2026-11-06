@@ -8,21 +8,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- FullCalendar CDN -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-
-  <!-- PROTEKSI SESI LOGIN ADMIN -->
-  <script>
-    if (!localStorage.getItem('admin_token')) {
-      window.location.href = '/login.html';
-    }
-  </script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 font-sans text-slate-800 min-h-screen flex flex-col">
 
-  <!-- Header Sarpras & Penerbangan -->
+  <!-- Header Sarpras -->
   <header class="bg-slate-900/90 backdrop-blur-md text-white border-b border-indigo-500/30 sticky top-0 z-40 shadow-xl">
     <div class="max-w-7xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-4">
@@ -41,15 +32,12 @@
         </div>
       </div>
       
-      <!-- Navigasi Dua Arah & Logout -->
+      <!-- Navigasi -->
       <div class="flex items-center space-x-3">
         <a href="/" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
           <i class="fa-solid fa-boxes-stacked"></i>
           <span>Ke Inventaris Sarpras &rarr;</span>
         </a>
-        <button onclick="handleLogout()" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5">
-          <i class="fa-solid fa-right-from-bracket"></i> Logout
-        </button>
       </div>
     </div>
   </header>
@@ -57,7 +45,7 @@
   <!-- Main Content Container -->
   <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full space-y-8">
 
-    <!-- SEKSI DASHBOARD KALENDER VISUAL (FULLCALENDAR) -->
+    <!-- DASHBOARD KALENDER VISUAL -->
     <div class="bg-white rounded-2xl p-6 shadow-2xl border border-slate-100">
       <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
         <i class="fa-solid fa-calendar-days text-indigo-600"></i> Kalender Visual Peminjaman Ruangan
@@ -66,7 +54,7 @@
     </div>
 
     <!-- Ringkasan Stat & Tab Navigasi -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div onclick="switchTab('ruangan')" id="tab-ruangan" class="cursor-pointer bg-slate-800/80 backdrop-blur border-2 border-indigo-500 rounded-2xl p-6 shadow-xl transition-all hover:scale-[1.02] relative group">
         <div class="flex items-center justify-between">
           <div>
@@ -90,21 +78,9 @@
           <span class="bg-emerald-500/20 text-emerald-300 font-bold px-3 py-1.5 rounded-xl text-sm" id="count-kendaraan">0 Data</span>
         </div>
       </div>
-
-      <div onclick="switchTab('maintenance')" id="tab-maintenance" class="cursor-pointer bg-slate-800/40 backdrop-blur border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-6 shadow-xl transition-all hover:scale-[1.02] relative group">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-xs font-bold uppercase tracking-wider text-amber-400">Pemeliharaan & K3</p>
-            <h3 class="text-lg font-bold text-white mt-1 flex items-center gap-2">
-              <i class="fa-solid fa-screwdriver-wrench text-amber-400"></i> Maintenance & Fasilitas
-            </h3>
-          </div>
-          <span class="bg-amber-500/20 text-amber-300 font-bold px-3 py-1.5 rounded-xl text-sm" id="count-maintenance">0 Data</span>
-        </div>
-      </div>
     </div>
 
-    <!-- SEKSI TAB 1: PENGGUNAAN RUANGAN -->
+    <!-- TAB 1: PENGGUNAAN RUANGAN -->
     <section id="section-ruangan" class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
       <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -112,11 +88,9 @@
             <i class="fa-solid fa-building-user text-indigo-600"></i> Jadwal & Peminjaman Ruangan
           </h2>
         </div>
-        <div class="flex items-center gap-3 flex-wrap">
-          <button onclick="openModal('ruangan')" class="role-write inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
-            <i class="fa-solid fa-plus"></i> + Tambah Permohonan Ruangan
-          </button>
-        </div>
+        <button onclick="openModal('ruangan')" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+          <i class="fa-solid fa-plus"></i> + Tambah Permohonan Ruangan
+        </button>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-slate-600">
@@ -127,21 +101,20 @@
               <th class="px-6 py-4 font-bold">Tanggal & Waktu</th>
               <th class="px-6 py-4 font-bold">Keperluan</th>
               <th class="px-6 py-4 font-bold">Status</th>
-              <th class="px-6 py-4 font-bold text-center role-superadmin">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbody-ruangan" class="divide-y divide-slate-100">
-            <tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>
+            <tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- SEKSI TAB 2: OPERATIONAL KENDARAAN -->
+    <!-- TAB 2: OPERATIONAL KENDARAAN -->
     <section id="section-kendaraan" class="hidden bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
       <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
         <h2 class="text-xl font-bold text-slate-800">Log Operasional Kendaraan Dinas</h2>
-        <button onclick="openModal('kendaraan')" class="role-write px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">+ Tambah Kendaraan</button>
+        <button onclick="openModal('kendaraan')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">+ Tambah Kendaraan</button>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-slate-600">
@@ -152,36 +125,10 @@
               <th class="px-6 py-4 font-bold">Tanggal</th>
               <th class="px-6 py-4 font-bold">Tujuan</th>
               <th class="px-6 py-4 font-bold">Status</th>
-              <th class="px-6 py-4 font-bold text-center role-superadmin">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbody-kendaraan" class="divide-y divide-slate-100">
-            <tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- SEKSI TAB 3: MAINTENANCE -->
-    <section id="section-maintenance" class="hidden bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
-      <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
-        <h2 class="text-xl font-bold text-slate-800">Maintenance & K3</h2>
-        <button onclick="openModal('maintenance')" class="role-write px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-md">+ Tambah Maintenance</button>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-slate-600">
-          <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
-            <tr>
-              <th class="px-6 py-4 font-bold">Kategori Fasilitas</th>
-              <th class="px-6 py-4 font-bold">Lokasi</th>
-              <th class="px-6 py-4 font-bold">Servis Terakhir</th>
-              <th class="px-6 py-4 font-bold">Servis Berikutnya</th>
-              <th class="px-6 py-4 font-bold">Status</th>
-              <th class="px-6 py-4 font-bold text-center role-superadmin">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-maintenance" class="divide-y divide-slate-100">
-            <tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>
+            <tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -189,152 +136,82 @@
 
   </main>
 
-  <!-- MODAL GENERIC TAMBAH DATA -->
+  <!-- MODAL TAMBAH DATA -->
   <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
     <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md">
       <h3 id="modalTitle" class="text-xl font-bold text-slate-900 mb-4">Input Data</h3>
       <form id="genericForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
         <input type="hidden" id="formCategory">
-        
         <div id="formFields" class="space-y-3"></div>
-
         <div class="flex justify-end gap-2 pt-4">
           <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md">Simpan & Kirim Notif WA</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md">Simpan Data</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://xlompxgjdifbthgpkphv.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
-    let supabaseClient = null;
-
-    if (window.supabase) {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-
     let calendarInstance = null;
-    const currentRole = localStorage.getItem('admin_role') || 'viewer';
-
-    function applyRolePermissions() {
-      if (currentRole === 'viewer') {
-        document.querySelectorAll('.role-superadmin, .role-write').forEach(el => el.classList.add('hidden'));
-      } else if (currentRole === 'operator') {
-        document.querySelectorAll('.role-superadmin').forEach(el => el.classList.add('hidden'));
-        document.querySelectorAll('.role-write').forEach(el => el.classList.remove('hidden'));
-      } else {
-        document.querySelectorAll('.role-superadmin, .role-write').forEach(el => el.classList.remove('hidden'));
-      }
-    }
-
-    function handleLogout() {
-      if (confirm("Apakah Anda yakin ingin keluar?")) {
-        localStorage.removeItem('admin_token');
-        localStorage.removeItem('admin_role');
-        window.location.href = '/login.html';
-      }
-    }
 
     document.addEventListener('DOMContentLoaded', () => {
       loadAllData();
-      applyRolePermissions();
     });
 
     async function loadAllData() {
-      await Promise.all([loadRuanganData(), loadKendaraanData(), loadMaintenanceData()]);
+      await Promise.all([loadRuanganData(), loadKendaraanData()]);
     }
 
     async function loadRuanganData() {
       try {
-        const { data, error } = await supabaseClient.from('peminjaman_ruangan').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
-
+        const res = await fetch('/api/peminjaman-ruangan');
+        const data = await res.json();
+        
         document.getElementById('count-ruangan').innerText = `${data.length} Data`;
         const tbody = document.getElementById('tbody-ruangan');
 
-        if (data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada peminjaman ruangan.</td></tr>`;
+        if (!data || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">Belum ada peminjaman ruangan.</td></tr>`;
         } else {
           tbody.innerHTML = data.map(item => `
             <tr class="hover:bg-slate-50">
-              <td class="px-6 py-4 font-bold text-slate-900">${item.nama_peminjam}</td>
-              <td class="px-6 py-4 font-semibold text-indigo-600">${item.ruangan}</td>
-              <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam} (${item.jam_mulai || '-'} - ${item.jam_selesai || '-'})</td>
+              <td class="px-6 py-4 font-bold text-slate-900">${item.nama_peminjam || '-'}</td>
+              <td class="px-6 py-4 font-semibold text-indigo-600">${item.ruangan || '-'}</td>
+              <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'} (${item.jam_mulai || '-'} - ${item.jam_selesai || '-'})</td>
               <td class="px-6 py-4 text-xs text-slate-600">${item.keperluan || '-'}</td>
-              <td class="px-6 py-4"><span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-md font-bold">${item.status}</span></td>
-              <td class="px-6 py-4 text-center role-superadmin">
-                <button onclick="deleteData('peminjaman_ruangan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
-              </td>
+              <td class="px-6 py-4"><span class="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
             </tr>
           `).join('');
         }
-
         renderCalendar(data);
-        applyRolePermissions();
       } catch (err) {
-        console.error("Gagal muat data ruangan:", err.message);
+        console.error("Gagal muat data ruangan:", err);
       }
     }
 
     async function loadKendaraanData() {
       try {
-        const { data, error } = await supabaseClient.from('peminjaman_kendaraan').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
+        const res = await fetch('/api/peminjaman-kendaraan');
+        const data = await res.json();
 
         document.getElementById('count-kendaraan').innerText = `${data.length} Data`;
         const tbody = document.getElementById('tbody-kendaraan');
 
-        if (data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada peminjaman kendaraan.</td></tr>`;
+        if (!data || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">Belum ada peminjaman kendaraan.</td></tr>`;
         } else {
           tbody.innerHTML = data.map(item => `
             <tr class="hover:bg-slate-50">
-              <td class="px-6 py-4 font-bold text-slate-900">${item.nama_driver}</td>
-              <td class="px-6 py-4 font-semibold text-emerald-600">${item.kendaraan}</td>
-              <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam}</td>
+              <td class="px-6 py-4 font-bold text-slate-900">${item.nama_driver || '-'}</td>
+              <td class="px-6 py-4 font-semibold text-emerald-600">${item.kendaraan || '-'}</td>
+              <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'}</td>
               <td class="px-6 py-4 text-xs text-slate-600">${item.tujuan || '-'}</td>
-              <td class="px-6 py-4"><span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-md font-bold">${item.status}</span></td>
-              <td class="px-6 py-4 text-center role-superadmin">
-                <button onclick="deleteData('peminjaman_kendaraan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
-              </td>
+              <td class="px-6 py-4"><span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
             </tr>
           `).join('');
         }
-        applyRolePermissions();
       } catch (err) {
-        console.error("Gagal muat data kendaraan:", err.message);
-      }
-    }
-
-    async function loadMaintenanceData() {
-      try {
-        const { data, error } = await supabaseClient.from('maintenance_k3_ac').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
-
-        document.getElementById('count-maintenance').innerText = `${data.length} Data`;
-        const tbody = document.getElementById('tbody-maintenance');
-
-        if (data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada data maintenance.</td></tr>`;
-        } else {
-          tbody.innerHTML = data.map(item => `
-            <tr class="hover:bg-slate-50">
-              <td class="px-6 py-4 font-bold text-slate-900">${item.kategori}</td>
-              <td class="px-6 py-4 text-amber-700 font-medium">${item.lokasi}</td>
-              <td class="px-6 py-4 text-xs font-mono">${item.tgl_service_terakhir || '-'}</td>
-              <td class="px-6 py-4 text-xs font-mono text-indigo-600 font-bold">${item.tgl_service_berikutnya || '-'}</td>
-              <td class="px-6 py-4"><span class="bg-amber-50 text-amber-700 text-xs px-2.5 py-1 rounded-md font-bold">${item.status}</span></td>
-              <td class="px-6 py-4 text-center role-superadmin">
-                <button onclick="deleteData('maintenance_k3_ac', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
-              </td>
-            </tr>
-          `).join('');
-        }
-        applyRolePermissions();
-      } catch (err) {
-        console.error("Gagal muat data maintenance:", err.message);
+        console.error("Gagal muat data kendaraan:", err);
       }
     }
 
@@ -346,7 +223,7 @@
         id: i.id,
         title: `${i.ruangan} (${i.nama_peminjam})`,
         start: i.tgl_pinjam,
-        backgroundColor: (i.status || '').toLowerCase().includes('setuju') ? '#10b981' : '#f59e0b'
+        backgroundColor: (i.status || '').toLowerCase().includes('setuju') ? '#10b981' : '#6366f1'
       }));
 
       if (calendarInstance) calendarInstance.destroy();
@@ -360,9 +237,16 @@
     }
 
     function switchTab(tabName) {
-      ['ruangan', 'kendaraan', 'maintenance'].forEach(tab => {
+      ['ruangan', 'kendaraan'].forEach(tab => {
         document.getElementById(`section-${tab}`).classList.toggle('hidden', tab !== tabName);
       });
+      document.getElementById('tab-ruangan').className = tabName === 'ruangan' 
+        ? 'cursor-pointer bg-slate-800/80 backdrop-blur border-2 border-indigo-500 rounded-2xl p-6 shadow-xl transition-all' 
+        : 'cursor-pointer bg-slate-800/40 backdrop-blur border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-6 shadow-xl transition-all';
+      
+      document.getElementById('tab-kendaraan').className = tabName === 'kendaraan' 
+        ? 'cursor-pointer bg-slate-800/80 backdrop-blur border-2 border-emerald-500 rounded-2xl p-6 shadow-xl transition-all' 
+        : 'cursor-pointer bg-slate-800/40 backdrop-blur border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-6 shadow-xl transition-all';
     }
 
     function openModal(category) {
@@ -388,14 +272,6 @@
           <div><label class="block text-xs font-bold mb-1">Kendaraan</label><input type="text" id="kendaraan" required class="w-full border p-2 rounded text-sm" placeholder="Contoh: Bus Operasional 01"></div>
           <div><label class="block text-xs font-bold mb-1">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" required class="w-full border p-2 rounded text-sm"></div>
           <div><label class="block text-xs font-bold mb-1">Tujuan Dinas</label><input type="text" id="tujuan" required class="w-full border p-2 rounded text-sm"></div>
-        `;
-      } else {
-        document.getElementById('modalTitle').innerText = "Data Maintenance & K3";
-        fields.innerHTML = `
-          <div><label class="block text-xs font-bold mb-1">Kategori Fasilitas</label><input type="text" id="kategori" required class="w-full border p-2 rounded text-sm" placeholder="Contoh: AC Split Rektorat"></div>
-          <div><label class="block text-xs font-bold mb-1">Lokasi</label><input type="text" id="lokasi" required class="w-full border p-2 rounded text-sm"></div>
-          <div><label class="block text-xs font-bold mb-1">Tanggal Servis Terakhir</label><input type="date" id="tgl_service_terakhir" class="w-full border p-2 rounded text-sm"></div>
-          <div><label class="block text-xs font-bold mb-1">Tanggal Servis Berikutnya</label><input type="date" id="tgl_service_berikutnya" class="w-full border p-2 rounded text-sm"></div>
         `;
       }
       document.getElementById('dataModal').classList.remove('hidden');
@@ -425,7 +301,6 @@
           body: JSON.stringify(payload)
         });
         if (res.ok) {
-          alert("Peminjaman ruangan berhasil ditambahkan & notifikasi WA terkirim!");
           closeModal();
           loadRuanganData();
         }
@@ -443,33 +318,8 @@
           body: JSON.stringify(payload)
         });
         if (res.ok) {
-          alert("Peminjaman kendaraan berhasil ditambahkan & notifikasi WA terkirim!");
           closeModal();
           loadKendaraanData();
-        }
-      } else if (category === 'maintenance') {
-        const payload = {
-          kategori: document.getElementById('kategori').value,
-          lokasi: document.getElementById('lokasi').value,
-          tgl_service_terakhir: document.getElementById('tgl_service_terakhir').value,
-          tgl_service_berikutnya: document.getElementById('tgl_service_berikutnya').value,
-          status: 'Baik'
-        };
-
-        const { error } = await supabaseClient.from('maintenance_k3_ac').insert([payload]);
-        if (!error) {
-          alert("Data maintenance berhasil disimpan!");
-          closeModal();
-          loadMaintenanceData();
-        }
-      }
-    }
-
-    async function deleteData(table, id) {
-      if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-        const { error } = await supabaseClient.from(table).delete().eq('id', id);
-        if (!error) {
-          loadAllData();
         }
       }
     }
