@@ -238,7 +238,7 @@
 
   <!-- Footer -->
   <footer class="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-400 mt-auto">
-    <p>&copy; 2026 Unit Bagian Umum - Politeknik Penerbangan Surabaya.</p>
+    <p>&copy; 2026 Bidang Umum - Politeknik Penerbangan Surabaya.</p>
   </footer>
 
   <!-- MODAL EDIT / TAMBAH DATA -->
@@ -533,7 +533,7 @@
       doc.setFontSize(16);
       doc.text(`Laporan Sub-Menu ${categoryTitle} - Rumah Tangga Sarpras`, 14, 20);
       doc.setFontSize(10);
-      doc.text(`Unit Bagian Umum - Politeknik Penerbangan Surabaya (${new Date().toLocaleDateString('id-ID')})`, 14, 26);
+      doc.text(` Bidang Umum - Politeknik Penerbangan Surabaya (${new Date().toLocaleDateString('id-ID')})`, 14, 26);
       doc.autoTable({
         startY: 32,
         html: `#section-${categoryTitle.toLowerCase()} table`,
