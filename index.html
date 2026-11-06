@@ -16,14 +16,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     
-    <!-- INITALIZE DEFAULT TOKEN FOR DEMO IF MISSING -->
+    <!-- PAKSA INITIALIZE TOKEN & ROLE OTOMATIS -->
     <script>
-        if (!localStorage.getItem('admin_token')) {
-            localStorage.setItem('admin_token', 'session_active_token');
-        }
-        if (!localStorage.getItem('admin_role')) {
-            localStorage.setItem('admin_role', 'superadmin');
-        }
+        localStorage.setItem('admin_token', 'session_active_token');
+        localStorage.setItem('admin_role', 'superadmin');
     </script>
 </head>
 <body class="bg-gray-100 p-4 md:p-8 font-sans text-gray-800">
@@ -60,7 +56,7 @@
             </div>
         </div>
 
-        <!-- SPANDUK ALERT STOK MINIMUM (OTOMATIS) -->
+        <!-- SPANDUK ALERT STOK MINIMUM -->
         <div id="stockAlertBanner" class="hidden bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-md">
             <div class="flex items-center">
                 <div class="py-1"><i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl mr-3"></i></div>
@@ -71,7 +67,7 @@
             </div>
         </div>
 
-        <!-- Section Grafik Analytics (2 Column Grid) -->
+        <!-- Section Grafik Analytics -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white p-4 md:p-6 rounded-lg shadow">
                 <h2 class="text-base md:text-lg font-bold mb-4 text-gray-700">Grafik Stok Akhir Barang (Top 15)</h2>
@@ -257,7 +253,7 @@
         let stockChartInstance = null;
         let fastMovingChartInstance = null;
 
-        const currentRole = localStorage.getItem('admin_role') || 'superadmin';
+        const currentRole = 'superadmin';
 
         document.addEventListener("DOMContentLoaded", function() {
             initLogFilters();

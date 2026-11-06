@@ -11,13 +11,9 @@ const PORT = process.env.PORT || 3000;
 // Nomor WhatsApp Tujuan Notifikasi (Fonnte API)
 const TARGET_WA_PHONE = '082333206815';
 
-// Sambungan ke Supabase Backend (Membaca Environment Variable)
+// Sambungan ke Supabase Backend
 const supabaseUrl = process.env.SUPABASE_URL || 'https://xlompxgjdifbthgpkphv.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SECRET_KEY;
-
-if (!supabaseKey) {
-    console.error('CRITICAL: SUPABASE_KEY belum dipasang di Environment Variables.');
-}
 
 const supabase = createClient(
     supabaseUrl, 
@@ -28,7 +24,7 @@ const supabase = createClient(
 app.use(cors());
 app.use(express.json());
 
-// Helper Notifikasi WhatsApp via Fonnte API
+// Helper Notifikasi WA
 async function sendWhatsAppAlert(targetPhone, message) {
     try {
         const token = process.env.FONNTE_TOKEN;
@@ -45,7 +41,7 @@ async function sendWhatsAppAlert(targetPhone, message) {
     }
 }
 
-// Serve Static Assets & Direct File Routes
+// Static Routes
 app.use(express.static(path.join(__dirname)));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
@@ -55,17 +51,10 @@ app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'ru
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 
-// =============================================================
-// 1. MODULE RUMAH TANGGA API (WA NOTIFICATION TO 082333206815)
-// =============================================================
-
-// GET Data Peminjaman Ruangan
+// API Rumah Tangga
 app.get('/api/peminjaman-ruangan', async (req, res) => {
     try {
-        const { data, error } = await supabase
-            .from('peminjaman_ruangan')
-            .select('*')
-            .order('id', { ascending: false });
+        const { data, error } = await supabase.from('peminjaman_ruangan').select('*').order('id', { ascending: false });
         if (error) throw error;
         res.json(data || []);
     } catch (err) {
@@ -73,7 +62,6 @@ app.get('/api/peminjaman-ruangan', async (req, res) => {
     }
 });
 
-// POST Tambah Peminjaman Ruangan
 app.post('/api/peminjaman-ruangan', async (req, res) => {
     try {
         const { nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status } = req.body;
@@ -83,22 +71,18 @@ app.post('/api/peminjaman-ruangan', async (req, res) => {
             .select();
         if (error) throw error;
 
-        const waMsg = `🏢 *PERMOHONAN PEMINJAMAN RUANGAN BARU*\n\nNama Peminjam: *${nama_peminjam}*\nRuangan: *${ruangan}*\nTanggal: *${tgl_pinjam}*\nJam: *${jam_mulai || '-'} s/d ${jam_selesai || '-'}*\nKeperluan: *${keperluan || '-'}*\nStatus: *Menunggu Konfirmasi Admin*`;
+        const waMsg = `🏢 *PERMOHONAN PEMINJAMAN RUANGAN BARU*\n\nNama Peminjam: *${nama_peminjam}*\nRuangan: *${ruangan}*\nTanggal: *${tgl_pinjam}*\nJam: *${jam_mulai || '-'} s/d ${jam_selesai || '-'}*\nKeperluan: *${keperluan || '-'}*`;
         sendWhatsAppAlert(TARGET_WA_PHONE, waMsg);
 
-        res.json({ message: "Peminjaman ruangan berhasil ditambahkan!", data });
+        res.json({ message: "Berhasil!", data });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// GET Data Peminjaman Kendaraan
 app.get('/api/peminjaman-kendaraan', async (req, res) => {
     try {
-        const { data, error } = await supabase
-            .from('peminjaman_kendaraan')
-            .select('*')
-            .order('id', { ascending: false });
+        const { data, error } = await supabase.from('peminjaman_kendaraan').select('*').order('id', { ascending: false });
         if (error) throw error;
         res.json(data || []);
     } catch (err) {
@@ -106,7 +90,6 @@ app.get('/api/peminjaman-kendaraan', async (req, res) => {
     }
 });
 
-// POST Tambah Peminjaman Kendaraan
 app.post('/api/peminjaman-kendaraan', async (req, res) => {
     try {
         const { nama_driver, kendaraan, tgl_pinjam, tujuan, status } = req.body;
@@ -116,10 +99,10 @@ app.post('/api/peminjaman-kendaraan', async (req, res) => {
             .select();
         if (error) throw error;
 
-        const waMsg = `🚗 *PERMOHONAN OPERASIONAL KENDARAAN BARU*\n\nDriver/Pengemudi: *${nama_driver}*\nKendaraan: *${kendaraan}*\nTanggal: *${tgl_pinjam}*\nTujuan: *${tujuan}*\nStatus: *Menunggu Konfirmasi Admin*`;
+        const waMsg = `🚗 *PERMOHONAN OPERASIONAL KENDARAAN BARU*\n\nDriver: *${nama_driver}*\nKendaraan: *${kendaraan}*\nTanggal: *${tgl_pinjam}*\nTujuan: *${tujuan}*`;
         sendWhatsAppAlert(TARGET_WA_PHONE, waMsg);
 
-        res.json({ message: "Peminjaman kendaraan berhasil ditambahkan!", data });
+        res.json({ message: "Berhasil!", data });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -138,10 +121,7 @@ app.get('/api/backup', async (req, res) => {
     }
 });
 
-// =============================================================
-// 2. MODULE INVENTORY STOK BARANG API (ALERT STOK < 10)
-// =============================================================
-
+// API Inventory & Logs
 app.get('/api/inventory', async (req, res) => {
     try {
         const { data, error } = await supabase.from('inventory').select('*').order('id', { ascending: true });
@@ -168,7 +148,7 @@ app.post('/api/inventory', async (req, res) => {
             .insert([{ code, name, initial: initial || 0, in_qty: inQty || 0, out_qty: outQty || 0 }])
             .select();
         if (error) throw error;
-        res.json({ message: "Barang berhasil ditambahkan!", data });
+        res.json({ message: "Berhasil!", data });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -184,7 +164,7 @@ app.put('/api/inventory/:id', async (req, res) => {
             .eq('id', id)
             .select();
         if (error) throw error;
-        res.json({ message: "Barang berhasil diperbarui!", data });
+        res.json({ message: "Berhasil!", data });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -195,7 +175,7 @@ app.delete('/api/inventory/:id', async (req, res) => {
         const { id } = req.params;
         const { error } = await supabase.from('inventory').delete().eq('id', id);
         if (error) throw error;
-        res.json({ message: "Barang berhasil dihapus!" });
+        res.json({ message: "Dihapus!" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -218,7 +198,7 @@ app.post('/api/inventory/transaction', async (req, res) => {
             updatedIn += qty;
         } else if (type === 'OUT') {
             if (qty > currentAvailableStock) {
-                return res.status(400).json({ error: `Stok tidak mencukupi! Sisa: ${currentAvailableStock}` });
+                return res.status(400).json({ error: `Stok kurang! Sisa: ${currentAvailableStock}` });
             }
             updatedOut += qty;
         }
@@ -226,14 +206,14 @@ app.post('/api/inventory/transaction', async (req, res) => {
         const finalStockAfter = (item.initial || 0) + updatedIn - updatedOut;
 
         if (finalStockAfter < 10) {
-            const waMsg = `⚠️ *PERINGATAN STOK MINIMUM SARPRAS*\n\nBarang: *${item.name}*\nSisa Stok: *${finalStockAfter} unit*\n\nMohon lakukan perencanaan pengadaan barang.`;
+            const waMsg = `⚠️ *STOK MINIMUM*\n\nBarang: *${item.name}*\nSisa Stok: *${finalStockAfter} unit*`;
             sendWhatsAppAlert(TARGET_WA_PHONE, waMsg);
         }
 
         await supabase.from('inventory').update({ in_qty: updatedIn, out_qty: updatedOut }).eq('id', itemIntId);
         await supabase.from('inventory_logs').insert([{ inventory_id: itemIntId, type, quantity: qty, pic_name: picName, notes: notes || '-' }]);
 
-        res.json({ message: "Transaksi berhasil dicatat!" });
+        res.json({ message: "Transaksi berhasil!" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -261,17 +241,16 @@ app.delete('/api/logs/:id', async (req, res) => {
         const { id } = req.params;
         const { error } = await supabase.from('inventory_logs').delete().eq('id', id);
         if (error) throw error;
-        res.json({ message: "Log transaksi berhasil dihapus!" });
+        res.json({ message: "Dihapus!" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Fallback jika rute tidak ditemukan
-app.use((req, res) => res.status(404).sendFile(path.join(__dirname, 'index.html')));
+app.use((req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 module.exports = app;
 
 if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => console.log(`Server berjalan di http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));
 }
