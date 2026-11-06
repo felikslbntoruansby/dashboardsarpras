@@ -36,6 +36,15 @@ app.get('/rumahtangga.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'rumahtangga.html'));
 });
 
+// Route Halaman Login Admin
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login.html'));
+});
+
 // =============================================================
 // 1. MODULE RUMAH TANGGA API
 // =============================================================
