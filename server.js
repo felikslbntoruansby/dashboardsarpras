@@ -11,20 +11,18 @@ const PORT = process.env.PORT || 3000;
 // Nomor WhatsApp Tujuan Notifikasi (Fonnte API)
 const TARGET_WA_PHONE = '082333206815';
 
-// Sambungan ke Supabase Backend
+// Sambungan ke Supabase Backend (Menggunakan Environment Variables & Fallback Safe Key)
 const supabaseUrl = process.env.SUPABASE_URL || 'https://xlompxgjdifbthgpkphv.supabase.co';
-const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SECRET_KEY;
+const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SECRET_KEY || 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
 
-const supabase = createClient(
-    supabaseUrl, 
-    supabaseKey || 'dummy_key_for_build', 
-    { auth: { persistSession: false } }
-);
+const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false }
+});
 
 app.use(cors());
 app.use(express.json());
 
-// Helper Notifikasi WA
+// Helper Notifikasi WA via Fonnte API
 async function sendWhatsAppAlert(targetPhone, message) {
     try {
         const token = process.env.FONNTE_TOKEN;
@@ -41,7 +39,7 @@ async function sendWhatsAppAlert(targetPhone, message) {
     }
 }
 
-// Static Routes
+// Static File & Page Routing
 app.use(express.static(path.join(__dirname)));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
@@ -51,14 +49,21 @@ app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'ru
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 
-// API Rumah Tangga
+// =============================================================
+// 1. MODULE RUMAH TANGGA API
+// =============================================================
+
 app.get('/api/peminjaman-ruangan', async (req, res) => {
     try {
         const { data, error } = await supabase.from('peminjaman_ruangan').select('*').order('id', { ascending: false });
-        if (error) throw error;
+        if (error) {
+            console.error('Error GET /api/peminjaman-ruangan:', error.message);
+            return res.json([]);
+        }
         res.json(data || []);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Catch GET /api/peminjaman-ruangan:', err.message);
+        res.json([]);
     }
 });
 
@@ -83,10 +88,14 @@ app.post('/api/peminjaman-ruangan', async (req, res) => {
 app.get('/api/peminjaman-kendaraan', async (req, res) => {
     try {
         const { data, error } = await supabase.from('peminjaman_kendaraan').select('*').order('id', { ascending: false });
-        if (error) throw error;
+        if (error) {
+            console.error('Error GET /api/peminjaman-kendaraan:', error.message);
+            return res.json([]);
+        }
         res.json(data || []);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Catch GET /api/peminjaman-kendaraan:', err.message);
+        res.json([]);
     }
 });
 
@@ -121,11 +130,17 @@ app.get('/api/backup', async (req, res) => {
     }
 });
 
-// API Inventory & Logs
+// =============================================================
+// 2. MODULE INVENTORY STOK BARANG API
+// =============================================================
+
 app.get('/api/inventory', async (req, res) => {
     try {
         const { data, error } = await supabase.from('inventory').select('*').order('id', { ascending: true });
-        if (error) throw error;
+        if (error) {
+            console.error('Error GET /api/inventory:', error.message);
+            return res.json([]);
+        }
         const formattedData = (data || []).map(item => ({
             id: item.id,
             code: item.code || '-',
@@ -136,7 +151,8 @@ app.get('/api/inventory', async (req, res) => {
         }));
         res.json(formattedData);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Catch GET /api/inventory:', err.message);
+        res.json([]);
     }
 });
 
@@ -232,7 +248,8 @@ app.get('/api/logs', async (req, res) => {
         }
         res.json(data || []);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Catch GET /api/logs:', err.message);
+        res.json([]);
     }
 });
 
@@ -247,6 +264,7 @@ app.delete('/api/logs/:id', async (req, res) => {
     }
 });
 
+// Fallback jika URL tidak cocok
 app.use((req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 module.exports = app;
