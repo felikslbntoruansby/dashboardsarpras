@@ -1,9 +1,8 @@
 {
   "version": 2,
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/server.js"
-    }
+    { "source": "/api/(.*)", "destination": "/server.js" },
+    { "source": "/rumah-tangga", "destination": "/rumahtangga.html" },
+    { "source": "/login", "destination": "/login.html" }
   ]
 }
