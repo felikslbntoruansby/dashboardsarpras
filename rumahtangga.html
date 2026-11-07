@@ -14,63 +14,94 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 font-sans text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-900 font-sans text-slate-100 p-4 md:p-8 min-h-screen">
 
-  <!-- Header Sarpras -->
-  <header class="bg-slate-900/90 backdrop-blur-md text-white border-b border-indigo-500/30 sticky top-0 z-40 shadow-xl">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-4">
+  <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
+    
+    <!-- Header Utama -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-xl backdrop-blur-md">
       <div class="flex items-center space-x-4">
         <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 p-3.5 rounded-xl shadow-lg shadow-indigo-500/30 flex items-center justify-center">
-          <i class="fa-solid fa-plane-departure text-white text-2xl"></i>
+          <i class="fa-solid fa-building-user text-white text-2xl"></i>
         </div>
         <div>
           <p class="text-xs font-bold uppercase tracking-widest text-indigo-400">BIDANG UMUM</p>
-          <h1 class="text-2xl font-extrabold tracking-wide text-white flex items-center gap-3">
-            Manajemen Sarana & Prasarana
-            <span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-400/30 shadow-inner">
-              Rumah Tangga
-            </span>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide text-white flex items-center gap-3">
+            Dashboard Layanan Rumah Tangga
           </h1>
-          <p class="text-xs text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya</p>
+          <p class="text-xs text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase</p>
         </div>
       </div>
       
       <!-- Navigasi -->
-      <div class="flex items-center space-x-3">
-        <a href="/" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
+      <div class="flex items-center space-x-3 w-full md:w-auto">
+        <a href="/" class="w-full md:w-auto text-center inline-flex justify-center items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-indigo-600/30 active:scale-95">
           <i class="fa-solid fa-boxes-stacked"></i>
           <span>Ke Inventaris Sarpras &rarr;</span>
         </a>
       </div>
     </div>
-  </header>
 
-  <!-- Main Content Container -->
-  <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full space-y-8">
+    <!-- SEKSI 1: BI SCORECARDS / KPI STATS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Layanan</p>
+        <h3 class="text-3xl font-black text-blue-400 mt-2" id="kpi-total-layanan">0</h3>
+        <p class="text-[11px] text-slate-500 mt-1">Permohonan Terdaftar</p>
+      </div>
+      <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Permohonan Disetujui</p>
+        <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-disetujui">0</h3>
+        <p class="text-[11px] text-emerald-500/80 mt-1">Status Disetujui</p>
+      </div>
+      <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sedang Diproses</p>
+        <h3 class="text-3xl font-black text-amber-400 mt-2" id="kpi-diproses">0</h3>
+        <p class="text-[11px] text-amber-500/80 mt-1">Menunggu Verifikasi</p>
+      </div>
+      <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Permohonan Ditolak</p>
+        <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-ditolak">0</h3>
+        <p class="text-[11px] text-rose-500/80 mt-1">Status Ditolak</p>
+      </div>
+    </div>
 
-    <!-- SEKSI GRAFIK ANALYTICS (Warna Berbeda Sesuai Status: Disetujui=Hijau, Diproses=Kuning, Ditolak=Merah) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bg-white p-6 rounded-2xl shadow-2xl border border-slate-100">
-        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-column text-indigo-600"></i> Status Peminjaman Ruangan
+    <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK MULTI-DIMENSI -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Combo Chart (Bar + Line) Tren Peminjaman Ruangan vs Kendaraan -->
+      <div class="lg:col-span-2 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+        <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-column text-blue-400"></i> Analytics Komparasi Peminjaman Ruangan & Kendaraan
         </h2>
-        <div style="position: relative; height: 30vh; width: 100%;">
-          <canvas id="ruanganChart"></canvas>
+        <div style="position: relative; height: 32vh; width: 100%;">
+          <canvas id="comboRtChart"></canvas>
         </div>
       </div>
-      <div class="bg-white p-6 rounded-2xl shadow-2xl border border-slate-100">
-        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-column text-emerald-600"></i> Status Operasional Kendaraan
+
+      <!-- Doughnut Chart Distribusi Status Persetujuan -->
+      <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+        <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-emerald-400"></i> Rasio Persetujuan Layanan Rumah Tangga
         </h2>
-        <div style="position: relative; height: 30vh; width: 100%;">
-          <canvas id="kendaraanChart"></canvas>
+        <div style="position: relative; height: 32vh; width: 100%;">
+          <canvas id="statusRtPieChart"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- Ringkasan Stat & Tab Navigasi -->
+    <!-- SEKSI 3: BAR CHART HORISONTAL POPULARITAS FASILITAS & KENDARAAN -->
+    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+      <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-fire text-indigo-400"></i> Analytics Ruangan & Armada Paling Sering Dipinjam
+      </h2>
+      <div style="position: relative; height: 26vh; width: 100%;">
+        <canvas id="topFacilityChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Tab Navigasi & Tabel Histori -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div onclick="switchTab('ruangan')" id="tab-ruangan" class="cursor-pointer bg-slate-800/80 backdrop-blur border-2 border-indigo-500 rounded-2xl p-6 shadow-xl transition-all hover:scale-[1.02] relative group">
+      <div onclick="switchTab('ruangan')" id="tab-ruangan" class="cursor-pointer bg-slate-800 border-2 border-indigo-500 rounded-2xl p-5 shadow-xl transition-all hover:scale-[1.01]">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-indigo-400">Fasilitas Gedung</p>
@@ -78,11 +109,11 @@
               <i class="fa-solid fa-building-user text-indigo-400"></i> Peminjaman Ruangan
             </h3>
           </div>
-          <span class="bg-indigo-500/20 text-indigo-300 font-bold px-3 py-1.5 rounded-xl text-sm" id="count-ruangan">0 Data</span>
+          <span class="bg-indigo-500/20 text-indigo-300 font-bold px-3 py-1.5 rounded-xl text-sm border border-indigo-500/30" id="count-ruangan">0 Data</span>
         </div>
       </div>
 
-      <div onclick="switchTab('kendaraan')" id="tab-kendaraan" class="cursor-pointer bg-slate-800/40 backdrop-blur border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-6 shadow-xl transition-all hover:scale-[1.02] relative group">
+      <div onclick="switchTab('kendaraan')" id="tab-kendaraan" class="cursor-pointer bg-slate-800/40 border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-5 shadow-xl transition-all hover:scale-[1.01]">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-emerald-400">Armada Operasional</p>
@@ -90,31 +121,29 @@
               <i class="fa-solid fa-car-side text-emerald-400"></i> Operational Kendaraan
             </h3>
           </div>
-          <span class="bg-emerald-500/20 text-emerald-300 font-bold px-3 py-1.5 rounded-xl text-sm" id="count-kendaraan">0 Data</span>
+          <span class="bg-emerald-500/20 text-emerald-300 font-bold px-3 py-1.5 rounded-xl text-sm border border-emerald-500/30" id="count-kendaraan">0 Data</span>
         </div>
       </div>
     </div>
 
-    <!-- TAB 1: LOG HISTORICAL PENGGUNAAN RUANGAN -->
-    <section id="section-ruangan" class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
-      <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-building-user text-indigo-600"></i> Log Historical Peminjaman Ruangan
-          </h2>
-        </div>
+    <!-- TABEL 1: RUANGAN -->
+    <section id="section-ruangan" class="bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-700">
+      <div class="p-5 border-b border-slate-700 bg-slate-800/90 flex flex-wrap items-center justify-between gap-4">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-building-user text-indigo-400"></i> Log Historical Peminjaman Ruangan
+        </h2>
         <div class="flex items-center gap-2">
-          <button onclick="exportToPDF('ruangan')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5">
+          <button onclick="exportToPDF('ruangan')" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
-          <button onclick="openModal('ruangan')" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
-            <i class="fa-solid fa-plus"></i> + Tambah Permohonan Ruangan
+          <button onclick="openModal('ruangan')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow transition">
+            + Tambah Permohonan Ruangan
           </button>
         </div>
       </div>
       <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-slate-600">
-          <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
+        <table class="w-full text-sm text-left text-slate-300">
+          <thead class="text-xs text-slate-300 uppercase bg-slate-900 border-b border-slate-700">
             <tr>
               <th class="px-6 py-4 font-bold">Nama Peminjam</th>
               <th class="px-6 py-4 font-bold">Ruangan</th>
@@ -124,29 +153,29 @@
               <th class="px-6 py-4 font-bold text-center">Aksi</th>
             </tr>
           </thead>
-          <tbody id="tbody-ruangan" class="divide-y divide-slate-100">
-            <tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>
+          <tbody id="tbody-ruangan" class="divide-y divide-slate-700/50">
+            <tr><td colspan="6" class="text-center py-4 text-slate-500">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- TAB 2: LOG HISTORICAL OPERATIONAL KENDARAAN -->
-    <section id="section-kendaraan" class="hidden bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
-      <div class="p-6 border-b border-slate-200 bg-slate-50/80 flex flex-wrap items-center justify-between gap-4">
-        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-car-side text-emerald-600"></i> Log Historical Operasional Kendaraan
+    <!-- TABEL 2: KENDARAAN -->
+    <section id="section-kendaraan" class="hidden bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-700">
+      <div class="p-5 border-b border-slate-700 bg-slate-800/90 flex flex-wrap items-center justify-between gap-4">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-car-side text-emerald-400"></i> Log Historical Operasional Kendaraan
         </h2>
         <div class="flex items-center gap-2">
-          <button onclick="exportToPDF('kendaraan')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5">
+          <button onclick="exportToPDF('kendaraan')" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
-          <button onclick="openModal('kendaraan')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">+ Tambah Kendaraan</button>
+          <button onclick="openModal('kendaraan')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow transition">+ Tambah Kendaraan</button>
         </div>
       </div>
       <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-slate-600">
-          <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
+        <table class="w-full text-sm text-left text-slate-300">
+          <thead class="text-xs text-slate-300 uppercase bg-slate-900 border-b border-slate-700">
             <tr>
               <th class="px-6 py-4 font-bold">Driver / Pengemudi</th>
               <th class="px-6 py-4 font-bold">Kendaraan</th>
@@ -156,26 +185,26 @@
               <th class="px-6 py-4 font-bold text-center">Aksi</th>
             </tr>
           </thead>
-          <tbody id="tbody-kendaraan" class="divide-y divide-slate-100">
-            <tr><td colspan="6" class="text-center py-4">Memuat data...</td></tr>
+          <tbody id="tbody-kendaraan" class="divide-y divide-slate-700/50">
+            <tr><td colspan="6" class="text-center py-4 text-slate-500">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-  </main>
+  </div>
 
   <!-- MODAL FORM TAMBAH / EDIT DATA -->
-  <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
-    <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md">
-      <h3 id="modalTitle" class="text-xl font-bold text-slate-900 mb-4">Input Data</h3>
+  <div id="dataModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
+      <h3 id="modalTitle" class="text-xl font-bold text-white mb-4">Input Data</h3>
       <form id="genericForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
         <input type="hidden" id="formCategory">
         <input type="hidden" id="editId">
         <div id="formFields" class="space-y-3"></div>
         <div class="flex justify-end gap-2 pt-4">
-          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md">Simpan Data</button>
+          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs shadow">Simpan Data</button>
         </div>
       </form>
     </div>
@@ -184,8 +213,9 @@
   <script>
     let ruanganData = [];
     let kendaraanData = [];
-    let ruanganChartInstance = null;
-    let kendaraanChartInstance = null;
+    let comboRtChartInstance = null;
+    let statusRtPieChartInstance = null;
+    let topFacilityChartInstance = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       loadAllData();
@@ -193,6 +223,10 @@
 
     async function loadAllData() {
       await Promise.all([loadRuanganData(), loadKendaraanData()]);
+      updateKpis();
+      renderComboRtChart();
+      renderStatusRtPieChart();
+      renderTopFacilityChart();
     }
 
     async function loadRuanganData() {
@@ -207,27 +241,26 @@
           tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada peminjaman ruangan.</td></tr>`;
         } else {
           tbody.innerHTML = ruanganData.map(item => {
-            let statusColor = 'bg-indigo-50 text-indigo-700';
-            if (item.status === 'Disetujui') statusColor = 'bg-emerald-50 text-emerald-700';
-            else if (item.status === 'Diproses') statusColor = 'bg-amber-50 text-amber-700';
-            else if (item.status === 'Ditolak') statusColor = 'bg-rose-50 text-rose-700';
+            let statusColor = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+            if (item.status === 'Disetujui') statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+            else if (item.status === 'Diproses') statusColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+            else if (item.status === 'Ditolak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
 
             return `
-              <tr class="hover:bg-slate-50">
-                <td class="px-6 py-4 font-bold text-slate-900">${item.nama_peminjam || '-'}</td>
-                <td class="px-6 py-4 font-semibold text-indigo-600">${item.ruangan || '-'}</td>
-                <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'} (${item.jam_mulai || '-'} - ${item.jam_selesai || '-'})</td>
-                <td class="px-6 py-4 text-xs text-slate-600">${item.keperluan || '-'}</td>
-                <td class="px-6 py-4"><span class="${statusColor} text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
+              <tr class="hover:bg-slate-700/40">
+                <td class="px-6 py-4 font-bold text-white">${item.nama_peminjam || '-'}</td>
+                <td class="px-6 py-4 font-semibold text-indigo-400">${item.ruangan || '-'}</td>
+                <td class="px-6 py-4 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'} (${item.jam_mulai || '-'} - ${item.jam_selesai || '-'})</td>
+                <td class="px-6 py-4 text-xs text-slate-400">${item.keperluan || '-'}</td>
+                <td class="px-6 py-4"><span class="${statusColor} border text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
                 <td class="px-6 py-4 text-center space-x-2">
-                  <button onclick="editItem('ruangan', ${item.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
-                  <button onclick="deleteItem('ruangan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
+                  <button onclick="editItem('ruangan', ${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
+                  <button onclick="deleteItem('ruangan', ${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
                 </td>
               </tr>
             `;
           }).join('');
         }
-        renderRuanganChart();
       } catch (err) {
         console.error("Gagal muat data ruangan:", err);
       }
@@ -245,127 +278,167 @@
           tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada peminjaman kendaraan.</td></tr>`;
         } else {
           tbody.innerHTML = kendaraanData.map(item => {
-            let statusColor = 'bg-indigo-50 text-indigo-700';
-            if (item.status === 'Disetujui') statusColor = 'bg-emerald-50 text-emerald-700';
-            else if (item.status === 'Diproses') statusColor = 'bg-amber-50 text-amber-700';
-            else if (item.status === 'Ditolak') statusColor = 'bg-rose-50 text-rose-700';
+            let statusColor = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+            if (item.status === 'Disetujui') statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+            else if (item.status === 'Diproses') statusColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+            else if (item.status === 'Ditolak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
 
             return `
-              <tr class="hover:bg-slate-50">
-                <td class="px-6 py-4 font-bold text-slate-900">${item.nama_driver || '-'}</td>
-                <td class="px-6 py-4 font-semibold text-emerald-600">${item.kendaraan || '-'}</td>
-                <td class="px-6 py-4 text-xs font-mono">${item.tgl_pinjam || '-'}</td>
-                <td class="px-6 py-4 text-xs text-slate-600">${item.tujuan || '-'}</td>
-                <td class="px-6 py-4"><span class="${statusColor} text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
+              <tr class="hover:bg-slate-700/40">
+                <td class="px-6 py-4 font-bold text-white">${item.nama_driver || '-'}</td>
+                <td class="px-6 py-4 font-semibold text-emerald-400">${item.kendaraan || '-'}</td>
+                <td class="px-6 py-4 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'}</td>
+                <td class="px-6 py-4 text-xs text-slate-400">${item.tujuan || '-'}</td>
+                <td class="px-6 py-4"><span class="${statusColor} border text-xs px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
                 <td class="px-6 py-4 text-center space-x-2">
-                  <button onclick="editItem('kendaraan', ${item.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
-                  <button onclick="deleteItem('kendaraan', ${item.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
+                  <button onclick="editItem('kendaraan', ${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
+                  <button onclick="deleteItem('kendaraan', ${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
                 </td>
               </tr>
             `;
           }).join('');
         }
-        renderKendaraanChart();
       } catch (err) {
         console.error("Gagal muat data kendaraan:", err);
       }
     }
 
-    // GRAFIK STATISTIK RUANGAN (STATUS BASED: DISETUJUI, DIPROSES, DITOLAK)
-    function renderRuanganChart() {
-      const statusCounts = { 'Disetujui': 0, 'Diproses': 0, 'Ditolak': 0 };
-      
-      ruanganData.forEach(item => {
-        const s = item.status || 'Diproses';
-        if (statusCounts[s] !== undefined) {
-          statusCounts[s] += 1;
-        } else {
-          statusCounts[s] = 1;
-        }
-      });
+    function updateKpis() {
+      const total = ruanganData.length + kendaraanData.length;
+      document.getElementById('kpi-total-layanan').innerText = total;
 
-      const labels = Object.keys(statusCounts);
-      const values = Object.values(statusCounts);
+      const disetujui = ruanganData.filter(i => i.status === 'Disetujui').length + kendaraanData.filter(i => i.status === 'Disetujui').length;
+      const diproses = ruanganData.filter(i => i.status === 'Diproses').length + kendaraanData.filter(i => i.status === 'Diproses').length;
+      const ditolak = ruanganData.filter(i => i.status === 'Ditolak').length + kendaraanData.filter(i => i.status === 'Ditolak').length;
 
-      // Pemetaan Warna Status
-      const backgroundColors = labels.map(status => {
-        if (status === 'Disetujui') return 'rgba(16, 185, 129, 0.85)'; // Hijau
-        if (status === 'Diproses') return 'rgba(245, 158, 11, 0.85)';  // Kuning
-        if (status === 'Ditolak') return 'rgba(239, 68, 68, 0.85)';   // Merah
-        return 'rgba(99, 102, 241, 0.85)';
-      });
+      document.getElementById('kpi-disetujui').innerText = disetujui;
+      document.getElementById('kpi-diproses').innerText = diproses;
+      document.getElementById('kpi-ditolak').innerText = ditolak;
+    }
 
-      const ctx = document.getElementById('ruanganChart').getContext('2d');
-      if (ruanganChartInstance) ruanganChartInstance.destroy();
+    // 1. Combo Chart (Bar + Line)
+    function renderComboRtChart() {
+      const ctx = document.getElementById('comboRtChart').getContext('2d');
+      if (comboRtChartInstance) comboRtChartInstance.destroy();
 
-      ruanganChartInstance = new Chart(ctx, {
+      comboRtChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: labels,
+          labels: ['Peminjaman Ruangan', 'Operasional Kendaraan'],
+          datasets: [
+            {
+              type: 'bar',
+              label: 'Permohonan Disetujui',
+              data: [
+                ruanganData.filter(i => i.status === 'Disetujui').length,
+                kendaraanData.filter(i => i.status === 'Disetujui').length
+              ],
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            },
+            {
+              type: 'bar',
+              label: 'Sedang Diproses',
+              data: [
+                ruanganData.filter(i => i.status === 'Diproses').length,
+                kendaraanData.filter(i => i.status === 'Diproses').length
+              ],
+              backgroundColor: '#f59e0b',
+              borderRadius: 6
+            },
+            {
+              type: 'line',
+              label: 'Total Permohonan Masuk',
+              data: [ruanganData.length, kendaraanData.length],
+              borderColor: '#6366f1',
+              borderWidth: 3,
+              fill: false,
+              tension: 0.2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+          }
+        }
+      });
+    }
+
+    // 2. Status Doughnut Chart
+    function renderStatusRtPieChart() {
+      const disetujui = ruanganData.filter(i => i.status === 'Disetujui').length + kendaraanData.filter(i => i.status === 'Disetujui').length;
+      const diproses = ruanganData.filter(i => i.status === 'Diproses').length + kendaraanData.filter(i => i.status === 'Diproses').length;
+      const ditolak = ruanganData.filter(i => i.status === 'Ditolak').length + kendaraanData.filter(i => i.status === 'Ditolak').length;
+
+      const ctx = document.getElementById('statusRtPieChart').getContext('2d');
+      if (statusRtPieChartInstance) statusRtPieChartInstance.destroy();
+
+      statusRtPieChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Disetujui', 'Diproses', 'Ditolak'],
           datasets: [{
-            label: 'Jumlah Permohonan',
-            data: values,
-            backgroundColor: backgroundColors,
-            borderRadius: 6
+            data: [disetujui, diproses, ditolak],
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+            borderWidth: 2,
+            borderColor: '#1e293b'
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+          plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
         }
       });
     }
 
-    // GRAFIK STATISTIK KENDARAAN (STATUS BASED: DISETUJUI, DIPROSES, DITOLAK)
-    function renderKendaraanChart() {
-      const statusCounts = { 'Disetujui': 0, 'Diproses': 0, 'Ditolak': 0 };
-      
-      kendaraanData.forEach(item => {
-        const s = item.status || 'Diproses';
-        if (statusCounts[s] !== undefined) {
-          statusCounts[s] += 1;
-        } else {
-          statusCounts[s] = 1;
-        }
+    // 3. Top Facility Horizontal Bar Chart
+    function renderTopFacilityChart() {
+      const facilityCounts = {};
+      ruanganData.forEach(i => {
+        const key = `[Ruang] ${i.ruangan || 'Lainnya'}`;
+        facilityCounts[key] = (facilityCounts[key] || 0) + 1;
+      });
+      kendaraanData.forEach(i => {
+        const key = `[Armada] ${i.kendaraan || 'Lainnya'}`;
+        facilityCounts[key] = (facilityCounts[key] || 0) + 1;
       });
 
-      const labels = Object.keys(statusCounts);
-      const values = Object.values(statusCounts);
+      const labels = Object.keys(facilityCounts).slice(0, 6);
+      const values = Object.values(facilityCounts).slice(0, 6);
 
-      // Pemetaan Warna Status
-      const backgroundColors = labels.map(status => {
-        if (status === 'Disetujui') return 'rgba(16, 185, 129, 0.85)'; // Hijau
-        if (status === 'Diproses') return 'rgba(245, 158, 11, 0.85)';  // Kuning
-        if (status === 'Ditolak') return 'rgba(239, 68, 68, 0.85)';   // Merah
-        return 'rgba(99, 102, 241, 0.85)';
-      });
+      const ctx = document.getElementById('topFacilityChart').getContext('2d');
+      if (topFacilityChartInstance) topFacilityChartInstance.destroy();
 
-      const ctx = document.getElementById('kendaraanChart').getContext('2d');
-      if (kendaraanChartInstance) kendaraanChartInstance.destroy();
-
-      kendaraanChartInstance = new Chart(ctx, {
+      topFacilityChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: labels,
+          labels: labels.length ? labels : ['Belum Ada Data'],
           datasets: [{
-            label: 'Jumlah Transaksi',
-            data: values,
-            backgroundColor: backgroundColors,
+            label: 'Total Permohonan',
+            data: values.length ? values : [0],
+            backgroundColor: 'rgba(99, 102, 241, 0.85)',
             borderRadius: 6
           }]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+          }
         }
       });
     }
 
-    // CETAK PDF HISTORICAL
     function exportToPDF(category) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
@@ -410,12 +483,12 @@
         document.getElementById(`section-${tab}`).classList.toggle('hidden', tab !== tabName);
       });
       document.getElementById('tab-ruangan').className = tabName === 'ruangan' 
-        ? 'cursor-pointer bg-slate-800/80 backdrop-blur border-2 border-indigo-500 rounded-2xl p-6 shadow-xl transition-all' 
-        : 'cursor-pointer bg-slate-800/40 backdrop-blur border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-6 shadow-xl transition-all';
+        ? 'cursor-pointer bg-slate-800 border-2 border-indigo-500 rounded-2xl p-5 shadow-xl transition-all' 
+        : 'cursor-pointer bg-slate-800/40 border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-5 shadow-xl transition-all';
       
       document.getElementById('tab-kendaraan').className = tabName === 'kendaraan' 
-        ? 'cursor-pointer bg-slate-800/80 backdrop-blur border-2 border-emerald-500 rounded-2xl p-6 shadow-xl transition-all' 
-        : 'cursor-pointer bg-slate-800/40 backdrop-blur border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-6 shadow-xl transition-all';
+        ? 'cursor-pointer bg-slate-800 border-2 border-emerald-500 rounded-2xl p-5 shadow-xl transition-all' 
+        : 'cursor-pointer bg-slate-800/40 border-2 border-slate-700 hover:border-slate-500 rounded-2xl p-5 shadow-xl transition-all';
     }
 
     function openModal(category, editObj = null) {
@@ -426,17 +499,17 @@
       if (category === 'ruangan') {
         document.getElementById('modalTitle').innerText = editObj ? "Edit Permohonan Ruangan" : "Permohonan Peminjaman Ruangan";
         fields.innerHTML = `
-          <div><label class="block text-xs font-bold mb-1">Nama Peminjam</label><input type="text" id="nama_peminjam" value="${editObj ? editObj.nama_peminjam : ''}" required class="w-full border p-2 rounded text-sm"></div>
-          <div><label class="block text-xs font-bold mb-1">Nama Ruangan</label><input type="text" id="ruangan" value="${editObj ? editObj.ruangan : ''}" required class="w-full border p-2 rounded text-sm" placeholder="Contoh: Aula Utama"></div>
-          <div><label class="block text-xs font-bold mb-1">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border p-2 rounded text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1 text-slate-300">Nama Peminjam</label><input type="text" id="nama_peminjam" value="${editObj ? editObj.nama_peminjam : ''}" required class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1 text-slate-300">Nama Ruangan</label><input type="text" id="ruangan" value="${editObj ? editObj.ruangan : ''}" required class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm" placeholder="Contoh: Aula Utama"></div>
+          <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm"></div>
           <div class="grid grid-cols-2 gap-2">
-            <div><label class="block text-xs font-bold mb-1">Jam Mulai</label><input type="time" id="jam_mulai" value="${editObj ? editObj.jam_mulai : ''}" class="w-full border p-2 rounded text-sm"></div>
-            <div><label class="block text-xs font-bold mb-1">Jam Selesai</label><input type="time" id="jam_selesai" value="${editObj ? editObj.jam_selesai : ''}" class="w-full border p-2 rounded text-sm"></div>
+            <div><label class="block text-xs font-bold mb-1 text-slate-300">Jam Mulai</label><input type="time" id="jam_mulai" value="${editObj ? editObj.jam_mulai : ''}" class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm"></div>
+            <div><label class="block text-xs font-bold mb-1 text-slate-300">Jam Selesai</label><input type="time" id="jam_selesai" value="${editObj ? editObj.jam_selesai : ''}" class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm"></div>
           </div>
-          <div><label class="block text-xs font-bold mb-1">Keperluan</label><textarea id="keperluan" class="w-full border p-2 rounded text-sm">${editObj ? editObj.keperluan : ''}</textarea></div>
+          <div><label class="block text-xs font-bold mb-1 text-slate-300">Keperluan</label><textarea id="keperluan" class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm">${editObj ? editObj.keperluan : ''}</textarea></div>
           <div>
-            <label class="block text-xs font-bold mb-1">Status</label>
-            <select id="statusSelect" class="w-full border p-2 rounded text-sm">
+            <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
+            <select id="statusSelect" class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm">
               <option value="Diproses" ${editObj && editObj.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
               <option value="Disetujui" ${editObj && editObj.status === 'Disetujui' ? 'selected' : ''}>Disetujui</option>
               <option value="Ditolak" ${editObj && editObj.status === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
@@ -446,13 +519,13 @@
       } else if (category === 'kendaraan') {
         document.getElementById('modalTitle').innerText = editObj ? "Edit Permohonan Kendaraan" : "Permohonan Peminjaman Kendaraan";
         fields.innerHTML = `
-          <div><label class="block text-xs font-bold mb-1">Nama Driver / Pengemudi</label><input type="text" id="nama_driver" value="${editObj ? editObj.nama_driver : ''}" required class="w-full border p-2 rounded text-sm"></div>
-          <div><label class="block text-xs font-bold mb-1">Kendaraan</label><input type="text" id="kendaraan" value="${editObj ? editObj.kendaraan : ''}" required class="w-full border p-2 rounded text-sm" placeholder="Contoh: Bus Operasional 01"></div>
-          <div><label class="block text-xs font-bold mb-1">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border p-2 rounded text-sm"></div>
-          <div><label class="block text-xs font-bold mb-1">Tujuan Dinas</label><input type="text" id="tujuan" value="${editObj ? editObj.tujuan : ''}" required class="w-full border p-2 rounded text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1 text-slate-300">Nama Driver / Pengemudi</label><input type="text" id="nama_driver" value="${editObj ? editObj.nama_driver : ''}" required class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1 text-slate-300">Kendaraan</label><input type="text" id="kendaraan" value="${editObj ? editObj.kendaraan : ''}" required class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm" placeholder="Contoh: Bus Operasional 01"></div>
+          <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm"></div>
+          <div><label class="block text-xs font-bold mb-1 text-slate-300">Tujuan Dinas</label><input type="text" id="tujuan" value="${editObj ? editObj.tujuan : ''}" required class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm"></div>
           <div>
-            <label class="block text-xs font-bold mb-1">Status</label>
-            <select id="statusSelect" class="w-full border p-2 rounded text-sm">
+            <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
+            <select id="statusSelect" class="w-full border border-slate-600 bg-slate-900 text-white p-2.5 rounded-xl text-sm">
               <option value="Diproses" ${editObj && editObj.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
               <option value="Disetujui" ${editObj && editObj.status === 'Disetujui' ? 'selected' : ''}>Disetujui</option>
               <option value="Ditolak" ${editObj && editObj.status === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
@@ -483,8 +556,7 @@
         try {
           const res = await fetch(url, { method: 'DELETE' });
           if (res.ok) {
-            if (category === 'ruangan') await loadRuanganData();
-            else await loadKendaraanData();
+            await loadAllData();
           } else {
             alert("Gagal menghapus data dari database.");
           }
@@ -520,7 +592,7 @@
         });
         if (res.ok) {
           closeModal();
-          await loadRuanganData();
+          await loadAllData();
         } else {
           alert("Gagal menyimpan data ke database.");
         }
@@ -543,7 +615,7 @@
         });
         if (res.ok) {
           closeModal();
-          await loadKendaraanData();
+          await loadAllData();
         } else {
           alert("Gagal menyimpan data ke database.");
         }
