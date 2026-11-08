@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Maintenance AC - Sarpras Poltekbang</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-slate-950 font-sans text-slate-100 p-4 md:p-6 min-h-screen antialiased">
+
+  <div class="max-w-7xl mx-auto space-y-6">
+    
+    <!-- Header Utama -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-xl">
+      <div class="flex items-center space-x-4">
+        <div class="bg-gradient-to-tr from-cyan-600 to-blue-500 p-3.5 rounded-xl shadow-lg shadow-cyan-500/20 flex items-center justify-center">
+          <i class="fa-solid fa-snowflake text-white text-2xl"></i>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-400">TEKNIK & MAINTENANCE</p>
+          <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-white flex items-center gap-3">
+            Dashboard Maintenance & Pemeliharaan AC
+          </h1>
+          <p class="text-xs text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya • Real-time Monitoring Supabase</p>
+        </div>
+      </div>
+      
+      <!-- Navigasi Menu -->
+      <div class="flex items-center space-x-2 w-full md:w-auto">
+        <a href="/" class="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
+          <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
+        </a>
+        <a href="/rumah-tangga" class="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold rounded-xl transition">
+          <i class="fa-solid fa-building-user mr-1"></i> Rumah Tangga
+        </a>
+        <a href="/ac" class="px-4 py-2 bg-cyan-600 text-white font-semibold text-xs rounded-xl shadow">
+          <i class="fa-solid fa-snowflake mr-1"></i> Maintenance AC
+        </a>
+      </div>
+    </div>
+
+    <!-- SEKSI 1: KPI SCORECARDS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="flex justify-between items-start">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Servis</p>
+          <i class="fa-solid fa-wrench text-cyan-400 text-xs"></i>
+        </div>
+        <h3 class="text-3xl font-black text-cyan-400 mt-2" id="kpi-total-ac">0</h3>
+        <p class="text-[11px] text-slate-500 mt-1">Kegiatan Maintenance</p>
+      </div>
+
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="flex justify-between items-start">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Selesai / Baik</p>
+          <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
+        </div>
+        <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-selesai-ac">0</h3>
+        <p class="text-[11px] text-emerald-500/80 mt-1">Kondisi Optimal</p>
+      </div>
+
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="flex justify-between items-start">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Dalam Pengerjaan</p>
+          <i class="fa-solid fa-screws-tilting text-amber-400 text-xs"></i>
+        </div>
+        <h3 class="text-3xl font-black text-amber-400 mt-2" id="kpi-proses-ac">0</h3>
+        <p class="text-[11px] text-amber-500/80 mt-1">Proses Perbaikan</p>
+      </div>
+
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="flex justify-between items-start">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Perlu Perhatian</p>
+          <i class="fa-solid fa-triangle-exclamation text-rose-400 text-xs"></i>
+        </div>
+        <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-rusak-ac">0</h3>
+        <p class="text-[11px] text-rose-500/80 mt-1">AC Rusak / Kendala</p>
+      </div>
+    </div>
+
+    <!-- SEKSI 2: GRAFIK ANALYTICS AC -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-bar text-cyan-400"></i> Sebaran Maintenance AC per Gedung / Lokasi
+        </h2>
+        <div style="position: relative; height: 230px; width: 100%;">
+          <canvas id="acLocationChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-emerald-400"></i> Status Kelayakan Unit AC
+        </h2>
+        <div style="position: relative; height: 230px; width: 100%;">
+          <canvas id="acStatusPieChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEKSI 3: TABEL DATA MAINTENANCE AC -->
+    <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
+      <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
+        <h2 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-cyan-400"></i> Log Historical Maintenance AC
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="exportToPDF()" class="px-4 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+          </button>
+          <button onclick="openModal()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl shadow transition">
+            + Tambah Data Servis AC
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
+          <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800">
+            <tr>
+              <th class="px-6 py-3.5 font-bold">Lokasi / Ruangan</th>
+              <th class="px-6 py-3.5 font-bold">Kode Unit AC</th>
+              <th class="px-6 py-3.5 font-bold">Tanggal Servis</th>
+              <th class="px-6 py-3.5 font-bold">Jenis Pekerjaan</th>
+              <th class="px-6 py-3.5 font-bold">Teknisi</th>
+              <th class="px-6 py-3.5 font-bold">Status</th>
+              <th class="px-6 py-3.5 font-bold text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-ac" class="divide-y divide-slate-800">
+            <tr><td colspan="7" class="text-center py-5 text-slate-500">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL FORM INPUT/EDIT AC -->
+  <div id="acModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
+      <h3 id="modalTitle" class="text-lg font-extrabold text-white mb-4">Input Data Servis AC</h3>
+      <form id="acForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
+        <input type="hidden" id="editId">
+        <div><label class="block text-xs font-bold mb-1 text-slate-300">Lokasi / Ruangan</label><input type="text" id="lokasi" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="Contoh: Lab Komputer 1"></div>
+        <div><label class="block text-xs font-bold mb-1 text-slate-300">Kode Unit AC</label><input type="text" id="kode_unit" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="Contoh: AC-LAB1-01"></div>
+        <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Servis</label><input type="date" id="tgl_servis" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
+        <div><label class="block text-xs font-bold mb-1 text-slate-300">Jenis Pekerjaan</label><input type="text" id="jenis_pekerjaan" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="Contoh: Cuci AC / Tambah Freon"></div>
+        <div><label class="block text-xs font-bold mb-1 text-slate-300">Teknisi / Petugas</label><input type="text" id="teknisi" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Status Maintenance</label>
+          <select id="statusSelect" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+            <option value="Selesai">Selesai / Baik</option>
+            <option value="Proses">Dalam Pengerjaan</option>
+            <option value="Rusak">Rusak / Perlu Diganti</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-cyan-600/30">Simpan Data</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let acData = [];
+    let locationChartInstance = null;
+    let statusPieChartInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => { loadAcData(); });
+
+    async function loadAcData() {
+      try {
+        const res = await fetch('/api/maintenance-ac');
+        acData = await res.json();
+        renderTable();
+        updateKpis();
+        renderCharts();
+      } catch (err) { console.error("Gagal muat data AC:", err); }
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tbody-ac');
+      if (!acData || acData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-slate-500">Belum ada data maintenance AC.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = acData.map(item => {
+        let statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+        if (item.status === 'Proses') statusColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+        else if (item.status === 'Rusak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+
+        return `
+          <tr class="hover:bg-slate-800/50">
+            <td class="px-6 py-3.5 font-bold text-white">${item.lokasi || '-'}</td>
+            <td class="px-6 py-3.5 font-mono text-cyan-400">${item.kode_unit || '-'}</td>
+            <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_servis || '-'}</td>
+            <td class="px-6 py-3.5 text-slate-300">${item.jenis_pekerjaan || '-'}</td>
+            <td class="px-6 py-3.5 text-slate-400">${item.teknisi || '-'}</td>
+            <td class="px-6 py-3.5"><span class="${statusColor} border text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'Selesai'}</span></td>
+            <td class="px-6 py-3.5 text-center space-x-2">
+              <button onclick="editItem(${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
+              <button onclick="deleteItem(${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateKpis() {
+      document.getElementById('kpi-total-ac').innerText = acData.length;
+      document.getElementById('kpi-selesai-ac').innerText = acData.filter(i => i.status === 'Selesai' || !i.status).length;
+      document.getElementById('kpi-proses-ac').innerText = acData.filter(i => i.status === 'Proses').length;
+      document.getElementById('kpi-rusak-ac').innerText = acData.filter(i => i.status === 'Rusak').length;
+    }
+
+    function renderCharts() {
+      // Grafik Lokasi
+      const locCounts = {};
+      acData.forEach(i => { const key = i.lokasi || 'Lainnya'; locCounts[key] = (locCounts[key] || 0) + 1; });
+      const labels = Object.keys(locCounts).slice(0, 6);
+      const values = Object.values(locCounts).slice(0, 6);
+
+      const ctxLoc = document.getElementById('acLocationChart').getContext('2d');
+      if (locationChartInstance) locationChartInstance.destroy();
+      locationChartInstance = new Chart(ctxLoc, {
+        type: 'bar',
+        data: {
+          labels: labels.length ? labels : ['Belum Ada Data'],
+          datasets: [{ label: 'Total Maintenance', data: values.length ? values : [0], backgroundColor: '#06b6d4', borderRadius: 4, barPercentage: 0.55 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { ticks: { color: '#cbd5e1' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#cbd5e1' }, grid: { color: '#1e293b' } } }
+        }
+      });
+
+      // Grafik Pie Status
+      const selesai = acData.filter(i => i.status === 'Selesai' || !i.status).length;
+      const proses = acData.filter(i => i.status === 'Proses').length;
+      const rusak = acData.filter(i => i.status === 'Rusak').length;
+
+      const ctxPie = document.getElementById('acStatusPieChart').getContext('2d');
+      if (statusPieChartInstance) statusPieChartInstance.destroy();
+      statusPieChartInstance = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+          labels: ['Selesai', 'Proses', 'Rusak'],
+          datasets: [{ data: [selesai, proses, rusak], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#0f172a' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } } }
+      });
+    }
+
+    function openModal(editObj = null) {
+      document.getElementById('editId').value = editObj ? editObj.id : '';
+      document.getElementById('modalTitle').innerText = editObj ? "Edit Data Servis AC" : "Input Data Servis AC";
+      document.getElementById('lokasi').value = editObj ? editObj.lokasi : '';
+      document.getElementById('kode_unit').value = editObj ? editObj.kode_unit : '';
+      document.getElementById('tgl_servis').value = editObj ? editObj.tgl_servis : '';
+      document.getElementById('jenis_pekerjaan').value = editObj ? editObj.jenis_pekerjaan : '';
+      document.getElementById('teknisi').value = editObj ? editObj.teknisi : '';
+      document.getElementById('statusSelect').value = editObj ? editObj.status : 'Selesai';
+      document.getElementById('acModal').classList.remove('hidden');
+    }
+
+    function closeModal() { document.getElementById('acModal').classList.add('hidden'); }
+
+    function editItem(id) {
+      const item = acData.find(i => i.id === id);
+      if (item) openModal(item);
+    }
+
+    async function deleteItem(id) {
+      if (confirm("Hapus data pemeliharaan AC ini dari database?")) {
+        try {
+          const res = await fetch(`/api/maintenance-ac/${id}`, { method: 'DELETE' });
+          if (res.ok) await loadAcData();
+        } catch (err) { alert("Error: " + err.message); }
+      }
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editId').value;
+      const payload = {
+        lokasi: document.getElementById('lokasi').value,
+        kode_unit: document.getElementById('kode_unit').value,
+        tgl_servis: document.getElementById('tgl_servis').value,
+        jenis_pekerjaan: document.getElementById('jenis_pekerjaan').value,
+        teknisi: document.getElementById('teknisi').value,
+        status: document.getElementById('statusSelect').value
+      };
+
+      const method = editId ? 'PUT' : 'POST';
+      const url = editId ? `/api/maintenance-ac/${editId}` : '/api/maintenance-ac';
+
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (res.ok) { closeModal(); await loadAcData(); }
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14); doc.setFont("helvetica", "bold");
+      doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
+      doc.setFontSize(10); doc.setFont("helvetica", "normal");
+      doc.text("LOG HISTORICAL MAINTENANCE & PEMELIHARAAN AC", 14, 22);
+      doc.line(14, 25, 196, 25);
+      const rows = acData.map((item, i) => [i + 1, item.lokasi || '-', item.kode_unit || '-', item.tgl_servis || '-', item.jenis_pekerjaan || '-', item.teknisi || '-', item.status || 'Selesai']);
+      doc.autoTable({ head: [['No', 'Lokasi', 'Kode Unit', 'Tanggal', 'Jenis Pekerjaan', 'Teknisi', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [6, 182, 212] } });
+      doc.save(`Historical_Maintenance_AC_${new Date().toISOString().split('T')[0]}.pdf`);
+    }
+  </script>
+</body>
+</html>
