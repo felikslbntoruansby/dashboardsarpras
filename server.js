@@ -19,11 +19,68 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Static Routing
+// Static Routing (LENGKAP DENGAN MODUL AC)
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
 app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
+app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
+app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
+
+// =============================================================
+// API MAINTENANCE AC (CRUD LENGKAP SUPABASE)
+// =============================================================
+
+app.get('/api/maintenance-ac', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('maintenance_k3_ac').select('*').order('id', { ascending: false });
+        if (error) return res.json([]);
+        res.json(data || []);
+    } catch (err) {
+        res.json([]);
+    }
+});
+
+app.post('/api/maintenance-ac', async (req, res) => {
+    try {
+        const { lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status } = req.body;
+        const { data, error } = await supabase
+            .from('maintenance_k3_ac')
+            .insert([{ lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status: status || 'Selesai' }])
+            .select();
+        if (error) throw error;
+        res.json({ message: "Berhasil!", data });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/maintenance-ac/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status } = req.body;
+        const { data, error } = await supabase
+            .from('maintenance_k3_ac')
+            .update({ lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status })
+            .eq('id', id)
+            .select();
+        if (error) throw error;
+        res.json({ message: "Berhasil diubah!", data });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/maintenance-ac/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { error } = await supabase.from('maintenance_k3_ac').delete().eq('id', id);
+        if (error) throw error;
+        res.json({ message: "Berhasil dihapus!" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // =============================================================
 // API RUMAH TANGGA (CRUD LENGKAP SUPABASE)
@@ -260,9 +317,10 @@ app.get('/api/backup', async (req, res) => {
         const { data: inv } = await supabase.from('inventory').select('*');
         const { data: rgn } = await supabase.from('peminjaman_ruangan').select('*');
         const { data: kdr } = await supabase.from('peminjaman_kendaraan').select('*');
+        const { data: ac } = await supabase.from('maintenance_k3_ac').select('*');
         res.setHeader('Content-disposition', 'attachment; filename=backup_sarpras.json');
         res.setHeader('Content-type', 'application/json');
-        res.send(JSON.stringify({ inventory: inv || [], peminjaman_ruangan: rgn || [], peminjaman_kendaraan: kdr || [] }, null, 2));
+        res.send(JSON.stringify({ inventory: inv || [], peminjaman_ruangan: rgn || [], peminjaman_kendaraan: kdr || [], maintenance_ac: ac || [] }, null, 2));
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
