@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Static Routing (LENGKAP DENGAN MODUL AC)
+// Static Routing (Tetap seperti semula + Rute AC)
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
@@ -28,7 +28,7 @@ app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 
 // =============================================================
-// API MAINTENANCE AC (CRUD LENGKAP SUPABASE)
+// API MAINTENANCE AC (TAMBAHAN UTAMA)
 // =============================================================
 
 app.get('/api/maintenance-ac', async (req, res) => {
@@ -82,8 +82,77 @@ app.delete('/api/maintenance-ac/:id', async (req, res) => {
     }
 });
 
+// ROUTE IMPOR DATA DARI GOOGLE SPREADSHEET (Support Link Anda: gid=1651543328)
+app.post('/api/maintenance-ac/import-sheet', async (req, res) => {
+    try {
+        const inputUrl = req.body.sheetUrl || 'https://docs.google.com/spreadsheets/d/1JUfy4mrP90Afv2UDVRrkFpGxrEhzFNtU822LcoOxp9I/edit?gid=1651543328#gid=1651543328';
+        
+        const docIdMatch = inputUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        const gidMatch = inputUrl.match(/[?&]gid=(\d+)/);
+
+        if (!docIdMatch || !docIdMatch[1]) {
+            return res.status(400).json({ error: "Format link Google Spreadsheet tidak valid!" });
+        }
+
+        const docId = docIdMatch[1];
+        const gid = gidMatch ? gidMatch[1] : '0';
+        const csvExportUrl = `https://docs.google.com/spreadsheets/d/${docId}/export?format=csv&gid=${gid}`;
+
+        const fetchRes = await fetch(csvExportUrl);
+        if (!fetchRes.ok) {
+            return res.status(400).json({ error: "Gagal mengambil data dari Google Sheet. Pastikan izin akses Share bernilai 'Anyone with the link can view'." });
+        }
+
+        const csvText = await fetchRes.text();
+        const lines = csvText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+        if (lines.length <= 1) {
+            return res.status(400).json({ error: "Spreadsheet kosong atau hanya berisi baris header!" });
+        }
+
+        const parseCsvRow = (rowStr) => {
+            const result = [];
+            let insideQuote = false;
+            let current = '';
+            for (let char of rowStr) {
+                if (char === '"') insideQuote = !insideQuote;
+                else if (char === ',' && !insideQuote) {
+                    result.push(current.trim().replace(/^"|"$/g, ''));
+                    current = '';
+                } else current += char;
+            }
+            result.push(current.trim().replace(/^"|"$/g, ''));
+            return result;
+        };
+
+        const headers = parseCsvRow(lines[0]).map(h => h.toLowerCase());
+        const rowsToInsert = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const cols = parseCsvRow(lines[i]);
+            if (cols.length >= 2) {
+                const lokasi = cols[headers.indexOf('lokasi')] || cols[0] || 'Ruangan';
+                const kode_unit = cols[headers.indexOf('kode_unit')] || cols[1] || 'AC-01';
+                const tgl_servis = cols[headers.indexOf('tgl_servis')] || cols[2] || new Date().toISOString().split('T')[0];
+                const jenis_pekerjaan = cols[headers.indexOf('jenis_pekerjaan')] || cols[3] || 'Servis AC';
+                const teknisi = cols[headers.indexOf('teknisi')] || cols[4] || 'Petugas K3';
+                const status = cols[headers.indexOf('status')] || cols[5] || 'Selesai';
+
+                rowsToInsert.push({ lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status });
+            }
+        }
+
+        const { data, error } = await supabase.from('maintenance_k3_ac').insert(rowsToInsert).select();
+        if (error) throw error;
+
+        res.json({ message: `Berhasil memasukkan ${rowsToInsert.length} data AC dari Google Spreadsheet!`, data });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // =============================================================
-// API RUMAH TANGGA (CRUD LENGKAP SUPABASE)
+// API RUMAH TANGGA (CRUD LENGKAP SUPABASE) - KODE LAMA ANDA
 // =============================================================
 
 // --- PEMINJAMAN RUANGAN ---
@@ -191,7 +260,7 @@ app.delete('/api/peminjaman-kendaraan/:id', async (req, res) => {
 });
 
 // =============================================================
-// API INVENTORY STOK BARANG
+// API INVENTORY STOK BARANG - KODE LAMA ANDA
 // =============================================================
 
 app.get('/api/inventory', async (req, res) => {
