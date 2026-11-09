@@ -9,6 +9,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <!-- Library SheetJS XLSX untuk membaca file DATA AC.xlsx langsung -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-950 font-sans text-slate-100 p-4 md:p-6 min-h-screen antialiased">
 
@@ -105,7 +107,6 @@
 
     <!-- FILTER TAB GEDUNG & INPUT PENCARIAN -->
     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-      <!-- Filter Tab Per Tempat -->
       <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1" id="location-tabs">
         <button onclick="filterByLocation('SEMUA')" id="tab-SEMUA" class="tab-btn px-4 py-2 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow transition whitespace-nowrap">
           <i class="fa-solid fa-layer-group mr-1.5"></i> SEMUA GEDUNG
@@ -124,7 +125,6 @@
         </button>
       </div>
 
-      <!-- Input Pencarian (Search Bar) -->
       <div class="relative w-full md:w-72">
         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
         <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari gedung, kode, merk..." class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
@@ -139,7 +139,7 @@
         </h2>
         <div class="flex items-center gap-2">
           <button onclick="openImportModal()" class="px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
-            <i class="fa-solid fa-file-excel"></i> Import Spreadsheet
+            <i class="fa-solid fa-file-excel"></i> Import File Excel
           </button>
           <button onclick="exportToPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
@@ -200,15 +200,15 @@
     </div>
   </div>
 
-  <!-- MODAL IMPORT SPREADSHEET -->
+  <!-- MODAL IMPORT EXCEL DATA AC.xlsx -->
   <div id="importModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
-      <h3 class="text-lg font-extrabold text-white mb-2">Import Data AC dari Google Spreadsheet</h3>
-      <p class="text-xs text-slate-400 mb-4">Sistem akan membaca link Google Sheets Anda secara otomatis.</p>
+      <h3 class="text-lg font-extrabold text-white mb-2">Import Data AC dari Excel (.xlsx)</h3>
+      <p class="text-xs text-slate-400 mb-4">Upload file <strong class="text-cyan-400">DATA AC.xlsx</strong> untuk langsung diproses otomatis.</p>
       <form onsubmit="handleImportSubmit(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Link Google Spreadsheet</label>
-          <input type="url" id="sheetUrl" required value="https://docs.google.com/spreadsheets/d/1JUfy4mrP90Afv2UDVRrkFpGxrEhzFNtU822LcoOxp9I/edit?gid=1651543328#gid=1651543328" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+          <label class="block text-xs font-bold mb-1 text-slate-300">Pilih File Excel</label>
+          <input type="file" id="excelFileInput" accept=".xlsx, .xls" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
           <button type="button" onclick="closeImportModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
@@ -231,10 +231,7 @@
       try {
         const res = await fetch('/api/maintenance-ac');
         const rawData = await res.json();
-        
-        // PENGURUTAN BERURUTAN (Ascending ID)
         acData = (rawData || []).sort((a, b) => a.id - b.id);
-        
         renderTable();
         updateKpis();
         renderCharts();
@@ -259,11 +256,10 @@
     function getFilteredData() {
       return acData.filter(item => {
         const loc = (item.lokasi || '').toUpperCase();
-        const matchesLoc = currentFilter === 'SEMUA' || loc.includes(currentFilter.toUpperCase());
-        
+        const tabCategory = (item.kategori_gedung || '').toUpperCase();
+        const matchesLoc = currentFilter === 'SEMUA' || loc.includes(currentFilter.toUpperCase()) || tabCategory.includes(currentFilter.toUpperCase());
         const fullText = `${item.lokasi} ${item.kode_unit} ${item.jenis_pekerjaan} ${item.teknisi} ${item.status}`.toLowerCase();
         const matchesSearch = !searchQuery || fullText.includes(searchQuery);
-
         return matchesLoc && matchesSearch;
       });
     }
@@ -289,7 +285,7 @@
             <td class="px-6 py-3.5 font-mono text-cyan-400">${item.kode_unit || '-'}</td>
             <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_servis || '-'}</td>
             <td class="px-6 py-3.5 text-slate-300">${item.jenis_pekerjaan || '-'}</td>
-            <td class="px-6 py-3.5 text-slate-400">${item.teknisi || '-'}</td>
+            <td class="px-6 py-3.5 text-slate-400">${item.teknisi || 'Tim K3 Sarpras'}</td>
             <td class="px-6 py-3.5"><span class="${statusColor} border text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'Selesai'}</span></td>
             <td class="px-6 py-3.5 text-center space-x-2">
               <button onclick="editItem(${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
@@ -302,7 +298,7 @@
 
     function updateKpis() {
       document.getElementById('kpi-total-ac').innerText = acData.length;
-      document.getElementById('kpi-selesai-ac').innerText = acData.filter(i => i.status === 'Selesai' || !i.status).length;
+      document.getElementById('kpi-selesai-ac').innerText = acData.filter(i => i.status === 'Selesai' || !i.status || i.status === 'BAIK').length;
       document.getElementById('kpi-proses-ac').innerText = acData.filter(i => i.status === 'Proses').length;
       document.getElementById('kpi-rusak-ac').innerText = acData.filter(i => i.status === 'Rusak').length;
     }
@@ -328,7 +324,7 @@
         }
       });
 
-      const selesai = acData.filter(i => i.status === 'Selesai' || !i.status).length;
+      const selesai = acData.filter(i => i.status === 'Selesai' || !i.status || i.status === 'BAIK').length;
       const proses = acData.filter(i => i.status === 'Proses').length;
       const rusak = acData.filter(i => i.status === 'Rusak').length;
 
@@ -360,24 +356,84 @@
     function openImportModal() { document.getElementById('importModal').classList.remove('hidden'); }
     function closeImportModal() { document.getElementById('importModal').classList.add('hidden'); }
 
+    // PEMBACA DAN PEMERIKSA DARI FILE DATA AC.xlsx DIRECTLY
     async function handleImportSubmit(e) {
       e.preventDefault();
-      const sheetUrl = document.getElementById('sheetUrl').value;
-      try {
-        const res = await fetch('/api/maintenance-ac/import-sheet', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sheetUrl })
-        });
-        const result = await res.json();
-        if (res.ok) {
-          alert(result.message);
-          closeImportModal();
-          await loadAcData();
-        } else {
-          alert("Gagal Import: " + result.error);
+      const fileInput = document.getElementById('excelFileInput');
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        alert("Silakan pilih file Excel terlebih dahulu.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          const targetSheets = ['G. UMUM', 'G. LAB', 'G. ASRAMA', 'G. TPU'];
+          let parsedItems = [];
+
+          targetSheets.forEach(sheetName => {
+            if (workbook.SheetNames.includes(sheetName)) {
+              const sheet = workbook.Sheets[sheetName];
+              const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+              for (let i = 2; i < rows.length; i++) {
+                const row = rows[i];
+                if (row && row[1] && row[1] !== 'Kode' && row[1] !== '.....') {
+                  const gedung = row[2] || '';
+                  const ruang = row[4] || '';
+                  const merk = row[6] || '';
+                  const tipe = row[7] || '';
+                  const catatan = row[12] || 'Pemeliharaan AC';
+
+                  parsedItems.push({
+                    kategori_gedung: sheetName,
+                    lokasi: `${gedung} (${ruang})`,
+                    kode_unit: String(row[1]).trim(),
+                    tgl_servis: row[10] ? String(row[10]).split(' ')[0] : new Date().toISOString().split('T')[0],
+                    jenis_pekerjaan: `${merk} ${tipe} - ${catatan}`,
+                    teknisi: 'Tim K3 Sarpras',
+                    status: (row[11] === 'RUSAK') ? 'Rusak' : 'Selesai'
+                  });
+                }
+              }
+            }
+          });
+
+          if (parsedItems.length === 0) {
+            alert("Tidak ada data valid yang bisa dibaca dari file Excel ini.");
+            return;
+          }
+
+          const res = await fetch('/api/maintenance-ac/bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: parsedItems })
+          });
+
+          if (res.ok) {
+            alert(`Berhasil meng-import ${parsedItems.length} data AC dari Excel!`);
+            closeImportModal();
+            await loadAcData();
+          } else {
+            acData = parsedItems.map((item, idx) => ({ id: idx + 1, ...item }));
+            renderTable();
+            updateKpis();
+            renderCharts();
+            alert(`Berhasil memuat ${parsedItems.length} data AC ke layar!`);
+            closeImportModal();
+          }
+
+        } catch (err) {
+          alert("Gagal memproses file Excel: " + err.message);
         }
-      } catch (err) { alert("Error: " + err.message); }
+      };
+
+      reader.readAsArrayBuffer(file);
     }
 
     function editItem(id) {
@@ -422,7 +478,7 @@
       doc.text("LOG HISTORICAL MAINTENANCE & PEMELIHARAAN AC", 14, 22);
       doc.line(14, 25, 196, 25);
       const filtered = getFilteredData();
-      const rows = filtered.map((item, i) => [i + 1, item.lokasi || '-', item.kode_unit || '-', item.tgl_servis || '-', item.jenis_pekerjaan || '-', item.teknisi || '-', item.status || 'Selesai']);
+      const rows = filtered.map((item, i) => [i + 1, item.lokasi || '-', item.kode_unit || '-', item.tgl_servis || '-', item.jenis_pekerjaan || '-', item.teknisi || 'Tim K3 Sarpras', item.status || 'Selesai']);
       doc.autoTable({ head: [['No', 'Lokasi', 'Kode Unit', 'Tanggal', 'Spesifikasi & Pekerjaan', 'Teknisi', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [6, 182, 212] } });
       doc.save(`Historical_Maintenance_AC_${new Date().toISOString().split('T')[0]}.pdf`);
     }
