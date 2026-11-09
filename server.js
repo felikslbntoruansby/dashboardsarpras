@@ -29,7 +29,7 @@ app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 
 // =============================================================
-// API MAINTENANCE AC (SUPPORT BULK INSERT EXCEL KE SUPABASE)
+// API MAINTENANCE AC (SUPPORT BULK BATCH INSERT KE SUPABASE)
 // =============================================================
 
 app.get('/api/maintenance-ac', async (req, res) => {
@@ -42,7 +42,7 @@ app.get('/api/maintenance-ac', async (req, res) => {
     }
 });
 
-// ENDPOINT BARU: BULK INSERT DARI FRONTEND EXCEL
+// BULK INSERT DENGAN PEMECAHAN BATCH (PERMANEN SUPABASE)
 app.post('/api/maintenance-ac/bulk', async (req, res) => {
     try {
         const { items } = req.body;
@@ -51,8 +51,11 @@ app.post('/api/maintenance-ac/bulk', async (req, res) => {
             return res.status(400).json({ error: "Data array 'items' kosong atau tidak valid!" });
         }
 
-        // Hapus data lama agar urutan data Excel tersusun rapi
-        await supabase.from('maintenance_k3_ac').delete().neq('id', 0);
+        // Hapus data lama agar tersusun rapi dari ID 1
+        const { error: deleteError } = await supabase.from('maintenance_k3_ac').delete().neq('id', 0);
+        if (deleteError) {
+            console.error("Gagal menghapus data lama:", deleteError);
+        }
 
         const rowsToInsert = items.map(item => ({
             lokasi: item.lokasi || 'Ruangan Sarpras',
@@ -63,16 +66,23 @@ app.post('/api/maintenance-ac/bulk', async (req, res) => {
             status: item.status || 'Selesai'
         }));
 
-        const { data, error } = await supabase
-            .from('maintenance_k3_ac')
-            .insert(rowsToInsert)
-            .select();
+        // Insert per BATCH 100 data
+        const BATCH_SIZE = 100;
+        let insertedTotal = 0;
 
-        if (error) throw error;
+        for (let i = 0; i < rowsToInsert.length; i += BATCH_SIZE) {
+            const chunk = rowsToInsert.slice(i, i + BATCH_SIZE);
+            const { error: insertErr } = await supabase.from('maintenance_k3_ac').insert(chunk);
+            if (insertErr) {
+                console.error(`Error pada batch ${i}:`, insertErr);
+                throw insertErr;
+            }
+            insertedTotal += chunk.length;
+        }
 
         res.json({ 
-            message: `Berhasil memasukkan ${rowsToInsert.length} data AC dari file Excel ke Supabase!`, 
-            data 
+            message: `Berhasil menyimpan ${insertedTotal} data AC ke Supabase secara permanen!`, 
+            total: insertedTotal 
         });
     } catch (err) {
         console.error("Error pada Bulk Insert AC:", err);
@@ -121,7 +131,11 @@ app.delete('/api/maintenance-ac/:id', async (req, res) => {
     }
 });
 
-// API RUMAH TANGGA & INVENTORY (TETAP SEPERTI SEMULA)
+// =============================================================
+// API RUMAH TANGGA & INVENTORY
+// =============================================================
+
+// PEMINJAMAN RUANGAN
 app.get('/api/peminjaman-ruangan', async (req, res) => {
     try {
         const { data, error } = await supabase.from('peminjaman_ruangan').select('*').order('id', { ascending: false });
@@ -165,6 +179,7 @@ app.delete('/api/peminjaman-ruangan/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// PEMINJAMAN KENDARAAN
 app.get('/api/peminjaman-kendaraan', async (req, res) => {
     try {
         const { data, error } = await supabase.from('peminjaman_kendaraan').select('*').order('id', { ascending: false });
@@ -208,6 +223,7 @@ app.delete('/api/peminjaman-kendaraan/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// INVENTORY
 app.get('/api/inventory', async (req, res) => {
     try {
         const { data, error } = await supabase.from('inventory').select('*').order('id', { ascending: true });

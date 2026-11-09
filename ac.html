@@ -9,14 +9,14 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-  <!-- Library SheetJS XLSX untuk membaca file DATA AC.xlsx langsung -->
+  <!-- Library XLSX untuk membaca file Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-950 font-sans text-slate-100 p-4 md:p-6 min-h-screen antialiased">
 
   <div class="max-w-7xl mx-auto space-y-6">
     
-    <!-- Header Utama -->
+    <!-- HEADER UTAMA -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-xl">
       <div class="flex items-center space-x-4">
         <div class="bg-gradient-to-tr from-cyan-600 to-blue-500 p-3.5 rounded-xl shadow-lg shadow-cyan-500/20 flex items-center justify-center">
@@ -31,7 +31,7 @@
         </div>
       </div>
       
-      <!-- Navigasi Menu -->
+      <!-- NAVIGASI MENU -->
       <div class="flex items-center space-x-2 w-full md:w-auto">
         <a href="/" class="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
           <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <!-- SEKSI 2: GRAFIK ANALYTICS AC -->
+    <!-- SEKSI 2: GRAFIK ANALYTICS -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
         <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
@@ -105,7 +105,7 @@
       </div>
     </div>
 
-    <!-- FILTER TAB GEDUNG & INPUT PENCARIAN -->
+    <!-- FILTER TAB & PENCARIAN -->
     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1" id="location-tabs">
         <button onclick="filterByLocation('SEMUA')" id="tab-SEMUA" class="tab-btn px-4 py-2 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow transition whitespace-nowrap">
@@ -173,7 +173,7 @@
 
   </div>
 
-  <!-- MODAL FORM INPUT/EDIT AC -->
+  <!-- MODAL FORM INPUT/EDIT -->
   <div id="acModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
       <h3 id="modalTitle" class="text-lg font-extrabold text-white mb-4">Input Data Servis AC</h3>
@@ -204,7 +204,7 @@
   <div id="importModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
       <h3 class="text-lg font-extrabold text-white mb-2">Import Data AC dari Excel (.xlsx)</h3>
-      <p class="text-xs text-slate-400 mb-4">Upload file <strong class="text-cyan-400">DATA AC.xlsx</strong> untuk langsung diproses otomatis.</p>
+      <p class="text-xs text-slate-400 mb-4">Pilih file <strong class="text-cyan-400">DATA AC.xlsx</strong> untuk di-upload permanen ke Supabase.</p>
       <form onsubmit="handleImportSubmit(event)" class="space-y-3">
         <div>
           <label class="block text-xs font-bold mb-1 text-slate-300">Pilih File Excel</label>
@@ -356,11 +356,11 @@
     function openImportModal() { document.getElementById('importModal').classList.remove('hidden'); }
     function closeImportModal() { document.getElementById('importModal').classList.add('hidden'); }
 
-    // PEMBACA DAN PEMERIKSA DARI FILE DATA AC.xlsx DIRECTLY
+    // PEMBACA DAN PEMERIKSA FILE DATA AC.xlsx
     async function handleImportSubmit(e) {
       e.preventDefault();
       const fileInput = document.getElementById('excelFileInput');
-      const file = fileInput.files[0];
+      const file = fileInput ? fileInput.files[0] : null;
       
       if (!file) {
         alert("Silakan pilih file Excel terlebih dahulu.");
@@ -371,7 +371,7 @@
       reader.onload = async function (e) {
         try {
           const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
+          const workbook = XLSX.read(data, { type: 'array', cellDates: true });
           
           const targetSheets = ['G. UMUM', 'G. LAB', 'G. ASRAMA', 'G. TPU'];
           let parsedItems = [];
@@ -381,6 +381,7 @@
               const sheet = workbook.Sheets[sheetName];
               const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+              // Mengabaikan 2 baris header pertama
               for (let i = 2; i < rows.length; i++) {
                 const row = rows[i];
                 if (row && row[1] && row[1] !== 'Kode' && row[1] !== '.....') {
@@ -390,12 +391,21 @@
                   const tipe = row[7] || '';
                   const catatan = row[12] || 'Pemeliharaan AC';
 
+                  let tglServis = new Date().toISOString().split('T')[0];
+                  if (row[10]) {
+                    if (row[10] instanceof Date) {
+                      tglServis = row[10].toISOString().split('T')[0];
+                    } else {
+                      tglServis = String(row[10]).split(' ')[0];
+                    }
+                  }
+
                   parsedItems.push({
                     kategori_gedung: sheetName,
-                    lokasi: `${gedung} (${ruang})`,
+                    lokasi: `${gedung} ${ruang ? '(' + ruang + ')' : ''}`.trim(),
                     kode_unit: String(row[1]).trim(),
-                    tgl_servis: row[10] ? String(row[10]).split(' ')[0] : new Date().toISOString().split('T')[0],
-                    jenis_pekerjaan: `${merk} ${tipe} - ${catatan}`,
+                    tgl_servis: tglServis,
+                    jenis_pekerjaan: `${merk} ${tipe} - ${catatan}`.trim(),
                     teknisi: 'Tim K3 Sarpras',
                     status: (row[11] === 'RUSAK') ? 'Rusak' : 'Selesai'
                   });
@@ -409,23 +419,21 @@
             return;
           }
 
+          // Kirim data ter-parse ke Backend
           const res = await fetch('/api/maintenance-ac/bulk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ items: parsedItems })
           });
 
+          const resJson = await res.json();
+
           if (res.ok) {
-            alert(`Berhasil meng-import ${parsedItems.length} data AC dari Excel!`);
+            alert(resJson.message || `Berhasil meng-import ${parsedItems.length} data AC ke Supabase!`);
             closeImportModal();
             await loadAcData();
           } else {
-            acData = parsedItems.map((item, idx) => ({ id: idx + 1, ...item }));
-            renderTable();
-            updateKpis();
-            renderCharts();
-            alert(`Berhasil memuat ${parsedItems.length} data AC ke layar!`);
-            closeImportModal();
+            alert("Gagal menyimpan ke Database: " + (resJson.error || "Terjadi kesalahan server"));
           }
 
         } catch (err) {
