@@ -82,7 +82,7 @@ app.delete('/api/maintenance-ac/:id', async (req, res) => {
     }
 });
 
-// ROUTE IMPOR DATA DARI GOOGLE SPREADSHEET (Support Link Anda: gid=1651543328)
+// ROUTE IMPOR DATA DARI GOOGLE SPREADSHEET (Disesuaikan dengan header kolom Spreadsheet Anda)
 app.post('/api/maintenance-ac/import-sheet', async (req, res) => {
     try {
         const inputUrl = req.body.sheetUrl || 'https://docs.google.com/spreadsheets/d/1JUfy4mrP90Afv2UDVRrkFpGxrEhzFNtU822LcoOxp9I/edit?gid=1651543328#gid=1651543328';
@@ -125,18 +125,33 @@ app.post('/api/maintenance-ac/import-sheet', async (req, res) => {
             return result;
         };
 
-        const headers = parseCsvRow(lines[0]).map(h => h.toLowerCase());
+        const headers = parseCsvRow(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
         const rowsToInsert = [];
 
         for (let i = 1; i < lines.length; i++) {
             const cols = parseCsvRow(lines[i]);
             if (cols.length >= 2) {
-                const lokasi = cols[headers.indexOf('lokasi')] || cols[0] || 'Ruangan';
-                const kode_unit = cols[headers.indexOf('kode_unit')] || cols[1] || 'AC-01';
-                const tgl_servis = cols[headers.indexOf('tgl_servis')] || cols[2] || new Date().toISOString().split('T')[0];
-                const jenis_pekerjaan = cols[headers.indexOf('jenis_pekerjaan')] || cols[3] || 'Servis AC';
-                const teknisi = cols[headers.indexOf('teknisi')] || cols[4] || 'Petugas K3';
-                const status = cols[headers.indexOf('status')] || cols[5] || 'Selesai';
+                // Pencarian dinamis berdasarkan header spreadsheet (No, Kode, Gedung, Lantai, Ruang, Merk, Tanggal, dll)
+                const getVal = (keyStr) => {
+                    const idx = headers.findIndex(h => h.includes(keyStr));
+                    return idx !== -1 ? cols[idx] : null;
+                };
+
+                const gedung = getVal('gedung') || cols[2] || '';
+                const ruang = getVal('ruang') || cols[4] || '';
+                const kode = getVal('kode') || cols[1] || '';
+                const merk = getVal('merk') || cols[6] || '';
+                const type = getVal('type') || cols[7] || '';
+                const tgl = getVal('tanggal') || getVal('tgl') || cols[10] || new Date().toISOString().split('T')[0];
+                const ket = getVal('keterangan') || cols[11] || 'Pemeliharaan AC';
+
+                // Pemetaan otomatis ke kolom database Supabase (lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status)
+                const lokasi = `${gedung} ${ruang ? '(' + ruang + ')' : ''}`.trim() || cols[0] || 'Ruangan Sarpras';
+                const kode_unit = kode || `AC-UNIT-${i}`;
+                const tgl_servis = tgl.match(/^\d{4}-\d{2}-\d{2}$/) ? tgl : new Date().toISOString().split('T')[0];
+                const jenis_pekerjaan = `${merk} ${type} ${ket}`.trim() || 'Servis AC';
+                const teknisi = 'Tim K3 Sarpras';
+                const status = ket.toLowerCase().includes('rusak') ? 'Rusak' : 'Selesai';
 
                 rowsToInsert.push({ lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status });
             }
