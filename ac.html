@@ -131,7 +131,7 @@
       </div>
     </div>
 
-    <!-- SEKSI 3: TABEL DATA MAINTENANCE AC -->
+    <!-- SEKSI 3: TABEL DATA MAINTENANCE AC DENGAN PAGINASI -->
     <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
       <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
         <h2 class="text-sm font-bold text-white flex items-center gap-2">
@@ -169,6 +169,17 @@
           </tbody>
         </table>
       </div>
+
+      <!-- BOTTOM BAR PAGINASI (20 DATA / HALAMAN) -->
+      <div class="p-4 border-t border-slate-800 bg-slate-950/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div class="text-slate-400" id="pagination-info">
+          Menampilkan 0 - 0 dari 0 data
+        </div>
+        <div class="flex items-center space-x-1.5" id="pagination-controls">
+          <!-- Button Prev & Page Buttons dimasukkan via JS -->
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -222,6 +233,9 @@
     let acData = [];
     let currentFilter = 'SEMUA';
     let searchQuery = '';
+    let currentPage = 1;
+    const itemsPerPage = 20;
+
     let locationChartInstance = null;
     let statusPieChartInstance = null;
 
@@ -232,6 +246,7 @@
         const res = await fetch('/api/maintenance-ac');
         const rawData = await res.json();
         acData = (rawData || []).sort((a, b) => a.id - b.id);
+        currentPage = 1;
         renderTable();
         updateKpis();
         renderCharts();
@@ -240,6 +255,7 @@
 
     function filterByLocation(loc) {
       currentFilter = loc;
+      currentPage = 1;
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.className = 'tab-btn px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-semibold text-xs rounded-xl transition whitespace-nowrap';
       });
@@ -250,6 +266,7 @@
 
     function handleSearch() {
       searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      currentPage = 1;
       renderTable();
     }
 
@@ -267,20 +284,30 @@
     function renderTable() {
       const tbody = document.getElementById('tbody-ac');
       const filtered = getFilteredData();
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+      const paginatedItems = filtered.slice(startIndex, endIndex);
 
       if (!filtered || filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-500">Data tidak ditemukan.</td></tr>`;
+        document.getElementById('pagination-info').innerText = 'Menampilkan 0 dari 0 data';
+        document.getElementById('pagination-controls').innerHTML = '';
         return;
       }
 
-      tbody.innerHTML = filtered.map((item, index) => {
+      tbody.innerHTML = paginatedItems.map((item, index) => {
         let statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
         if (item.status === 'Proses') statusColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
         else if (item.status === 'Rusak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
 
         return `
           <tr class="hover:bg-slate-800/50">
-            <td class="px-4 py-3.5 text-center font-bold text-slate-400">${index + 1}</td>
+            <td class="px-4 py-3.5 text-center font-bold text-slate-400">${startIndex + index + 1}</td>
             <td class="px-6 py-3.5 font-bold text-white">${item.lokasi || '-'}</td>
             <td class="px-6 py-3.5 font-mono text-cyan-400">${item.kode_unit || '-'}</td>
             <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_servis || '-'}</td>
@@ -294,6 +321,55 @@
           </tr>
         `;
       }).join('');
+
+      renderPaginationControls(totalItems, totalPages, startIndex, endIndex);
+    }
+
+    function renderPaginationControls(totalItems, totalPages, startIndex, endIndex) {
+      document.getElementById('pagination-info').innerText = `Menampilkan ${startIndex + 1} - ${endIndex} dari ${totalItems} data`;
+
+      const controls = document.getElementById('pagination-controls');
+      let html = '';
+
+      // Tombol Prev
+      html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed font-bold transition">
+        <i class="fa-solid fa-chevron-left"></i> Prev
+      </button>`;
+
+      // Logika Penampilan Tombol Nomor Halaman
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, currentPage + 2);
+
+      if (startPage > 1) {
+        html += `<button onclick="changePage(1)" class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 font-bold transition">1</button>`;
+        if (startPage > 2) html += `<span class="px-1 text-slate-500">...</span>`;
+      }
+
+      for (let p = startPage; p <= endPage; p++) {
+        const activeClass = p === currentPage ? 'bg-cyan-600 text-white font-black border-cyan-500 shadow-md' : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 font-bold';
+        html += `<button onclick="changePage(${p})" class="px-3 py-1.5 rounded-lg border ${activeClass} transition">${p}</button>`;
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += `<span class="px-1 text-slate-500">...</span>`;
+        html += `<button onclick="changePage(${totalPages})" class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 font-bold transition">${totalPages}</button>`;
+      }
+
+      // Tombol Next
+      html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed font-bold transition">
+        Next <i class="fa-solid fa-chevron-right"></i>
+      </button>`;
+
+      controls.innerHTML = html;
+    }
+
+    function changePage(page) {
+      const filtered = getFilteredData();
+      const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+      if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        renderTable();
+      }
     }
 
     function updateKpis() {
@@ -356,6 +432,45 @@
     function openImportModal() { document.getElementById('importModal').classList.remove('hidden'); }
     function closeImportModal() { document.getElementById('importModal').classList.add('hidden'); }
 
+    // FUNGSI KONVERSI TANGGAL KE ISO (YYYY-MM-DD)
+    function parseExcelDate(val) {
+      if (!val) return new Date().toISOString().split('T')[0];
+      
+      if (val instanceof Date && !isNaN(val)) {
+        const year = val.getFullYear();
+        const month = String(val.getMonth() + 1).padStart(2, '0');
+        const day = String(val.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+      
+      const strVal = String(val).trim();
+      
+      if (strVal.includes('/')) {
+        const parts = strVal.split(' ')[0].split('/');
+        if (parts.length === 3) {
+          let day = parts[0].padStart(2, '0');
+          let month = parts[1].padStart(2, '0');
+          let year = parts[2];
+          if (year.length === 2) year = '20' + year;
+          return `${year}-${month}-${day}`;
+        }
+      }
+
+      if (strVal.includes('-')) {
+        const parts = strVal.split(' ')[0].split('-');
+        if (parts.length === 3) {
+          if (parts[0].length === 4) return strVal.split(' ')[0];
+          let day = parts[0].padStart(2, '0');
+          let month = parts[1].padStart(2, '0');
+          let year = parts[2];
+          if (year.length === 2) year = '20' + year;
+          return `${year}-${month}-${day}`;
+        }
+      }
+
+      return new Date().toISOString().split('T')[0];
+    }
+
     // PEMBACA DAN PEMERIKSA FILE DATA AC.xlsx
     async function handleImportSubmit(e) {
       e.preventDefault();
@@ -381,7 +496,6 @@
               const sheet = workbook.Sheets[sheetName];
               const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-              // Mengabaikan 2 baris header pertama
               for (let i = 2; i < rows.length; i++) {
                 const row = rows[i];
                 if (row && row[1] && row[1] !== 'Kode' && row[1] !== '.....') {
@@ -391,14 +505,7 @@
                   const tipe = row[7] || '';
                   const catatan = row[12] || 'Pemeliharaan AC';
 
-                  let tglServis = new Date().toISOString().split('T')[0];
-                  if (row[10]) {
-                    if (row[10] instanceof Date) {
-                      tglServis = row[10].toISOString().split('T')[0];
-                    } else {
-                      tglServis = String(row[10]).split(' ')[0];
-                    }
-                  }
+                  const tglServis = parseExcelDate(row[10]);
 
                   parsedItems.push({
                     kategori_gedung: sheetName,
@@ -419,7 +526,6 @@
             return;
           }
 
-          // Kirim data ter-parse ke Backend
           const res = await fetch('/api/maintenance-ac/bulk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
