@@ -110,11 +110,14 @@
           <i class="fa-solid fa-list-check text-cyan-400"></i> Log Historical Maintenance AC
         </h2>
         <div class="flex items-center gap-2">
-          <button onclick="exportToPDF()" class="px-4 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
+          <button onclick="openImportModal()" class="px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-file-excel"></i> Import Spreadsheet
+          </button>
+          <button onclick="exportToPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
-          <button onclick="openModal()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl shadow transition">
-            + Tambah Data Servis AC
+          <button onclick="openModal()" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl shadow transition">
+            + Tambah Data
           </button>
         </div>
       </div>
@@ -163,6 +166,24 @@
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
           <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
           <button type="submit" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-cyan-600/30">Simpan Data</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL IMPORT SPREADSHEET -->
+  <div id="importModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
+      <h3 class="text-lg font-extrabold text-white mb-2">Import Data AC dari Google Spreadsheet</h3>
+      <p class="text-xs text-slate-400 mb-4">Sistem akan membaca link Google Sheets Anda secara otomatis.</p>
+      <form onsubmit="handleImportSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Link Google Spreadsheet</label>
+          <input type="url" id="sheetUrl" required value="https://docs.google.com/spreadsheets/d/1JUfy4mrP90Afv2UDVRrkFpGxrEhzFNtU822LcoOxp9I/edit?gid=1651543328#gid=1651543328" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+        <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeImportModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30">Mulai Import</button>
         </div>
       </form>
     </div>
@@ -221,7 +242,6 @@
     }
 
     function renderCharts() {
-      // Grafik Lokasi
       const locCounts = {};
       acData.forEach(i => { const key = i.lokasi || 'Lainnya'; locCounts[key] = (locCounts[key] || 0) + 1; });
       const labels = Object.keys(locCounts).slice(0, 6);
@@ -242,7 +262,6 @@
         }
       });
 
-      // Grafik Pie Status
       const selesai = acData.filter(i => i.status === 'Selesai' || !i.status).length;
       const proses = acData.filter(i => i.status === 'Proses').length;
       const rusak = acData.filter(i => i.status === 'Rusak').length;
@@ -272,6 +291,28 @@
     }
 
     function closeModal() { document.getElementById('acModal').classList.add('hidden'); }
+    function openImportModal() { document.getElementById('importModal').classList.remove('hidden'); }
+    function closeImportModal() { document.getElementById('importModal').classList.add('hidden'); }
+
+    async function handleImportSubmit(e) {
+      e.preventDefault();
+      const sheetUrl = document.getElementById('sheetUrl').value;
+      try {
+        const res = await fetch('/api/maintenance-ac/import-sheet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sheetUrl })
+        });
+        const result = await res.json();
+        if (res.ok) {
+          alert(result.message);
+          closeImportModal();
+          await loadAcData();
+        } else {
+          alert("Gagal Import: " + result.error);
+        }
+      } catch (err) { alert("Error: " + err.message); }
+    }
 
     function editItem(id) {
       const item = acData.find(i => i.id === id);
