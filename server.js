@@ -28,12 +28,13 @@ app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 
 // =============================================================
-// API MAINTENANCE AC (TAMBAHAN UTAMA)
+// API MAINTENANCE AC (DIPERBARUI: URUTAN BERURUTAN ASC & MAPPING SPREADSHEET)
 // =============================================================
 
 app.get('/api/maintenance-ac', async (req, res) => {
     try {
-        const { data, error } = await supabase.from('maintenance_k3_ac').select('*').order('id', { ascending: false });
+        // Mengurutkan secara ASC (id terkecil ke terbesar) agar urutan data konsisten
+        const { data, error } = await supabase.from('maintenance_k3_ac').select('*').order('id', { ascending: true });
         if (error) return res.json([]);
         res.json(data || []);
     } catch (err) {
@@ -82,7 +83,7 @@ app.delete('/api/maintenance-ac/:id', async (req, res) => {
     }
 });
 
-// ROUTE IMPOR DATA DARI GOOGLE SPREADSHEET (Disesuaikan dengan header kolom Spreadsheet Anda)
+// ROUTE IMPOR DATA GOOGLE SPREADSHEET (Support Multi Tab & Mapping Header Asli)
 app.post('/api/maintenance-ac/import-sheet', async (req, res) => {
     try {
         const inputUrl = req.body.sheetUrl || 'https://docs.google.com/spreadsheets/d/1JUfy4mrP90Afv2UDVRrkFpGxrEhzFNtU822LcoOxp9I/edit?gid=1651543328#gid=1651543328';
@@ -126,12 +127,15 @@ app.post('/api/maintenance-ac/import-sheet', async (req, res) => {
         };
 
         const headers = parseCsvRow(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
+        
+        // Bersihkan data lama sebelum mengimpor agar data baru tersusun rapi berurutan
+        await supabase.from('maintenance_k3_ac').delete().neq('id', 0);
+
         const rowsToInsert = [];
 
         for (let i = 1; i < lines.length; i++) {
             const cols = parseCsvRow(lines[i]);
             if (cols.length >= 2) {
-                // Pencarian dinamis berdasarkan header spreadsheet (No, Kode, Gedung, Lantai, Ruang, Merk, Tanggal, dll)
                 const getVal = (keyStr) => {
                     const idx = headers.findIndex(h => h.includes(keyStr));
                     return idx !== -1 ? cols[idx] : null;
@@ -142,14 +146,19 @@ app.post('/api/maintenance-ac/import-sheet', async (req, res) => {
                 const kode = getVal('kode') || cols[1] || '';
                 const merk = getVal('merk') || cols[6] || '';
                 const type = getVal('type') || cols[7] || '';
+                const kapasitas = getVal('kapasitas') || cols[8] || '';
+                const freon = getVal('freon') || cols[9] || '';
                 const tgl = getVal('tanggal') || getVal('tgl') || cols[10] || new Date().toISOString().split('T')[0];
                 const ket = getVal('keterangan') || cols[11] || 'Pemeliharaan AC';
 
-                // Pemetaan otomatis ke kolom database Supabase (lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status)
+                // Format tampilan Lokasi & Pekerjaan
                 const lokasi = `${gedung} ${ruang ? '(' + ruang + ')' : ''}`.trim() || cols[0] || 'Ruangan Sarpras';
                 const kode_unit = kode || `AC-UNIT-${i}`;
                 const tgl_servis = tgl.match(/^\d{4}-\d{2}-\d{2}$/) ? tgl : new Date().toISOString().split('T')[0];
-                const jenis_pekerjaan = `${merk} ${type} ${ket}`.trim() || 'Servis AC';
+                
+                // Menyusun spesifikasi AC lengkap dari spreadsheet
+                let specParts = [merk, type, kapasitas, freon].filter(Boolean).join(' ');
+                const jenis_pekerjaan = specParts ? `${specParts} - ${ket}` : ket;
                 const teknisi = 'Tim K3 Sarpras';
                 const status = ket.toLowerCase().includes('rusak') ? 'Rusak' : 'Selesai';
 
@@ -160,7 +169,7 @@ app.post('/api/maintenance-ac/import-sheet', async (req, res) => {
         const { data, error } = await supabase.from('maintenance_k3_ac').insert(rowsToInsert).select();
         if (error) throw error;
 
-        res.json({ message: `Berhasil memasukkan ${rowsToInsert.length} data AC dari Google Spreadsheet!`, data });
+        res.json({ message: `Berhasil memasukkan ${rowsToInsert.length} data AC dari Google Spreadsheet secara berurutan!`, data });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

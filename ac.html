@@ -103,11 +103,39 @@
       </div>
     </div>
 
+    <!-- FILTER TAB GEDUNG & INPUT PENCARIAN -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <!-- Filter Tab Per Tempat -->
+      <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1" id="location-tabs">
+        <button onclick="filterByLocation('SEMUA')" id="tab-SEMUA" class="tab-btn px-4 py-2 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow transition whitespace-nowrap">
+          <i class="fa-solid fa-layer-group mr-1.5"></i> SEMUA GEDUNG
+        </button>
+        <button onclick="filterByLocation('G. UMUM')" id="tab-G. UMUM" class="tab-btn px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-semibold text-xs rounded-xl transition whitespace-nowrap">
+          <i class="fa-solid fa-building mr-1.5 text-cyan-400"></i> G. UMUM
+        </button>
+        <button onclick="filterByLocation('G. LAB')" id="tab-G. LAB" class="tab-btn px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-semibold text-xs rounded-xl transition whitespace-nowrap">
+          <i class="fa-solid fa-flask mr-1.5 text-emerald-400"></i> G. LAB
+        </button>
+        <button onclick="filterByLocation('G. ASRAMA')" id="tab-G. ASRAMA" class="tab-btn px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-semibold text-xs rounded-xl transition whitespace-nowrap">
+          <i class="fa-solid fa-bed mr-1.5 text-amber-400"></i> G. ASRAMA
+        </button>
+        <button onclick="filterByLocation('G. TPU')" id="tab-G. TPU" class="tab-btn px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-semibold text-xs rounded-xl transition whitespace-nowrap">
+          <i class="fa-solid fa-plane-arrival mr-1.5 text-purple-400"></i> G. TPU
+        </button>
+      </div>
+
+      <!-- Input Pencarian (Search Bar) -->
+      <div class="relative w-full md:w-72">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari gedung, kode, merk..." class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
+      </div>
+    </div>
+
     <!-- SEKSI 3: TABEL DATA MAINTENANCE AC -->
     <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
       <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
         <h2 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-cyan-400"></i> Log Historical Maintenance AC
+          <i class="fa-solid fa-list-check text-cyan-400"></i> Log Historical Maintenance AC (Berurutan)
         </h2>
         <div class="flex items-center gap-2">
           <button onclick="openImportModal()" class="px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
@@ -126,17 +154,18 @@
         <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
           <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800">
             <tr>
-              <th class="px-6 py-3.5 font-bold">Lokasi / Ruangan</th>
+              <th class="px-4 py-3.5 font-bold text-center">No</th>
+              <th class="px-6 py-3.5 font-bold">Gedung / Lokasi</th>
               <th class="px-6 py-3.5 font-bold">Kode Unit AC</th>
               <th class="px-6 py-3.5 font-bold">Tanggal Servis</th>
-              <th class="px-6 py-3.5 font-bold">Jenis Pekerjaan</th>
+              <th class="px-6 py-3.5 font-bold">Spesifikasi & Pekerjaan</th>
               <th class="px-6 py-3.5 font-bold">Teknisi</th>
               <th class="px-6 py-3.5 font-bold">Status</th>
               <th class="px-6 py-3.5 font-bold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbody-ac" class="divide-y divide-slate-800">
-            <tr><td colspan="7" class="text-center py-5 text-slate-500">Memuat data...</td></tr>
+            <tr><td colspan="8" class="text-center py-5 text-slate-500">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -150,10 +179,10 @@
       <h3 id="modalTitle" class="text-lg font-extrabold text-white mb-4">Input Data Servis AC</h3>
       <form id="acForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
         <input type="hidden" id="editId">
-        <div><label class="block text-xs font-bold mb-1 text-slate-300">Lokasi / Ruangan</label><input type="text" id="lokasi" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="Contoh: Lab Komputer 1"></div>
-        <div><label class="block text-xs font-bold mb-1 text-slate-300">Kode Unit AC</label><input type="text" id="kode_unit" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="Contoh: AC-LAB1-01"></div>
+        <div><label class="block text-xs font-bold mb-1 text-slate-300">Lokasi / Ruangan</label><input type="text" id="lokasi" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
+        <div><label class="block text-xs font-bold mb-1 text-slate-300">Kode Unit AC</label><input type="text" id="kode_unit" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
         <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Servis</label><input type="date" id="tgl_servis" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
-        <div><label class="block text-xs font-bold mb-1 text-slate-300">Jenis Pekerjaan</label><input type="text" id="jenis_pekerjaan" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="Contoh: Cuci AC / Tambah Freon"></div>
+        <div><label class="block text-xs font-bold mb-1 text-slate-300">Jenis Pekerjaan</label><input type="text" id="jenis_pekerjaan" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
         <div><label class="block text-xs font-bold mb-1 text-slate-300">Teknisi / Petugas</label><input type="text" id="teknisi" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
         <div>
           <label class="block text-xs font-bold mb-1 text-slate-300">Status Maintenance</label>
@@ -191,6 +220,8 @@
 
   <script>
     let acData = [];
+    let currentFilter = 'SEMUA';
+    let searchQuery = '';
     let locationChartInstance = null;
     let statusPieChartInstance = null;
 
@@ -199,26 +230,61 @@
     async function loadAcData() {
       try {
         const res = await fetch('/api/maintenance-ac');
-        acData = await res.json();
+        const rawData = await res.json();
+        
+        // PENGURUTAN BERURUTAN (Ascending ID)
+        acData = (rawData || []).sort((a, b) => a.id - b.id);
+        
         renderTable();
         updateKpis();
         renderCharts();
       } catch (err) { console.error("Gagal muat data AC:", err); }
     }
 
+    function filterByLocation(loc) {
+      currentFilter = loc;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = 'tab-btn px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-semibold text-xs rounded-xl transition whitespace-nowrap';
+      });
+      const activeTab = document.getElementById(`tab-${loc}`);
+      if (activeTab) activeTab.className = 'tab-btn px-4 py-2 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow transition whitespace-nowrap';
+      renderTable();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      renderTable();
+    }
+
+    function getFilteredData() {
+      return acData.filter(item => {
+        const loc = (item.lokasi || '').toUpperCase();
+        const matchesLoc = currentFilter === 'SEMUA' || loc.includes(currentFilter.toUpperCase());
+        
+        const fullText = `${item.lokasi} ${item.kode_unit} ${item.jenis_pekerjaan} ${item.teknisi} ${item.status}`.toLowerCase();
+        const matchesSearch = !searchQuery || fullText.includes(searchQuery);
+
+        return matchesLoc && matchesSearch;
+      });
+    }
+
     function renderTable() {
       const tbody = document.getElementById('tbody-ac');
-      if (!acData || acData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-slate-500">Belum ada data maintenance AC.</td></tr>`;
+      const filtered = getFilteredData();
+
+      if (!filtered || filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-500">Data tidak ditemukan.</td></tr>`;
         return;
       }
-      tbody.innerHTML = acData.map(item => {
+
+      tbody.innerHTML = filtered.map((item, index) => {
         let statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
         if (item.status === 'Proses') statusColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
         else if (item.status === 'Rusak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
 
         return `
           <tr class="hover:bg-slate-800/50">
+            <td class="px-4 py-3.5 text-center font-bold text-slate-400">${index + 1}</td>
             <td class="px-6 py-3.5 font-bold text-white">${item.lokasi || '-'}</td>
             <td class="px-6 py-3.5 font-mono text-cyan-400">${item.kode_unit || '-'}</td>
             <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_servis || '-'}</td>
@@ -355,8 +421,9 @@
       doc.setFontSize(10); doc.setFont("helvetica", "normal");
       doc.text("LOG HISTORICAL MAINTENANCE & PEMELIHARAAN AC", 14, 22);
       doc.line(14, 25, 196, 25);
-      const rows = acData.map((item, i) => [i + 1, item.lokasi || '-', item.kode_unit || '-', item.tgl_servis || '-', item.jenis_pekerjaan || '-', item.teknisi || '-', item.status || 'Selesai']);
-      doc.autoTable({ head: [['No', 'Lokasi', 'Kode Unit', 'Tanggal', 'Jenis Pekerjaan', 'Teknisi', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [6, 182, 212] } });
+      const filtered = getFilteredData();
+      const rows = filtered.map((item, i) => [i + 1, item.lokasi || '-', item.kode_unit || '-', item.tgl_servis || '-', item.jenis_pekerjaan || '-', item.teknisi || '-', item.status || 'Selesai']);
+      doc.autoTable({ head: [['No', 'Lokasi', 'Kode Unit', 'Tanggal', 'Spesifikasi & Pekerjaan', 'Teknisi', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [6, 182, 212] } });
       doc.save(`Historical_Maintenance_AC_${new Date().toISOString().split('T')[0]}.pdf`);
     }
   </script>
