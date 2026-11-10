@@ -45,6 +45,26 @@
       </div>
     </div>
 
+    <!-- WIDGET MOTIVASI HARIAN -->
+    <div class="bg-gradient-to-r from-cyan-950/60 via-slate-900 to-indigo-950/60 p-4 rounded-2xl border border-cyan-500/20 shadow-lg flex items-center gap-4 backdrop-blur-md">
+      <div class="bg-cyan-500/20 text-cyan-400 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-cyan-500/30">
+        <i class="fa-solid fa-quote-left text-xl"></i>
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center gap-2">
+          <span class="bg-cyan-500/20 text-cyan-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cyan-500/30">MOTIVASI HARIAN SARPRAS</span>
+          <span id="quoteDate" class="text-[10px] text-slate-400"></span>
+        </div>
+        <p id="quoteText" class="text-xs md:text-sm font-medium text-slate-200 mt-1 italic">
+          "Kenyamanan fasilitas kampus adalah cerminan dari dedikasi dan kerja keras kita."
+        </p>
+        <p id="quoteAuthor" class="text-[11px] font-bold text-cyan-400 mt-0.5">— Tim K3 & Sarpras Poltekbang</p>
+      </div>
+      <button onclick="changeQuote()" title="Ganti Motivasi" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl text-xs transition border border-slate-700 active:scale-95">
+        <i class="fa-solid fa-rotate text-cyan-400"></i>
+      </button>
+    </div>
+
     <!-- SEKSI 1: KPI SCORECARDS -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl">
@@ -240,6 +260,9 @@
     </div>
   </div>
 
+  <!-- CONTAINER TOAST NOTIFICATION -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
   <script>
     let acData = [];
     let currentFilter = 'SEMUA';
@@ -250,7 +273,48 @@
     let locationChartInstance = null;
     let statusPieChartInstance = null;
 
-    document.addEventListener('DOMContentLoaded', () => { loadAcData(); });
+    const quotes = [
+      { text: "Kenyamanan fasilitas kampus adalah cerminan dari dedikasi dan kerja keras kita.", author: "Tim K3 & Sarpras Poltekbang" },
+      { text: "Bekerja dengan cermat hari ini adalah bentuk pelayanan terbaik untuk masa depan penerbangan.", author: "Insan Perhubungan" },
+      { text: "Pemeliharaan yang konsisten mencegah kerusakan besar. Tetap semangat!", author: "Teknik & Maintenance AC" },
+      { text: "Kerja sama tim yang kokoh membuat pekerjaan seberat apa pun terasa lebih ringan.", author: "Keluarga Besar Poltekbang Surabaya" },
+      { text: "Setiap fasilitas yang berfungsi baik membantu proses belajar mengajar berjalan lancar.", author: "Dedikasi Sarpras" }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => { 
+      initQuote();
+      loadAcData(); 
+    });
+
+    function initQuote() {
+      const today = new Date();
+      const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+      const q = quotes[dayOfYear % quotes.length];
+      document.getElementById('quoteText').innerText = `"${q.text}"`;
+      document.getElementById('quoteAuthor').innerText = `— ${q.author}`;
+      document.getElementById('quoteDate').innerText = today.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+
+    function changeQuote() {
+      const q = quotes[Math.floor(Math.random() * quotes.length)];
+      document.getElementById('quoteText').innerText = `"${q.text}"`;
+      document.getElementById('quoteAuthor').innerText = `— ${q.author}`;
+    }
+
+    function showToast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-600' : 'bg-rose-600';
+      const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark';
+      t.className = `${bg} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold transition-all transform translate-y-5 opacity-0`;
+      t.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => t.classList.remove('translate-y-5', 'opacity-0'), 50);
+      setTimeout(() => {
+        t.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => t.remove(), 300);
+      }, 3500);
+    }
 
     async function loadAcData() {
       try {
@@ -347,7 +411,6 @@
         <i class="fa-solid fa-chevron-left"></i> Prev
       </button>`;
 
-      // Logika Penampilan Tombol Nomor Halaman
       let startPage = Math.max(1, currentPage - 2);
       let endPage = Math.min(totalPages, currentPage + 2);
 
@@ -490,7 +553,7 @@
       const file = fileInput ? fileInput.files[0] : null;
       
       if (!file) {
-        alert("Silakan pilih file Excel terlebih dahulu.");
+        showToast("Silakan pilih file Excel terlebih dahulu.", "error");
         return;
       }
 
@@ -534,7 +597,7 @@
           });
 
           if (parsedItems.length === 0) {
-            alert("Tidak ada data valid yang bisa dibaca dari file Excel ini.");
+            showToast("Tidak ada data valid yang bisa dibaca dari file Excel ini.", "error");
             return;
           }
 
@@ -547,15 +610,15 @@
           const resJson = await res.json();
 
           if (res.ok) {
-            alert(resJson.message || `Berhasil meng-import ${parsedItems.length} data AC terbagi per gedung ke Supabase!`);
+            showToast(resJson.message || `Berhasil meng-import ${parsedItems.length} data AC per gedung!`, "success");
             closeImportModal();
             await loadAcData();
           } else {
-            alert("Gagal menyimpan ke Database: " + (resJson.error || "Terjadi kesalahan server"));
+            showToast("Gagal menyimpan ke Database: " + (resJson.error || "Terjadi kesalahan server"), "error");
           }
 
         } catch (err) {
-          alert("Gagal memproses file Excel: " + err.message);
+          showToast("Gagal memproses file Excel: " + err.message, "error");
         }
       };
 
@@ -571,8 +634,11 @@
       if (confirm("Hapus data pemeliharaan AC ini dari database?")) {
         try {
           const res = await fetch(`/api/maintenance-ac/${id}`, { method: 'DELETE' });
-          if (res.ok) await loadAcData();
-        } catch (err) { alert("Error: " + err.message); }
+          if (res.ok) {
+            showToast("Data AC berhasil dihapus!", "success");
+            await loadAcData();
+          }
+        } catch (err) { showToast("Error: " + err.message, "error"); }
       }
     }
 
@@ -593,134 +659,105 @@
       const url = editId ? `/api/maintenance-ac/${editId}` : '/api/maintenance-ac';
 
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (res.ok) { closeModal(); await loadAcData(); }
+      if (res.ok) {
+        closeModal();
+        showToast(editId ? "Data AC berhasil diubah!" : "Data AC berhasil ditambah!", "success");
+        await loadAcData();
+      } else {
+        showToast("Gagal menyimpan data AC.", "error");
+      }
     }
 
-    // FUNGSI LAPORAN EKSEKUTIF GABUNGAN PDF TERMASUK GRAFIK ANALYTICS
+    // FUNGSI CETAK PDF SESUAI HASIL PENCARIAN & FILTER DI TABEL AC
     async function exportToPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      let dataAc = [], dataRuangan = [], dataKendaraan = [], dataInventory = [];
-      try {
-        const [resAc, resRgn, resKdr, resInv] = await Promise.all([
-          fetch('/api/maintenance-ac').then(r => r.json()).catch(() => []),
-          fetch('/api/peminjaman-ruangan').then(r => r.json()).catch(() => []),
-          fetch('/api/peminjaman-kendaraan').then(r => r.json()).catch(() => []),
-          fetch('/api/inventory').then(r => r.json()).catch(() => [])
-        ]);
-        dataAc = resAc || [];
-        dataRuangan = resRgn || [];
-        dataKendaraan = resKdr || [];
-        dataInventory = resInv || [];
-      } catch (err) {
-        console.error("Gagal mengambil data gabungan PDF:", err);
+      // 1. Ambil data yang sedang di-filter/dicari di tabel saat ini
+      const filteredData = getFilteredData();
+
+      if (!filteredData || filteredData.length === 0) {
+        showToast("Tidak ada data AC yang sesuai dengan pencarian untuk dicetak.", "error");
+        return;
       }
 
+      // Ambil kata kunci pencarian & filter gedung aktif untuk judul laporan
+      const filterGedung = currentFilter !== 'SEMUA' ? ` (Gedung: ${currentFilter})` : '';
+      const searchInfo = searchQuery ? ` | Kata Kunci: "${searchQuery}"` : '';
+
+      // 2. Header Laporan
       doc.setFontSize(15); doc.setFont("helvetica", "bold");
       doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
       doc.setFontSize(10); doc.setFont("helvetica", "normal");
-      doc.text("LAPORAN EKSEKUTIF GABUNGAN SARPRAS & TEKNIK MAINTENANCE AC", 14, 22);
+      doc.text(`LAPORAN MAINTENANCE & PEMELIHARAAN AC${filterGedung.toUpperCase()}`, 14, 22);
       doc.setFontSize(8);
-      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Real-time Supabase Monitoring`, 14, 26);
+      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Total Data Ditemukan: ${filteredData.length} Unit${searchInfo}`, 14, 26);
       doc.line(14, 28, 196, 28);
 
       let currentY = 34;
 
+      // 3. Ringkasan Eksekutif Data Yang Dicari
       doc.setFontSize(10); doc.setFont("helvetica", "bold");
-      doc.text("1. Ringkasan Eksekutif Layanan", 14, currentY);
+      doc.text("1. Ringkasan Status Maintenance Data Terfilter", 14, currentY);
       currentY += 4;
 
+      const totalSelesai = filteredData.filter(i => i.status === 'Selesai' || !i.status || i.status === 'BAIK').length;
+      const totalProses = filteredData.filter(i => i.status === 'Proses').length;
+      const totalRusak = filteredData.filter(i => i.status === 'Rusak').length;
+
       const kpiSummary = [
-        ['Modul Layanan', 'Total Record', 'Status / Kondisi Utama'],
-        ['Maintenance AC', `${dataAc.length} Unit Servis`, `${dataAc.filter(i => i.status === 'Selesai' || !i.status).length} Baik / Optimal`],
-        ['Peminjaman Ruangan', `${dataRuangan.length} Pengajuan`, `${dataRuangan.filter(i => i.status === 'Disetujui').length} Disetujui`],
-        ['Peminjaman Kendaraan', `${dataKendaraan.length} Permohonan`, `${dataKendaraan.filter(i => i.status === 'Disetujui').length} Disetujui`],
-        ['Inventaris Barang', `${dataInventory.length} Jenis Barang`, `Total Stok Terdata`]
+        ['Total Terfilter', 'Selesai / Baik', 'Dalam Pengerjaan', 'Perlu Perhatian / Rusak'],
+        [`${filteredData.length} Data`, `${totalSelesai} Unit`, `${totalProses} Unit`, `${totalRusak} Unit`]
       ];
 
       doc.autoTable({
         head: [kpiSummary[0]],
-        body: kpiSummary.slice(1),
-        startY: currentY,
-        headStyles: { fillColor: [15, 23, 42] },
-        styles: { fontSize: 8 }
-      });
-
-      currentY = doc.lastAutoTable.finalY + 8;
-
-      const chartLocCanvas = document.getElementById('acLocationChart');
-      const chartPieCanvas = document.getElementById('acStatusPieChart');
-
-      if (chartLocCanvas && chartPieCanvas) {
-        doc.setFontSize(10); doc.setFont("helvetica", "bold");
-        doc.text("2. Visualisasi Analytics Maintenance AC", 14, currentY);
-        currentY += 4;
-
-        try {
-          const imgLoc = chartLocCanvas.toDataURL('image/png');
-          const imgPie = chartPieCanvas.toDataURL('image/png');
-
-          doc.addImage(imgLoc, 'PNG', 14, currentY, 110, 45);
-          doc.addImage(imgPie, 'PNG', 130, currentY, 65, 45);
-          currentY += 50;
-        } catch (e) { console.warn("Gagal render grafik ke PDF:", e); }
-      }
-
-      doc.setFontSize(10); doc.setFont("helvetica", "bold");
-      doc.text("3. Detail Log Historical Maintenance AC", 14, currentY);
-      currentY += 4;
-
-      const rowsAc = dataAc.slice(0, 25).map((item, i) => [
-        i + 1, item.lokasi || '-', item.kode_unit || '-', item.tgl_servis || '-', item.jenis_pekerjaan || '-', item.status || 'Selesai'
-      ]);
-
-      doc.autoTable({
-        head: [['No', 'Lokasi', 'Kode Unit', 'Tanggal', 'Pekerjaan', 'Status']],
-        body: rowsAc,
+        body: [kpiSummary[1]],
         startY: currentY,
         headStyles: { fillColor: [6, 182, 212] },
-        styles: { fontSize: 7.5 }
-      });
-
-      doc.addPage();
-      currentY = 15;
-
-      doc.setFontSize(10); doc.setFont("helvetica", "bold");
-      doc.text("4. Data Peminjaman Ruangan & Kendaraan", 14, currentY);
-      currentY += 4;
-
-      const rowsRuangan = dataRuangan.slice(0, 10).map((item, i) => [
-        i + 1, item.nama_peminjam || '-', item.ruangan || '-', item.tgl_pinjam || '-', item.status || 'Diproses'
-      ]);
-
-      doc.autoTable({
-        head: [['No', 'Peminjam', 'Ruangan', 'Tanggal', 'Status']],
-        body: rowsRuangan.length ? rowsRuangan : [['-', 'Belum ada data', '-', '-', '-']],
-        startY: currentY,
-        headStyles: { fillColor: [79, 70, 229] },
-        styles: { fontSize: 7.5 }
+        styles: { fontSize: 8, halign: 'center' }
       });
 
       currentY = doc.lastAutoTable.finalY + 8;
 
+      // 4. Detail Tabel Hasil Pencarian AC
       doc.setFontSize(10); doc.setFont("helvetica", "bold");
-      doc.text("5. Ringkasan Stok Inventaris Barang", 14, currentY);
+      doc.text("2. Detail Data Pemeliharaan AC", 14, currentY);
       currentY += 4;
 
-      const rowsInventory = dataInventory.slice(0, 15).map((item, i) => [
-        i + 1, item.code || '-', item.name || '-', item.initial || 0, item.inQty || 0, item.outQty || 0, ((item.initial || 0) + (item.inQty || 0) - (item.outQty || 0))
+      const rowsAc = filteredData.map((item, i) => [
+        i + 1, 
+        item.kategori_gedung || '-',
+        item.lokasi || '-', 
+        item.kode_unit || '-', 
+        item.tgl_servis || '-', 
+        item.jenis_pekerjaan || '-', 
+        item.teknisi || 'Tim K3 Sarpras',
+        item.status || 'Selesai'
       ]);
 
       doc.autoTable({
-        head: [['No', 'Kode Barang', 'Nama Barang', 'Awal', 'Masuk', 'Keluar', 'Sisa Stok']],
-        body: rowsInventory.length ? rowsInventory : [['-', 'Belum ada data', '-', '-', '-', '-', '-']],
+        head: [['No', 'Kategori', 'Lokasi', 'Kode Unit', 'Tanggal', 'Spesifikasi / Pekerjaan', 'Teknisi', 'Status']],
+        body: rowsAc,
         startY: currentY,
-        headStyles: { fillColor: [16, 185, 129] },
-        styles: { fontSize: 7.5 }
+        headStyles: { fillColor: [15, 23, 42] },
+        styles: { fontSize: 7 },
+        columnStyles: {
+          0: { cellWidth: 8 },
+          1: { cellWidth: 20 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 22 },
+          4: { cellWidth: 20 },
+          5: { cellWidth: 45 },
+          6: { cellWidth: 22 },
+          7: { cellWidth: 15 }
+        }
       });
 
-      doc.save(`Laporan_Eksekutif_Gabungan_Sarpras_${new Date().toISOString().split('T')[0]}.pdf`);
+      // Simpan PDF dengan nama file dinamis sesuai kata kunci pencarian
+      const fileSuffix = searchQuery ? `_${searchQuery.replace(/[^a-zA-Z0-9]/g, '_')}` : '';
+      doc.save(`Laporan_Maintenance_AC${fileSuffix}_${new Date().toISOString().split('T')[0]}.pdf`);
+      showToast("Laporan PDF data pencarian berhasil diunduh!", "success");
     }
   </script>
 </body>
