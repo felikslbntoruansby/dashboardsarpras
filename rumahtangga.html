@@ -4,13 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Rumah Tangga - Sarpras Poltekbang</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- jsPDF & AutoTable CDN untuk Cetak PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -47,6 +43,26 @@
       </div>
     </div>
 
+    <!-- WIDGET MOTIVASI HARIAN -->
+    <div class="bg-gradient-to-r from-indigo-950/60 via-slate-900 to-blue-950/60 p-4 rounded-2xl border border-indigo-500/20 shadow-lg flex items-center gap-4 backdrop-blur-md">
+      <div class="bg-indigo-500/20 text-indigo-400 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-indigo-500/30">
+        <i class="fa-solid fa-quote-left text-xl"></i>
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center gap-2">
+          <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-indigo-500/30">MOTIVASI HARIAN RUMAH TANGGA</span>
+          <span id="quoteDate" class="text-[10px] text-slate-400"></span>
+        </div>
+        <p id="quoteText" class="text-xs md:text-sm font-medium text-slate-200 mt-1 italic">
+          "Pelayanan terbaik lahir dari koordinasi yang solid dan sikap ramah."
+        </p>
+        <p id="quoteAuthor" class="text-[11px] font-bold text-indigo-400 mt-0.5">— Tim Rumah Tangga Poltekbang</p>
+      </div>
+      <button onclick="changeQuote()" title="Ganti Motivasi" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl text-xs transition border border-slate-700 active:scale-95">
+        <i class="fa-solid fa-rotate text-indigo-400"></i>
+      </button>
+    </div>
+
     <!-- SEKSI 1: BI SCORECARDS / KPI STATS -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden group hover:border-blue-500/40 transition">
@@ -64,7 +80,7 @@
           <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400"><i class="fa-solid fa-circle-check text-xs"></i></div>
         </div>
         <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-disetujui">0</h3>
-        <p class="text-[11px] text-emerald-500/80 mt-1">Status Disetujui</p>
+        <p class="text-[11px] text-emerald-500/80 mt-1">Status Disetujui / Aktif</p>
       </div>
 
       <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden group hover:border-amber-500/40 transition">
@@ -78,15 +94,15 @@
 
       <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden group hover:border-rose-500/40 transition">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Permohonan Ditolak</p>
-          <div class="p-2 bg-rose-500/10 rounded-lg text-rose-400"><i class="fa-solid fa-circle-xmark text-xs"></i></div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Maintenance / Ditolak</p>
+          <div class="p-2 bg-rose-500/10 rounded-lg text-rose-400"><i class="fa-solid fa-triangle-exclamation text-xs"></i></div>
         </div>
         <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-ditolak">0</h3>
-        <p class="text-[11px] text-rose-500/80 mt-1">Status Ditolak</p>
+        <p class="text-[11px] text-rose-500/80 mt-1">Kendala / Perawatan</p>
       </div>
     </div>
 
-    <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK MULTI-DIMENSI -->
+    <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
         <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
@@ -107,7 +123,7 @@
       </div>
     </div>
 
-    <!-- SEKSI 3: BAR CHART HORISONTAL DENGAN WARNA TERPISAH DAN LEGENDA -->
+    <!-- SEKSI 3: BAR CHART HORISONTAL -->
     <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
         <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
@@ -131,7 +147,6 @@
     <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
       <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
         
-        <!-- INTEGRATED TAB SWITCHER -->
         <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
           <button onclick="switchTab('ruangan')" id="tab-btn-ruangan" class="px-4 py-2 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow">
             <i class="fa-solid fa-building-user mr-1.5"></i> Peminjaman Ruangan (<span id="count-ruangan">0 Data</span>)
@@ -141,7 +156,6 @@
           </button>
         </div>
 
-        <!-- ACTION BUTTONS -->
         <div class="flex items-center gap-2">
           <button id="btn-pdf-act" onclick="exportToPDF('ruangan')" class="px-4 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
@@ -209,6 +223,9 @@
     </div>
   </div>
 
+  <!-- CONTAINER TOAST NOTIFICATION -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
   <script>
     let ruanganData = [];
     let kendaraanData = [];
@@ -216,9 +233,73 @@
     let statusRtPieChartInstance = null;
     let topFacilityChartInstance = null;
 
+    // DAFTAR DRIVER (TERURUT A-Z)
+    const defaultDrivers = [
+      "Anang Rivai Indarmawan",
+      "Arief Sulaiman",
+      "Indra Setiawan",
+      "M. Ghozali Z",
+      "Nur Wahyudi",
+      "Prasetyo Adi Wiyono",
+      "Pujas Didik Wahyudi",
+      "Wismoyo Tri Wibowo"
+    ].sort();
+
+    // DAFTAR KENDARAAN (TERURUT A-Z)
+    const defaultVehicles = [
+      "Ambulance Hiace",
+      "Ambulance Hilux",
+      "Bus Besar",
+      "Bus Kecil",
+      "Evalia",
+      "Fortuner",
+      "Hiace",
+      "Triton",
+      "Truck Pick Up"
+    ].sort();
+
+    // KUTIPAN MOTIVASI
+    const quotes = [
+      { text: "Pelayanan terbaik lahir dari koordinasi yang solid dan sikap ramah.", author: "Tim Rumah Tangga Poltekbang" },
+      { text: "Pengelolaan fasilitas yang tertata rapi mendukung produktivitas bersama.", author: "Bagian Rumah Tangga" },
+      { text: "Komunikasi yang lancar membuat setiap permohonan dapat diproses dengan cepat.", author: "Insan Perhubungan" },
+      { text: "Mengabdi dengan ikhlas, melayani civitas akademika dengan sepenuh hati.", author: "Sarpras Poltekbang Surabaya" }
+    ];
+
     document.addEventListener('DOMContentLoaded', () => {
+      initQuote();
       loadAllData();
     });
+
+    function initQuote() {
+      const today = new Date();
+      const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+      const q = quotes[dayOfYear % quotes.length];
+      document.getElementById('quoteText').innerText = `"${q.text}"`;
+      document.getElementById('quoteAuthor').innerText = `— ${q.author}`;
+      document.getElementById('quoteDate').innerText = today.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+
+    function changeQuote() {
+      const q = quotes[Math.floor(Math.random() * quotes.length)];
+      document.getElementById('quoteText').innerText = `"${q.text}"`;
+      document.getElementById('quoteAuthor').innerText = `— ${q.author}`;
+    }
+
+    function showToast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-600' : 'bg-rose-600';
+      const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark';
+      t.className = `${bg} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold transition-all transform translate-y-5 opacity-0`;
+      t.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => t.classList.remove('translate-y-5', 'opacity-0'), 50);
+      setTimeout(() => {
+        t.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => t.remove(), 300);
+      }, 3500);
+    }
 
     async function loadAllData() {
       await Promise.all([loadRuanganData(), loadKendaraanData()]);
@@ -259,9 +340,7 @@
             `;
           }).join('');
         }
-      } catch (err) {
-        console.error("Gagal muat data ruangan:", err);
-      }
+      } catch (err) { console.error("Gagal muat data ruangan:", err); }
     }
 
     async function loadKendaraanData() {
@@ -276,9 +355,11 @@
           tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-500">Belum ada peminjaman kendaraan.</td></tr>`;
         } else {
           tbody.innerHTML = kendaraanData.map(item => {
-            let statusColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-            if (item.status === 'Disetujui') statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-            else if (item.status === 'Ditolak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+            let statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+            if (item.status === 'Maintenance' || item.status === 'Ditolak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+            else if (item.status === 'VIP-Transport' || item.status === 'Official Visit') statusColor = 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+            else if (item.status === 'PU- Airport' || item.status === 'Transfer') statusColor = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+            else if (item.status === 'DL') statusColor = 'bg-blue-500/20 text-blue-300 border-blue-500/30';
 
             return `
               <tr class="hover:bg-slate-800/50">
@@ -286,7 +367,7 @@
                 <td class="px-6 py-3.5 font-semibold text-emerald-400">${item.kendaraan || '-'}</td>
                 <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'}</td>
                 <td class="px-6 py-3.5 text-xs text-slate-400">${item.tujuan || '-'}</td>
-                <td class="px-6 py-3.5"><span class="${statusColor} border text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
+                <td class="px-6 py-3.5"><span class="${statusColor} border text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'DL'}</span></td>
                 <td class="px-6 py-3.5 text-center space-x-2">
                   <button onclick="editItem('kendaraan', ${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
                   <button onclick="deleteItem('kendaraan', ${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
@@ -295,25 +376,22 @@
             `;
           }).join('');
         }
-      } catch (err) {
-        console.error("Gagal muat data kendaraan:", err);
-      }
+      } catch (err) { console.error("Gagal muat data kendaraan:", err); }
     }
 
     function updateKpis() {
       const total = ruanganData.length + kendaraanData.length;
       document.getElementById('kpi-total-layanan').innerText = total;
 
-      const disetujui = ruanganData.filter(i => i.status === 'Disetujui').length + kendaraanData.filter(i => i.status === 'Disetujui').length;
-      const diproses = ruanganData.filter(i => i.status === 'Diproses').length + kendaraanData.filter(i => i.status === 'Diproses').length;
-      const ditolak = ruanganData.filter(i => i.status === 'Ditolak').length + kendaraanData.filter(i => i.status === 'Ditolak').length;
+      const disetujui = ruanganData.filter(i => i.status === 'Disetujui').length + kendaraanData.filter(i => i.status !== 'Maintenance').length;
+      const diproses = ruanganData.filter(i => i.status === 'Diproses').length;
+      const ditolak = ruanganData.filter(i => i.status === 'Ditolak').length + kendaraanData.filter(i => i.status === 'Maintenance').length;
 
       document.getElementById('kpi-disetujui').innerText = disetujui;
       document.getElementById('kpi-diproses').innerText = diproses;
       document.getElementById('kpi-ditolak').innerText = ditolak;
     }
 
-    // 1. Combo Chart (Bar + Line)
     function renderComboRtChart() {
       const ctx = document.getElementById('comboRtChart').getContext('2d');
       if (comboRtChartInstance) comboRtChartInstance.destroy();
@@ -323,56 +401,23 @@
         data: {
           labels: ['Peminjaman Ruangan', 'Operasional Kendaraan'],
           datasets: [
-            {
-              type: 'bar',
-              label: 'Permohonan Disetujui',
-              data: [
-                ruanganData.filter(i => i.status === 'Disetujui').length,
-                kendaraanData.filter(i => i.status === 'Disetujui').length
-              ],
-              backgroundColor: '#10b981',
-              borderRadius: 4,
-              barPercentage: 0.55
-            },
-            {
-              type: 'bar',
-              label: 'Sedang Diproses',
-              data: [
-                ruanganData.filter(i => i.status === 'Diproses').length,
-                kendaraanData.filter(i => i.status === 'Diproses').length
-              ],
-              backgroundColor: '#f59e0b',
-              borderRadius: 4,
-              barPercentage: 0.55
-            },
-            {
-              type: 'line',
-              label: 'Total Permohonan Masuk',
-              data: [ruanganData.length, kendaraanData.length],
-              borderColor: '#6366f1',
-              borderWidth: 2,
-              fill: false,
-              tension: 0.2
-            }
+            { type: 'bar', label: 'Permohonan Disetujui / Aktif', data: [ruanganData.filter(i => i.status === 'Disetujui').length, kendaraanData.filter(i => i.status !== 'Maintenance').length], backgroundColor: '#10b981', borderRadius: 4, barPercentage: 0.55 },
+            { type: 'bar', label: 'Diproses / Maintenance', data: [ruanganData.filter(i => i.status === 'Diproses').length, kendaraanData.filter(i => i.status === 'Maintenance').length], backgroundColor: '#f59e0b', borderRadius: 4, barPercentage: 0.55 },
+            { type: 'line', label: 'Total Permohonan Masuk', data: [ruanganData.length, kendaraanData.length], borderColor: '#6366f1', borderWidth: 2, fill: false, tension: 0.2 }
           ]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } },
-          scales: {
-            x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } },
-            y: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } }
-          }
+          scales: { x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } } }
         }
       });
     }
 
-    // 2. Status Doughnut Chart
     function renderStatusRtPieChart() {
-      const disetujui = ruanganData.filter(i => i.status === 'Disetujui').length + kendaraanData.filter(i => i.status === 'Disetujui').length;
-      const diproses = ruanganData.filter(i => i.status === 'Diproses').length + kendaraanData.filter(i => i.status === 'Diproses').length;
-      const ditolak = ruanganData.filter(i => i.status === 'Ditolak').length + kendaraanData.filter(i => i.status === 'Ditolak').length;
+      const disetujui = ruanganData.filter(i => i.status === 'Disetujui').length + kendaraanData.filter(i => i.status !== 'Maintenance').length;
+      const diproses = ruanganData.filter(i => i.status === 'Diproses').length;
+      const ditolak = ruanganData.filter(i => i.status === 'Ditolak').length + kendaraanData.filter(i => i.status === 'Maintenance').length;
 
       const ctx = document.getElementById('statusRtPieChart').getContext('2d');
       if (statusRtPieChartInstance) statusRtPieChartInstance.destroy();
@@ -380,40 +425,21 @@
       statusRtPieChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['Disetujui', 'Diproses', 'Ditolak'],
-          datasets: [{
-            data: [disetujui, diproses, ditolak],
-            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-            borderWidth: 2,
-            borderColor: '#0f172a'
-          }]
+          labels: ['Disetujui / Aktif', 'Diproses', 'Ditolak / Maintenance'],
+          datasets: [{ data: [disetujui, diproses, ditolak], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#0f172a' }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { size: 11 } } } }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { size: 11 } } } } }
       });
     }
 
-    // 3. Top Facility Horizontal Bar Chart (Ruangan = Indigo, Kendaraan = Emerald)
     function renderTopFacilityChart() {
       const facilityCounts = {};
-      ruanganData.forEach(i => {
-        const key = `[Ruang] ${i.ruangan || 'Lainnya'}`;
-        facilityCounts[key] = (facilityCounts[key] || 0) + 1;
-      });
-      kendaraanData.forEach(i => {
-        const key = `[Armada] ${i.kendaraan || 'Lainnya'}`;
-        facilityCounts[key] = (facilityCounts[key] || 0) + 1;
-      });
+      ruanganData.forEach(i => { const key = `[Ruang] ${i.ruangan || 'Lainnya'}`; facilityCounts[key] = (facilityCounts[key] || 0) + 1; });
+      kendaraanData.forEach(i => { const key = `[Armada] ${i.kendaraan || 'Lainnya'}`; facilityCounts[key] = (facilityCounts[key] || 0) + 1; });
 
       const labels = Object.keys(facilityCounts).slice(0, 5);
       const values = Object.values(facilityCounts).slice(0, 5);
-
-      const backgroundColors = labels.map(label => 
-        label.startsWith('[Ruang]') ? '#6366f1' : '#10b981'
-      );
+      const backgroundColors = labels.map(label => label.startsWith('[Ruang]') ? '#6366f1' : '#10b981');
 
       const ctx = document.getElementById('topFacilityChart').getContext('2d');
       if (topFacilityChartInstance) topFacilityChartInstance.destroy();
@@ -422,23 +448,12 @@
         type: 'bar',
         data: {
           labels: labels.length ? labels : ['Belum Ada Data'],
-          datasets: [{
-            label: 'Total Permohonan',
-            data: values.length ? values : [0],
-            backgroundColor: labels.length ? backgroundColors : '#6366f1',
-            borderRadius: 4,
-            barPercentage: 0.55
-          }]
+          datasets: [{ label: 'Total Permohonan', data: values.length ? values : [0], backgroundColor: labels.length ? backgroundColors : '#6366f1', borderRadius: 4, barPercentage: 0.55 }]
         },
         options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
+          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
           plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } },
-            y: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } }
-          }
+          scales: { x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } } }
         }
       });
     }
@@ -446,12 +461,9 @@
     function exportToPDF(category) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14); doc.setFont("helvetica", "bold");
       doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10); doc.setFont("helvetica", "normal");
 
       if (category === 'ruangan') {
         doc.text("LOG HISTORICAL PEMINJAMAN RUANGAN (RUMAH TANGGA)", 14, 22);
@@ -459,25 +471,15 @@
         const rows = ruanganData.map((item, i) => [
           i + 1, item.nama_peminjam || '-', item.ruangan || '-', `${item.tgl_pinjam} (${item.jam_mulai || ''}-${item.jam_selesai || ''})`, item.keperluan || '-', item.status || 'Diproses'
         ]);
-        doc.autoTable({
-          head: [['No', 'Peminjam', 'Ruangan', 'Tanggal & Jam', 'Keperluan', 'Status']],
-          body: rows,
-          startY: 28,
-          headStyles: { fillColor: [99, 102, 241] }
-        });
+        doc.autoTable({ head: [['No', 'Peminjam', 'Ruangan', 'Tanggal & Jam', 'Keperluan', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [99, 102, 241] } });
         doc.save(`Historical_Peminjaman_Ruangan_${new Date().toISOString().split('T')[0]}.pdf`);
       } else {
         doc.text("LOG HISTORICAL OPERASIONAL KENDARAAN (RUMAH TANGGA)", 14, 22);
         doc.line(14, 25, 196, 25);
         const rows = kendaraanData.map((item, i) => [
-          i + 1, item.nama_driver || '-', item.kendaraan || '-', item.tgl_pinjam || '-', item.tujuan || '-', item.status || 'Diproses'
+          i + 1, item.nama_driver || '-', item.kendaraan || '-', item.tgl_pinjam || '-', item.tujuan || '-', item.status || 'DL'
         ]);
-        doc.autoTable({
-          head: [['No', 'Driver', 'Kendaraan', 'Tanggal', 'Tujuan', 'Status']],
-          body: rows,
-          startY: 28,
-          headStyles: { fillColor: [16, 185, 129] }
-        });
+        doc.autoTable({ head: [['No', 'Driver', 'Kendaraan', 'Tanggal', 'Tujuan', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [16, 185, 129] } });
         doc.save(`Historical_Operasional_Kendaraan_${new Date().toISOString().split('T')[0]}.pdf`);
       }
     }
@@ -485,7 +487,6 @@
     function switchTab(tabName) {
       document.getElementById('section-ruangan').classList.toggle('hidden', tabName !== 'ruangan');
       document.getElementById('section-kendaraan').classList.toggle('hidden', tabName !== 'kendaraan');
-      
       const btnRng = document.getElementById('tab-btn-ruangan');
       const btnKnd = document.getElementById('tab-btn-kendaraan');
       const btnPdf = document.getElementById('btn-pdf-act');
@@ -535,17 +536,40 @@
         `;
       } else if (category === 'kendaraan') {
         document.getElementById('modalTitle').innerText = editObj ? "Edit Permohonan Kendaraan" : "Permohonan Peminjaman Kendaraan";
+        
+        // Buat Datalist Driver
+        const driverOptions = defaultDrivers.map(d => `<option value="${d}"></option>`).join('');
+        // Buat Datalist Kendaraan
+        const vehicleOptions = defaultVehicles.map(v => `<option value="${v}"></option>`).join('');
+
         fields.innerHTML = `
-          <div><label class="block text-xs font-bold mb-1 text-slate-300">Nama Driver / Pengemudi</label><input type="text" id="nama_driver" value="${editObj ? editObj.nama_driver : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-          <div><label class="block text-xs font-bold mb-1 text-slate-300">Kendaraan</label><input type="text" id="kendaraan" value="${editObj ? editObj.kendaraan : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: Bus Operasional 01"></div>
-          <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-          <div><label class="block text-xs font-bold mb-1 text-slate-300">Tujuan Dinas</label><input type="text" id="tujuan" value="${editObj ? editObj.tujuan : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Nama Driver / Pengemudi</label>
+            <input type="text" id="nama_driver" list="driverList" value="${editObj ? editObj.nama_driver : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Pilih dari daftar atau ketik nama driver baru...">
+            <datalist id="driverList">${driverOptions}</datalist>
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Kendaraan</label>
+            <input type="text" id="kendaraan" list="vehicleList" value="${editObj ? editObj.kendaraan : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Pilih kendaraan atau ketik unit baru...">
+            <datalist id="vehicleList">${vehicleOptions}</datalist>
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label>
+            <input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Tujuan Dinas</label>
+            <input type="text" id="tujuan" value="${editObj ? editObj.tujuan : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
           <div>
             <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
-            <select id="statusSelect" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
-              <option value="Diproses" ${editObj && editObj.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
-              <option value="Disetujui" ${editObj && editObj.status === 'Disetujui' ? 'selected' : ''}>Disetujui</option>
-              <option value="Ditolak" ${editObj && editObj.status === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
+            <select id="statusSelect" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+              <option value="DL" ${editObj && editObj.status === 'DL' ? 'selected' : ''}>DL (Dinas Luar)</option>
+              <option value="Maintenance" ${editObj && editObj.status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
+              <option value="Official Visit" ${editObj && editObj.status === 'Official Visit' ? 'selected' : ''}>Official Visit</option>
+              <option value="VIP-Transport" ${editObj && editObj.status === 'VIP-Transport' ? 'selected' : ''}>VIP-Transport</option>
+              <option value="Transfer" ${editObj && editObj.status === 'Transfer' ? 'selected' : ''}>Transfer</option>
+              <option value="PU- Airport" ${editObj && editObj.status === 'PU- Airport' ? 'selected' : ''}>PU- Airport</option>
             </select>
           </div>
         `;
@@ -553,9 +577,7 @@
       document.getElementById('dataModal').classList.remove('hidden');
     }
 
-    function closeModal() {
-      document.getElementById('dataModal').classList.add('hidden');
-    }
+    function closeModal() { document.getElementById('dataModal').classList.add('hidden'); }
 
     function editItem(category, id) {
       if (category === 'ruangan') {
@@ -568,18 +590,17 @@
     }
 
     async function deleteItem(category, id) {
-      if (confirm("Apakah Anda yakin ingin menghapus data ini dari database?")) {
+      if (confirm("Hapus data ini dari database?")) {
         const url = category === 'ruangan' ? `/api/peminjaman-ruangan/${id}` : `/api/peminjaman-kendaraan/${id}`;
         try {
           const res = await fetch(url, { method: 'DELETE' });
           if (res.ok) {
+            showToast("Data berhasil dihapus!", 'success');
             await loadAllData();
           } else {
-            alert("Gagal menghapus data dari database.");
+            showToast("Gagal menghapus data.", 'error');
           }
-        } catch (err) {
-          alert("Error: " + err.message);
-        }
+        } catch (err) { showToast("Error: " + err.message, 'error'); }
       }
     }
 
@@ -601,17 +622,13 @@
 
         const method = editId ? 'PUT' : 'POST';
         const url = editId ? `/api/peminjaman-ruangan/${editId}` : '/api/peminjaman-ruangan';
-
-        const res = await fetch(url, {
-          method: method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         if (res.ok) {
           closeModal();
+          showToast(editId ? "Permohonan ruangan diubah!" : "Permohonan ruangan ditambah!", 'success');
           await loadAllData();
         } else {
-          alert("Gagal menyimpan data ke database.");
+          showToast("Gagal menyimpan data ruangan.", 'error');
         }
       } else if (category === 'kendaraan') {
         const payload = {
@@ -624,17 +641,13 @@
 
         const method = editId ? 'PUT' : 'POST';
         const url = editId ? `/api/peminjaman-kendaraan/${editId}` : '/api/peminjaman-kendaraan';
-
-        const res = await fetch(url, {
-          method: method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         if (res.ok) {
           closeModal();
+          showToast(editId ? "Permohonan kendaraan diubah!" : "Permohonan kendaraan ditambah!", 'success');
           await loadAllData();
         } else {
-          alert("Gagal menyimpan data ke database.");
+          showToast("Gagal menyimpan data kendaraan.", 'error');
         }
       }
     }
