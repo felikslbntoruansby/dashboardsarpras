@@ -4,40 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Sarpras Poltekbang</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS (XLSX) CDN -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- jsPDF & jsPDF-AutoTable CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-slate-900 font-sans text-slate-100 p-4 md:p-8 min-h-screen">
 
+    <!-- CINEMATIC PLANE LOADING OVERLAY -->
+    <div id="pageLoader" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
+      <div class="relative flex flex-col items-center">
+        <div class="relative">
+          <div class="absolute -inset-4 rounded-full bg-blue-500/20 blur-xl animate-pulse"></div>
+          <i class="fa-solid fa-plane-up text-5xl text-blue-400 animate-bounce"></i>
+        </div>
+        <h3 class="mt-6 text-sm font-bold tracking-widest text-slate-200 uppercase flex items-center gap-2">
+          <i class="fa-solid fa-circle-notch animate-spin text-blue-400"></i> Memuat Layanan Sarpras...
+        </h3>
+        <p class="text-[11px] text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya</p>
+        <div class="w-48 bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden border border-slate-700">
+          <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full w-full animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
         
-        <!-- Header Utama -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-xl backdrop-blur-md">
-            <div>
+        <!-- Header Utama dengan Dynamic Pulse -->
+        <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-xl backdrop-blur-md overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="z-10">
                 <h1 class="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-3">
                     <i class="fa-solid fa-boxes-stacked text-blue-500"></i> Dashboard Monitoring Inventaris Sarpras
                 </h1>
                 <p class="text-sm text-slate-400 mt-1">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase Data</p>
             </div>
-            <div class="flex gap-2 flex-wrap w-full md:w-auto">
-                <a href="/rumah-tangga" class="flex-1 md:flex-none justify-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
+            <div class="flex gap-2 flex-wrap w-full md:w-auto z-10">
+                <a href="/rumah-tangga" class="nav-link flex-1 md:flex-none justify-center bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
                     <i class="fa-solid fa-building-user"></i> Rumah Tangga
                 </a>
-                <button onclick="exportExecutiveSummaryPDF()" class="flex-1 md:flex-none justify-center bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
-                    <i class="fa-solid fa-file-pdf"></i> Laporan Eksekutif PDF
-                </button>
-                <a href="/api/backup" target="_blank" class="flex-1 md:flex-none justify-center bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
-                    <i class="fa-solid fa-database"></i> Backup JSON
+                <a href="/ac" class="nav-link flex-1 md:flex-none justify-center bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-snowflake"></i> Maintenance AC
                 </a>
+                <button onclick="exportExecutiveSummaryPDF()" class="flex-1 md:flex-none justify-center bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-file-pdf"></i> Laporan PDF
+                </button>
                 <button onclick="exportToExcel()" class="flex-1 md:flex-none justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
                     <i class="fa-solid fa-file-excel"></i> Excel
                 </button>
@@ -58,33 +72,32 @@
             </div>
         </div>
 
-        <!-- SEKSI 1: BI SCORECARDS / KPI STATS -->
+        <!-- SEKSI 1: BI SCORECARDS ANIMATED COUNTER -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Jenis Barang</p>
+            <div class="bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-blue-500/40 shadow-xl transition-all duration-300 group">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-blue-300 transition">Total Jenis Barang</p>
                 <h3 class="text-3xl font-black text-blue-400 mt-2" id="kpi-total-items">0</h3>
                 <p class="text-[11px] text-slate-500 mt-1">Item Terdaftar di Master</p>
             </div>
-            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Akumulasi Stok</p>
+            <div class="bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-emerald-500/40 shadow-xl transition-all duration-300 group">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-emerald-300 transition">Total Akumulasi Stok</p>
                 <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-total-stock">0</h3>
                 <p class="text-[11px] text-emerald-500/80 mt-1">Unit Siap Pakai</p>
             </div>
-            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Barang Keluar (Terpakai)</p>
+            <div class="bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-rose-500/40 shadow-xl transition-all duration-300 group">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-rose-300 transition">Barang Keluar (Terpakai)</p>
                 <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-total-out">0</h3>
                 <p class="text-[11px] text-rose-500/80 mt-1">Total Distribusi Unit</p>
             </div>
-            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Barang Kritis (< 5 Unit)</p>
+            <div class="bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-amber-500/40 shadow-xl transition-all duration-300 group">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-amber-300 transition">Barang Kritis (< 5 Unit)</p>
                 <h3 class="text-3xl font-black text-amber-400 mt-2" id="kpi-kritis-count">0</h3>
                 <p class="text-[11px] text-amber-500/80 mt-1">Perlu Restok Segera</p>
             </div>
         </div>
 
-        <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK MULTI-DIMENSI -->
+        <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Combo Chart (Bar + Line) Stok vs Distribusi -->
             <div class="lg:col-span-2 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
                 <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-chart-column text-blue-400"></i> Analisis Stok Akhir vs Keluar (Top 15 Barang)
@@ -94,7 +107,6 @@
                 </div>
             </div>
 
-            <!-- Doughnut Chart Distribusi Kesehatan Stok -->
             <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
                 <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie text-emerald-400"></i> Distribusi Status Kesehatan Stok
@@ -105,7 +117,7 @@
             </div>
         </div>
 
-        <!-- SEKSI 3: FAST-MOVING ITEMS (BAR CHART HORIZONTAL) -->
+        <!-- SEKSI 3: FAST-MOVING ITEMS -->
         <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
             <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-fire text-amber-400"></i> Analytics Fast-Moving Items (Barang Paling Sering Diambil)
@@ -272,7 +284,41 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             loadInventory();
+            initNavLoader();
         });
+
+        function initNavLoader() {
+            document.querySelectorAll('a.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = link.getAttribute('href');
+                    const loader = document.getElementById('pageLoader');
+                    if (loader) {
+                        loader.classList.remove('opacity-0', 'pointer-events-none');
+                        setTimeout(() => { window.location.href = target; }, 400);
+                    } else {
+                        window.location.href = target;
+                    }
+                });
+            });
+        }
+
+        function animateCounter(id, targetVal) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            let start = 0;
+            const duration = 800;
+            const stepTime = Math.max(Math.floor(duration / (targetVal || 1)), 20);
+            const timer = setInterval(() => {
+                start += Math.ceil(targetVal / (duration / stepTime));
+                if (start >= targetVal) {
+                    el.innerText = targetVal.toLocaleString('id-ID');
+                    clearInterval(timer);
+                } else {
+                    el.innerText = start.toLocaleString('id-ID');
+                }
+            }, stepTime);
+        }
 
         function loadInventory() {
             fetch('/api/inventory')
@@ -294,16 +340,14 @@
         }
 
         function updateKpis() {
-            document.getElementById('kpi-total-items').innerText = inventory.length;
-            
             const totalStock = inventory.reduce((sum, item) => sum + calculateFinalStock(item), 0);
-            document.getElementById('kpi-total-stock').innerText = totalStock.toLocaleString('id-ID');
-
             const totalOut = inventory.reduce((sum, item) => sum + (item.outQty || 0), 0);
-            document.getElementById('kpi-total-out').innerText = totalOut.toLocaleString('id-ID');
-
             const kritisCount = inventory.filter(item => calculateFinalStock(item) < 5).length;
-            document.getElementById('kpi-kritis-count').innerText = kritisCount;
+
+            animateCounter('kpi-total-items', inventory.length);
+            animateCounter('kpi-total-stock', totalStock);
+            animateCounter('kpi-total-out', totalOut);
+            animateCounter('kpi-kritis-count', kritisCount);
         }
 
         function checkStockAlerts() {
@@ -320,7 +364,6 @@
             }
         }
 
-        // 1. Combo Chart Stock vs Out
         function renderChart() {
             const ctx = document.getElementById('stockChart').getContext('2d');
             const chartItems = filteredInventory.slice(0, 15);
@@ -365,7 +408,6 @@
             });
         }
 
-        // 2. Health Stock Pie Chart
         function renderHealthPieChart() {
             let aman = 0, warning = 0, kritis = 0;
             inventory.forEach(item => {
@@ -397,7 +439,6 @@
             });
         }
 
-        // 3. Fast-Moving Horizontal Bar Chart
         function renderFastMovingChart() {
             const sortedByOut = [...inventory].sort((a, b) => (b.outQty || 0) - (a.outQty || 0)).slice(0, 7);
             const labels = sortedByOut.map(i => i.name);
@@ -450,7 +491,7 @@
                         const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
 
                         return `
-                            <tr class="hover:bg-slate-700/40">
+                            <tr class="hover:bg-slate-700/40 transition duration-150">
                                 <td class="py-3 px-4 font-mono text-xs">${date}</td>
                                 <td class="py-3 px-4 font-semibold text-slate-200">${itemCode} - ${itemName}</td>
                                 <td class="py-3 px-4 text-center">${badge}</td>
@@ -471,9 +512,7 @@
             if(confirm("Apakah Anda yakin ingin menghapus catatan transaksi ini dari database?")) {
                 fetch(`/api/logs/${logId}`, { method: 'DELETE' })
                     .then(res => res.json())
-                    .then(() => {
-                        loadInventory();
-                    })
+                    .then(() => loadInventory())
                     .catch(err => alert("Gagal menghapus log: " + err.message));
             }
         }
@@ -482,11 +521,9 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape');
 
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14); doc.setFont("helvetica", "bold");
             doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10); doc.setFont("helvetica", "normal");
             doc.text("LAPORAN HISTORI TRANSAKSI INVENTARIS BARANG", 14, 22);
             doc.line(14, 25, 283, 25);
 
@@ -494,17 +531,12 @@
                 const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
                 const itemCode = log.inventory ? log.inventory.code : '-';
                 const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
-                return [
-                    index + 1, date, `${itemCode} - ${itemName}`, log.type === 'IN' ? 'PENAMBAHAN' : 'PENGAMBILAN', log.quantity, log.pic_name || '-', log.notes || '-'
-                ];
+                return [index + 1, date, `${itemCode} - ${itemName}`, log.type === 'IN' ? 'PENAMBAHAN' : 'PENGAMBILAN', log.quantity, log.pic_name || '-', log.notes || '-'];
             });
 
             doc.autoTable({
                 head: [['No', 'Waktu & Tanggal', 'Barang', 'Jenis Transaksi', 'Jumlah', 'Petugas/Pengambil', 'Catatan']],
-                body: tableRows,
-                startY: 28,
-                theme: 'grid',
-                headStyles: { fillColor: [30, 58, 138], halign: 'center' }
+                body: tableRows, startY: 28, theme: 'grid', headStyles: { fillColor: [30, 58, 138], halign: 'center' }
             });
 
             doc.save(`Laporan_Histori_Transaksi_${new Date().toISOString().split('T')[0]}.pdf`);
@@ -514,11 +546,9 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape');
 
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14); doc.setFont("helvetica", "bold");
             doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10); doc.setFont("helvetica", "normal");
             doc.text("LAPORAN EKSEKUTIF GABUNGAN MONITORING SARPRAS & STOK BARANG", 14, 22);
             doc.line(14, 25, 283, 25);
 
@@ -528,10 +558,7 @@
 
             doc.autoTable({
                 head: [['No', 'Kode Barang', 'Nama Barang', 'Stok Awal', 'Barang Masuk', 'Barang Keluar', 'Stok Akhir']],
-                body: tableRows,
-                startY: 28,
-                theme: 'grid',
-                headStyles: { fillColor: [30, 58, 138], halign: 'center' }
+                body: tableRows, startY: 28, theme: 'grid', headStyles: { fillColor: [30, 58, 138], halign: 'center' }
             });
 
             const finalY = doc.lastAutoTable.finalY + 15;
@@ -586,7 +613,7 @@
                 let statusText = finalStock <= 0 ? " (HABIS)" : "";
 
                 tableBody.innerHTML += `
-                    <tr class="border-b border-slate-700/50 ${rowClass}">
+                    <tr class="border-b border-slate-700/50 ${rowClass} transition duration-150">
                         <td class="py-3 px-5 font-mono text-xs">${item.code || '-'}</td>
                         <td class="py-3 px-5 font-medium text-slate-200">${item.name || '-'} <span class="text-xs text-rose-400">${statusText}</span></td>
                         <td class="py-3 px-5 text-center">${item.initial || 0}</td>
@@ -642,13 +669,10 @@
                 btn.className = "bg-amber-600 hover:bg-amber-500 text-white py-2 px-4 rounded-xl text-xs font-bold shadow";
                 btn.innerText = "Simpan Pengambilan";
             }
-            
             document.getElementById("transModal").classList.remove("hidden");
         }
 
-        function closeTransModal() {
-            document.getElementById("transModal").classList.add("hidden");
-        }
+        function closeTransModal() { document.getElementById("transModal").classList.add("hidden"); }
 
         document.getElementById("transForm").addEventListener("submit", function(e) {
             e.preventDefault();
@@ -669,10 +693,7 @@
                 if(!res.ok) return res.json().then(err => { throw new Error(err.error) });
                 return res.json();
             })
-            .then(() => {
-                closeTransModal();
-                loadInventory();
-            })
+            .then(() => { closeTransModal(); loadInventory(); })
             .catch(err => alert("Gagal transaksi: " + err.message));
         });
 
@@ -685,7 +706,6 @@
                 "Barang Keluar": item.outQty,
                 "Stok Akhir": calculateFinalStock(item)
             }));
-
             const worksheet = XLSX.utils.json_to_sheet(excelData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Stok Barang");
@@ -699,9 +719,7 @@
             document.getElementById("itemModal").classList.remove("hidden");
         }
 
-        function closeModal() {
-            document.getElementById("itemModal").classList.add("hidden");
-        }
+        function closeModal() { document.getElementById("itemModal").classList.add("hidden"); }
 
         document.getElementById("itemForm").addEventListener("submit", function(e) {
             e.preventDefault(); 
@@ -722,10 +740,7 @@
                 body: JSON.stringify(payload) 
             })
             .then(res => res.json())
-            .then(() => { 
-                closeModal(); 
-                loadInventory(); 
-            })
+            .then(() => { closeModal(); loadInventory(); })
             .catch(err => console.error("Gagal menyimpan:", err)); 
         });
 

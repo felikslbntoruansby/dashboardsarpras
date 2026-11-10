@@ -12,13 +12,33 @@
 </head>
 <body class="bg-slate-950 font-sans text-slate-100 p-4 md:p-6 min-h-screen antialiased">
 
+  <!-- CINEMATIC PLANE LOADING OVERLAY -->
+  <div id="pageLoader" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
+    <div class="relative flex flex-col items-center">
+      <div class="relative">
+        <div class="absolute -inset-4 rounded-full bg-indigo-500/20 blur-xl animate-pulse"></div>
+        <i class="fa-solid fa-plane-up text-5xl text-indigo-400 animate-bounce"></i>
+      </div>
+      <h3 class="mt-6 text-sm font-bold tracking-widest text-slate-200 uppercase flex items-center gap-2">
+        <i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i> Memuat Layanan Sarpras...
+      </h3>
+      <p class="text-[11px] text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya</p>
+      <div class="w-48 bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden border border-slate-700">
+        <div class="bg-gradient-to-r from-indigo-500 to-blue-500 h-full w-full animate-pulse"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="max-w-7xl mx-auto space-y-6">
     
-    <!-- Header Utama -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-xl">
-      <div class="flex items-center space-x-4">
-        <div class="bg-gradient-to-tr from-indigo-600 to-blue-500 p-3.5 rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center">
-          <i class="fa-solid fa-building-user text-white text-2xl"></i>
+    <!-- HEADER UTAMA DENGAN GLOW PULSE -->
+    <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-xl overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex items-center space-x-4 z-10">
+        <div class="relative bg-gradient-to-tr from-indigo-600 to-blue-500 p-3.5 rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center">
+          <span class="absolute -inset-1 rounded-xl bg-indigo-400/20 animate-ping"></span>
+          <i class="fa-solid fa-building-user text-white text-2xl relative z-10"></i>
         </div>
         <div>
           <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">BIDANG UMUM</p>
@@ -30,14 +50,14 @@
       </div>
       
       <!-- Navigasi Menu Multi-Module -->
-      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-        <a href="/" class="px-3.5 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
+      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto z-10">
+        <a href="/" class="nav-link px-3.5 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
           <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
         </a>
-        <a href="/rumah-tangga" class="px-3.5 py-2 bg-blue-600 text-white font-semibold text-xs rounded-xl shadow">
+        <a href="/rumah-tangga" class="nav-link px-3.5 py-2 bg-blue-600 text-white font-semibold text-xs rounded-xl shadow">
           <i class="fa-solid fa-building-user mr-1"></i> Rumah Tangga
         </a>
-        <a href="/ac" class="px-3.5 py-2 bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-xs font-semibold rounded-xl transition">
+        <a href="/ac" class="nav-link px-3.5 py-2 bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-xs font-semibold rounded-xl transition">
           <i class="fa-solid fa-snowflake mr-1"></i> Maintenance AC
         </a>
       </div>
@@ -63,38 +83,38 @@
       </button>
     </div>
 
-    <!-- SEKSI 1: BI SCORECARDS / KPI STATS -->
+    <!-- SEKSI 1: BI SCORECARDS DENGAN COUNTER ANIMATED -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden group hover:border-blue-500/40 transition">
+      <div class="bg-slate-900/80 hover:bg-slate-800/90 p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 shadow-xl transition-all duration-300 group">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Layanan</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-blue-300 transition">Total Layanan</p>
           <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400"><i class="fa-solid fa-folder-open text-xs"></i></div>
         </div>
         <h3 class="text-3xl font-black text-blue-400 mt-2" id="kpi-total-layanan">0</h3>
         <p class="text-[11px] text-slate-500 mt-1">Permohonan Terdaftar</p>
       </div>
 
-      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden group hover:border-emerald-500/40 transition">
+      <div class="bg-slate-900/80 hover:bg-slate-800/90 p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/40 shadow-xl transition-all duration-300 group">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Permohonan Disetujui</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-emerald-300 transition">Permohonan Disetujui</p>
           <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400"><i class="fa-solid fa-circle-check text-xs"></i></div>
         </div>
         <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-disetujui">0</h3>
         <p class="text-[11px] text-emerald-500/80 mt-1">Status Disetujui / Aktif</p>
       </div>
 
-      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden group hover:border-amber-500/40 transition">
+      <div class="bg-slate-900/80 hover:bg-slate-800/90 p-5 rounded-2xl border border-slate-800 hover:border-amber-500/40 shadow-xl transition-all duration-300 group">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sedang Diproses</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-amber-300 transition">Sedang Diproses</p>
           <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400"><i class="fa-solid fa-clock text-xs"></i></div>
         </div>
         <h3 class="text-3xl font-black text-amber-400 mt-2" id="kpi-diproses">0</h3>
         <p class="text-[11px] text-amber-500/80 mt-1">Menunggu Verifikasi</p>
       </div>
 
-      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden group hover:border-rose-500/40 transition">
+      <div class="bg-slate-900/80 hover:bg-slate-800/90 p-5 rounded-2xl border border-slate-800 hover:border-rose-500/40 shadow-xl transition-all duration-300 group">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Maintenance / Ditolak</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-rose-300 transition">Maintenance / Ditolak</p>
           <div class="p-2 bg-rose-500/10 rounded-lg text-rose-400"><i class="fa-solid fa-triangle-exclamation text-xs"></i></div>
         </div>
         <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-ditolak">0</h3>
@@ -233,7 +253,6 @@
     let statusRtPieChartInstance = null;
     let topFacilityChartInstance = null;
 
-    // DAFTAR DRIVER (TERURUT A-Z)
     const defaultDrivers = [
       "Anang Rivai Indarmawan",
       "Arief Sulaiman",
@@ -245,7 +264,6 @@
       "Wismoyo Tri Wibowo"
     ].sort();
 
-    // DAFTAR KENDARAAN (TERURUT A-Z)
     const defaultVehicles = [
       "Ambulance Hiace",
       "Ambulance Hilux",
@@ -260,7 +278,6 @@
       "Truck Pick Up"
     ].sort();
 
-    // KUTIPAN MOTIVASI
     const quotes = [
       { text: "Pelayanan terbaik lahir dari koordinasi yang solid dan sikap ramah.", author: "Tim Rumah Tangga Poltekbang" },
       { text: "Pengelolaan fasilitas yang tertata rapi mendukung produktivitas bersama.", author: "Bagian Rumah Tangga" },
@@ -271,7 +288,41 @@
     document.addEventListener('DOMContentLoaded', () => {
       initQuote();
       loadAllData();
+      initNavLoader();
     });
+
+    function initNavLoader() {
+      document.querySelectorAll('a.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = link.getAttribute('href');
+          const loader = document.getElementById('pageLoader');
+          if (loader) {
+            loader.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => { window.location.href = target; }, 400);
+          } else {
+            window.location.href = target;
+          }
+        });
+      });
+    }
+
+    function animateCounter(id, targetVal) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let start = 0;
+      const duration = 800;
+      const stepTime = Math.max(Math.floor(duration / (targetVal || 1)), 20);
+      const timer = setInterval(() => {
+        start += Math.ceil(targetVal / (duration / stepTime));
+        if (start >= targetVal) {
+          el.innerText = targetVal.toLocaleString('id-ID');
+          clearInterval(timer);
+        } else {
+          el.innerText = start.toLocaleString('id-ID');
+        }
+      }, stepTime);
+    }
 
     function initQuote() {
       const today = new Date();
@@ -315,7 +366,6 @@
       try {
         const res = await fetch('/api/peminjaman-ruangan');
         ruanganData = await res.json();
-        
         document.getElementById('count-ruangan').innerText = `${ruanganData.length} Data`;
         const tbody = document.getElementById('tbody-ruangan');
 
@@ -328,7 +378,7 @@
             else if (item.status === 'Ditolak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
 
             return `
-              <tr class="hover:bg-slate-800/50">
+              <tr class="hover:bg-slate-800/50 transition duration-150">
                 <td class="px-6 py-3.5 font-bold text-white">${item.nama_peminjam || '-'}</td>
                 <td class="px-6 py-3.5 font-semibold text-indigo-400">${item.ruangan || '-'}</td>
                 <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'} (${item.jam_mulai || '-'} - ${item.jam_selesai || '-'})</td>
@@ -349,7 +399,6 @@
       try {
         const res = await fetch('/api/peminjaman-kendaraan');
         kendaraanData = await res.json();
-
         document.getElementById('count-kendaraan').innerText = `${kendaraanData.length} Data`;
         const tbody = document.getElementById('tbody-kendaraan');
 
@@ -364,7 +413,7 @@
             else if (item.status === 'DL') statusColor = 'bg-blue-500/20 text-blue-300 border-blue-500/30';
 
             return `
-              <tr class="hover:bg-slate-800/50">
+              <tr class="hover:bg-slate-800/50 transition duration-150">
                 <td class="px-6 py-3.5 font-bold text-white">${item.nama_driver || '-'}</td>
                 <td class="px-6 py-3.5 font-semibold text-emerald-400">${item.kendaraan || '-'}</td>
                 <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'}</td>
@@ -383,15 +432,14 @@
 
     function updateKpis() {
       const total = ruanganData.length + kendaraanData.length;
-      document.getElementById('kpi-total-layanan').innerText = total;
-
       const disetujui = ruanganData.filter(i => i.status === 'Disetujui').length + kendaraanData.filter(i => i.status !== 'Maintenance').length;
       const diproses = ruanganData.filter(i => i.status === 'Diproses').length;
       const ditolak = ruanganData.filter(i => i.status === 'Ditolak').length + kendaraanData.filter(i => i.status === 'Maintenance').length;
 
-      document.getElementById('kpi-disetujui').innerText = disetujui;
-      document.getElementById('kpi-diproses').innerText = diproses;
-      document.getElementById('kpi-ditolak').innerText = ditolak;
+      animateCounter('kpi-total-layanan', total);
+      animateCounter('kpi-disetujui', disetujui);
+      animateCounter('kpi-diproses', diproses);
+      animateCounter('kpi-ditolak', ditolak);
     }
 
     function renderComboRtChart() {
@@ -539,9 +587,7 @@
       } else if (category === 'kendaraan') {
         document.getElementById('modalTitle').innerText = editObj ? "Edit Permohonan Kendaraan" : "Permohonan Peminjaman Kendaraan";
         
-        // Buat Datalist Driver
         const driverOptions = defaultDrivers.map(d => `<option value="${d}"></option>`).join('');
-        // Buat Datalist Kendaraan
         const vehicleOptions = defaultVehicles.map(v => `<option value="${v}"></option>`).join('');
 
         fields.innerHTML = `

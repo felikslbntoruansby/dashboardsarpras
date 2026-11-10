@@ -11,19 +11,47 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <!-- Library XLSX untuk membaca file Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    @keyframes radarPulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.3; }
+      100% { transform: scale(0.9); opacity: 0.8; }
+    }
+    .radar-pulse { animation: radarPulse 3s infinite ease-in-out; }
+  </style>
 </head>
 <body class="bg-slate-950 font-sans text-slate-100 p-4 md:p-6 min-h-screen antialiased">
+
+  <!-- CINEMATIC PLANE LOADING OVERLAY -->
+  <div id="pageLoader" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
+    <div class="relative flex flex-col items-center">
+      <div class="relative">
+        <div class="absolute -inset-4 rounded-full bg-cyan-500/20 blur-xl radar-pulse"></div>
+        <i class="fa-solid fa-plane-up text-5xl text-cyan-400 animate-bounce"></i>
+      </div>
+      <h3 class="mt-6 text-sm font-bold tracking-widest text-slate-200 uppercase flex items-center gap-2">
+        <i class="fa-solid fa-circle-notch animate-spin text-cyan-400"></i> Memuat Layanan Sarpras...
+      </h3>
+      <p class="text-[11px] text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya</p>
+      <div class="w-48 bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden border border-slate-700">
+        <div class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full w-full animate-pulse"></div>
+      </div>
+    </div>
+  </div>
 
   <div class="max-w-7xl mx-auto space-y-6">
     
     <!-- HEADER UTAMA -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-xl">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-xl relative overflow-hidden">
+      <div class="absolute right-0 top-0 -mr-10 -mt-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div class="flex items-center space-x-4">
         <div class="bg-gradient-to-tr from-cyan-600 to-blue-500 p-3.5 rounded-xl shadow-lg shadow-cyan-500/20 flex items-center justify-center">
           <i class="fa-solid fa-snowflake text-white text-2xl"></i>
         </div>
         <div>
-          <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-400">TEKNIK & MAINTENANCE</p>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-plane text-[9px]"></i> TEKNIK & MAINTENANCE
+          </p>
           <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-white flex items-center gap-3">
             Dashboard Maintenance & Pemeliharaan AC
           </h1>
@@ -33,20 +61,20 @@
       
       <!-- NAVIGASI MENU -->
       <div class="flex items-center space-x-2 w-full md:w-auto">
-        <a href="/" class="px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
+        <a href="/" class="nav-link px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition hover:border-indigo-400">
           <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
         </a>
-        <a href="/rumah-tangga" class="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold rounded-xl transition">
+        <a href="/rumah-tangga" class="nav-link px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold rounded-xl transition hover:border-blue-400">
           <i class="fa-solid fa-building-user mr-1"></i> Rumah Tangga
         </a>
-        <a href="/ac" class="px-4 py-2 bg-cyan-600 text-white font-semibold text-xs rounded-xl shadow">
+        <a href="/ac" class="nav-link px-4 py-2 bg-cyan-600 text-white font-semibold text-xs rounded-xl shadow shadow-cyan-600/30">
           <i class="fa-solid fa-snowflake mr-1"></i> Maintenance AC
         </a>
       </div>
     </div>
 
     <!-- WIDGET MOTIVASI HARIAN -->
-    <div class="bg-gradient-to-r from-cyan-950/60 via-slate-900 to-indigo-950/60 p-4 rounded-2xl border border-cyan-500/20 shadow-lg flex items-center gap-4 backdrop-blur-md">
+    <div class="bg-gradient-to-r from-cyan-950/60 via-slate-900 to-indigo-950/60 p-4 rounded-2xl border border-cyan-500/20 shadow-lg flex items-center gap-4 backdrop-blur-md hover:border-cyan-500/40 transition">
       <div class="bg-cyan-500/20 text-cyan-400 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-cyan-500/30">
         <i class="fa-solid fa-quote-left text-xl"></i>
       </div>
@@ -67,7 +95,7 @@
 
     <!-- SEKSI 1: KPI SCORECARDS -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-cyan-500/40 transition duration-300">
         <div class="flex justify-between items-start">
           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Servis</p>
           <i class="fa-solid fa-wrench text-cyan-400 text-xs"></i>
@@ -76,7 +104,7 @@
         <p class="text-[11px] text-slate-500 mt-1">Kegiatan Maintenance</p>
       </div>
 
-      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-emerald-500/40 transition duration-300">
         <div class="flex justify-between items-start">
           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Selesai / Baik</p>
           <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
@@ -85,7 +113,7 @@
         <p class="text-[11px] text-emerald-500/80 mt-1">Kondisi Optimal</p>
       </div>
 
-      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-amber-500/40 transition duration-300">
         <div class="flex justify-between items-start">
           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Dalam Pengerjaan</p>
           <i class="fa-solid fa-screws-tilting text-amber-400 text-xs"></i>
@@ -94,7 +122,7 @@
         <p class="text-[11px] text-amber-500/80 mt-1">Proses Perbaikan</p>
       </div>
 
-      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-rose-500/40 transition duration-300">
         <div class="flex justify-between items-start">
           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Perlu Perhatian</p>
           <i class="fa-solid fa-triangle-exclamation text-rose-400 text-xs"></i>
@@ -195,9 +223,7 @@
         <div class="text-slate-400" id="pagination-info">
           Menampilkan 0 - 0 dari 0 data
         </div>
-        <div class="flex items-center space-x-1.5" id="pagination-controls">
-          <!-- Button Prev & Page Buttons dimasukkan via JS -->
-        </div>
+        <div class="flex items-center space-x-1.5" id="pagination-controls"></div>
       </div>
 
     </div>
@@ -260,7 +286,6 @@
     </div>
   </div>
 
-  <!-- CONTAINER TOAST NOTIFICATION -->
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
   <script>
@@ -282,9 +307,45 @@
     ];
 
     document.addEventListener('DOMContentLoaded', () => { 
+      initNavLoader();
       initQuote();
       loadAcData(); 
     });
+
+    function initNavLoader() {
+      document.querySelectorAll('a.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = link.getAttribute('href');
+          const loader = document.getElementById('pageLoader');
+          if (loader) {
+            loader.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => { window.location.href = target; }, 350);
+          } else { window.location.href = target; }
+        });
+      });
+    }
+
+    function animateCounter(id, targetVal) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let start = 0;
+      const duration = 1000;
+      const stepTime = 20;
+      const steps = duration / stepTime;
+      const increment = (targetVal - start) / steps;
+      let current = start;
+
+      const timer = setInterval(() => {
+        current += increment;
+        if ((increment >= 0 && current >= targetVal) || (increment < 0 && current <= targetVal)) {
+          el.innerText = targetVal.toLocaleString('id-ID');
+          clearInterval(timer);
+        } else {
+          el.innerText = Math.floor(current).toLocaleString('id-ID');
+        }
+      }, stepTime);
+    }
 
     function initQuote() {
       const today = new Date();
@@ -381,7 +442,7 @@
         else if (item.status === 'Rusak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
 
         return `
-          <tr class="hover:bg-slate-800/50">
+          <tr class="hover:bg-slate-800/50 transition">
             <td class="px-4 py-3.5 text-center font-bold text-slate-400">${startIndex + index + 1}</td>
             <td class="px-6 py-3.5 font-bold text-white">${item.lokasi || '-'}</td>
             <td class="px-6 py-3.5 font-mono text-cyan-400">${item.kode_unit || '-'}</td>
@@ -402,11 +463,9 @@
 
     function renderPaginationControls(totalItems, totalPages, startIndex, endIndex) {
       document.getElementById('pagination-info').innerText = `Menampilkan ${startIndex + 1} - ${endIndex} dari ${totalItems} data`;
-
       const controls = document.getElementById('pagination-controls');
       let html = '';
 
-      // Tombol Prev
       html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed font-bold transition">
         <i class="fa-solid fa-chevron-left"></i> Prev
       </button>`;
@@ -429,7 +488,6 @@
         html += `<button onclick="changePage(${totalPages})" class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 font-bold transition">${totalPages}</button>`;
       }
 
-      // Tombol Next
       html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed font-bold transition">
         Next <i class="fa-solid fa-chevron-right"></i>
       </button>`;
@@ -447,10 +505,15 @@
     }
 
     function updateKpis() {
-      document.getElementById('kpi-total-ac').innerText = acData.length;
-      document.getElementById('kpi-selesai-ac').innerText = acData.filter(i => i.status === 'Selesai' || !i.status || i.status === 'BAIK').length;
-      document.getElementById('kpi-proses-ac').innerText = acData.filter(i => i.status === 'Proses').length;
-      document.getElementById('kpi-rusak-ac').innerText = acData.filter(i => i.status === 'Rusak').length;
+      const total = acData.length;
+      const selesai = acData.filter(i => i.status === 'Selesai' || !i.status || i.status === 'BAIK').length;
+      const proses = acData.filter(i => i.status === 'Proses').length;
+      const rusak = acData.filter(i => i.status === 'Rusak').length;
+
+      animateCounter('kpi-total-ac', total);
+      animateCounter('kpi-selesai-ac', selesai);
+      animateCounter('kpi-proses-ac', proses);
+      animateCounter('kpi-rusak-ac', rusak);
     }
 
     function renderCharts() {
@@ -507,19 +570,15 @@
     function openImportModal() { document.getElementById('importModal').classList.remove('hidden'); }
     function closeImportModal() { document.getElementById('importModal').classList.add('hidden'); }
 
-    // FUNGSI KONVERSI TANGGAL KE ISO (YYYY-MM-DD)
     function parseExcelDate(val) {
       if (!val) return new Date().toISOString().split('T')[0];
-      
       if (val instanceof Date && !isNaN(val)) {
         const year = val.getFullYear();
         const month = String(val.getMonth() + 1).padStart(2, '0');
         const day = String(val.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
       }
-      
       const strVal = String(val).trim();
-      
       if (strVal.includes('/')) {
         const parts = strVal.split(' ')[0].split('/');
         if (parts.length === 3) {
@@ -530,7 +589,6 @@
           return `${year}-${month}-${day}`;
         }
       }
-
       if (strVal.includes('-')) {
         const parts = strVal.split(' ')[0].split('-');
         if (parts.length === 3) {
@@ -542,27 +600,20 @@
           return `${year}-${month}-${day}`;
         }
       }
-
       return new Date().toISOString().split('T')[0];
     }
 
-    // PEMBACA DAN PEMERIKSA FILE DATA AC.xlsx (TERBAGI OTOMATIS PER GEDUNG)
     async function handleImportSubmit(e) {
       e.preventDefault();
       const fileInput = document.getElementById('excelFileInput');
       const file = fileInput ? fileInput.files[0] : null;
-      
-      if (!file) {
-        showToast("Silakan pilih file Excel terlebih dahulu.", "error");
-        return;
-      }
+      if (!file) { showToast("Silakan pilih file Excel terlebih dahulu.", "error"); return; }
 
       const reader = new FileReader();
       reader.onload = async function (e) {
         try {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-          
           const targetSheets = ['G. UMUM', 'G. LAB', 'G. ASRAMA', 'G. TPU'];
           let parsedItems = [];
 
@@ -579,7 +630,6 @@
                   const merk = row[6] || '';
                   const tipe = row[7] || '';
                   const catatan = row[12] || 'Pemeliharaan AC';
-
                   const tglServis = parseExcelDate(row[10]);
 
                   parsedItems.push({
@@ -596,10 +646,7 @@
             }
           });
 
-          if (parsedItems.length === 0) {
-            showToast("Tidak ada data valid yang bisa dibaca dari file Excel ini.", "error");
-            return;
-          }
+          if (parsedItems.length === 0) { showToast("Tidak ada data valid yang bisa dibaca dari file Excel ini.", "error"); return; }
 
           const res = await fetch('/api/maintenance-ac/bulk', {
             method: 'POST',
@@ -608,20 +655,13 @@
           });
 
           const resJson = await res.json();
-
           if (res.ok) {
             showToast(resJson.message || `Berhasil meng-import ${parsedItems.length} data AC per gedung!`, "success");
             closeImportModal();
             await loadAcData();
-          } else {
-            showToast("Gagal menyimpan ke Database: " + (resJson.error || "Terjadi kesalahan server"), "error");
-          }
-
-        } catch (err) {
-          showToast("Gagal memproses file Excel: " + err.message, "error");
-        }
+          } else { showToast("Gagal menyimpan ke Database: " + (resJson.error || "Terjadi kesalahan server"), "error"); }
+        } catch (err) { showToast("Gagal memproses file Excel: " + err.message, "error"); }
       };
-
       reader.readAsArrayBuffer(file);
     }
 
@@ -634,10 +674,7 @@
       if (confirm("Hapus data pemeliharaan AC ini dari database?")) {
         try {
           const res = await fetch(`/api/maintenance-ac/${id}`, { method: 'DELETE' });
-          if (res.ok) {
-            showToast("Data AC berhasil dihapus!", "success");
-            await loadAcData();
-          }
+          if (res.ok) { showToast("Data AC berhasil dihapus!", "success"); await loadAcData(); }
         } catch (err) { showToast("Error: " + err.message, "error"); }
       }
     }
@@ -663,17 +700,12 @@
         closeModal();
         showToast(editId ? "Data AC berhasil diubah!" : "Data AC berhasil ditambah!", "success");
         await loadAcData();
-      } else {
-        showToast("Gagal menyimpan data AC.", "error");
-      }
+      } else { showToast("Gagal menyimpan data AC.", "error"); }
     }
 
-    // FUNGSI CETAK PDF SESUAI HASIL PENCARIAN & FILTER DI TABEL AC
     async function exportToPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-
-      // 1. Ambil data yang sedang di-filter/dicari di tabel saat ini
       const filteredData = getFilteredData();
 
       if (!filteredData || filteredData.length === 0) {
@@ -681,11 +713,9 @@
         return;
       }
 
-      // Ambil kata kunci pencarian & filter gedung aktif untuk judul laporan
       const filterGedung = currentFilter !== 'SEMUA' ? ` (Gedung: ${currentFilter})` : '';
       const searchInfo = searchQuery ? ` | Kata Kunci: "${searchQuery}"` : '';
 
-      // 2. Header Laporan
       doc.setFontSize(15); doc.setFont("helvetica", "bold");
       doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
       doc.setFontSize(10); doc.setFont("helvetica", "normal");
@@ -696,7 +726,6 @@
 
       let currentY = 34;
 
-      // 3. Ringkasan Eksekutif Data Yang Dicari
       doc.setFontSize(10); doc.setFont("helvetica", "bold");
       doc.text("1. Ringkasan Status Maintenance Data Terfilter", 14, currentY);
       currentY += 4;
@@ -720,20 +749,12 @@
 
       currentY = doc.lastAutoTable.finalY + 8;
 
-      // 4. Detail Tabel Hasil Pencarian AC
       doc.setFontSize(10); doc.setFont("helvetica", "bold");
       doc.text("2. Detail Data Pemeliharaan AC", 14, currentY);
       currentY += 4;
 
       const rowsAc = filteredData.map((item, i) => [
-        i + 1, 
-        item.kategori_gedung || '-',
-        item.lokasi || '-', 
-        item.kode_unit || '-', 
-        item.tgl_servis || '-', 
-        item.jenis_pekerjaan || '-', 
-        item.teknisi || 'Tim K3 Sarpras',
-        item.status || 'Selesai'
+        i + 1, item.kategori_gedung || '-', item.lokasi || '-', item.kode_unit || '-', item.tgl_servis || '-', item.jenis_pekerjaan || '-', item.teknisi || 'Tim K3 Sarpras', item.status || 'Selesai'
       ]);
 
       doc.autoTable({
@@ -742,19 +763,9 @@
         startY: currentY,
         headStyles: { fillColor: [15, 23, 42] },
         styles: { fontSize: 7 },
-        columnStyles: {
-          0: { cellWidth: 8 },
-          1: { cellWidth: 20 },
-          2: { cellWidth: 30 },
-          3: { cellWidth: 22 },
-          4: { cellWidth: 20 },
-          5: { cellWidth: 45 },
-          6: { cellWidth: 22 },
-          7: { cellWidth: 15 }
-        }
+        columnStyles: { 0: { cellWidth: 8 }, 1: { cellWidth: 20 }, 2: { cellWidth: 30 }, 3: { cellWidth: 22 }, 4: { cellWidth: 20 }, 5: { cellWidth: 45 }, 6: { cellWidth: 22 }, 7: { cellWidth: 15 } }
       });
 
-      // Simpan PDF dengan nama file dinamis sesuai kata kunci pencarian
       const fileSuffix = searchQuery ? `_${searchQuery.replace(/[^a-zA-Z0-9]/g, '_')}` : '';
       doc.save(`Laporan_Maintenance_AC${fileSuffix}_${new Date().toISOString().split('T')[0]}.pdf`);
       showToast("Laporan PDF data pencarian berhasil diunduh!", "success");
