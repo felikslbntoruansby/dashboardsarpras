@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <!-- SEKSI 1: BI SCORECARDS ANIMATED COUNTER -->
+        <!-- SEKSI 1: BI SCORECARDS -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-blue-500/40 shadow-xl transition-all duration-300 group">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-blue-300 transition">Total Jenis Barang</p>
@@ -165,16 +165,18 @@
             </div>
         </div>
 
-        <!-- TABEL HISTORI TRANSAKSI -->
-        <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 md:p-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+        <!-- TABEL HISTORI TRANSAKSI DENGAN FILTER BULAN & TAHUN -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 md:p-6 space-y-4">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <h2 class="text-lg font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left text-purple-400"></i> Histori Transaksi (Penambahan & Pengambilan)
                 </h2>
                 
-                <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
+                <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap">
+                    <input type="month" id="logMonthFilter" onchange="filterLogsByMonth()" class="bg-slate-900 border border-slate-600 text-purple-400 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <button onclick="resetLogMonthFilter()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-xs px-3 py-2 rounded-xl border border-slate-600">Semua Bulan</button>
                     <button onclick="exportLogsToPDF()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow text-xs md:text-sm flex items-center gap-2 transition">
-                        <i class="fa-solid fa-file-pdf"></i> Cetak PDF Histori
+                        <i class="fa-solid fa-file-pdf"></i> Cetak PDF Histori Terfilter
                     </button>
                 </div>
             </div>
@@ -275,9 +277,12 @@
     <script>
         let inventory = [];
         let filteredInventory = [];
-        let currentLogsData = [];
+        let allLogsData = [];
+        let filteredLogsData = [];
         let currentPage = 1;
         const rowsPerPage = 10;
+        let selectedLogMonth = '';
+
         let stockChartInstance = null;
         let healthPieChartInstance = null;
         let fastMovingChartInstance = null;
@@ -337,6 +342,10 @@
                     console.error("Gagal memuat data:", err);
                     document.getElementById("tableBody").innerHTML = `<tr><td colspan="8" class="text-center py-6 text-rose-500 font-semibold">Gagal memuat data dari API backend.</td></tr>`;
                 });
+        }
+
+        function calculateFinalStock(item) {
+            return (item.initial || 0) + (item.inQty || 0) - (item.outQty || 0);
         }
 
         function updateKpis() {
@@ -475,37 +484,57 @@
             fetch('/api/logs')
                 .then(res => res.json())
                 .then(logs => {
-                    currentLogsData = Array.isArray(logs) ? logs : [];
-                    const tbody = document.getElementById('logTableBody');
-                    if (!currentLogsData || currentLogsData.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-slate-500">Tidak ada riwayat transaksi.</td></tr>`;
-                        return;
-                    }
-                    tbody.innerHTML = currentLogsData.map(log => {
-                        const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-                        const isIN = log.type === 'IN';
-                        const badge = isIN ? `<span class="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-1 rounded-md font-bold border border-emerald-500/30">PENAMBAHAN</span>` 
-                                           : `<span class="bg-rose-500/20 text-rose-300 text-xs px-2.5 py-1 rounded-md font-bold border border-rose-500/30">PENGAMBILAN</span>`;
-                        
-                        const itemCode = log.inventory ? log.inventory.code : '-';
-                        const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
+                    allLogsData = Array.isArray(logs) ? logs : [];
+                    filterLogsByMonth();
+                });
+        }
 
-                        return `
-                            <tr class="hover:bg-slate-700/40 transition duration-150">
-                                <td class="py-3 px-4 font-mono text-xs">${date}</td>
-                                <td class="py-3 px-4 font-semibold text-slate-200">${itemCode} - ${itemName}</td>
-                                <td class="py-3 px-4 text-center">${badge}</td>
-                                <td class="py-3 px-4 text-center font-bold ${isIN ? 'text-emerald-400' : 'text-rose-400'}">${isIN ? '+' : '-'}${log.quantity}</td>
-                                <td class="py-3 px-4 font-medium text-blue-300">${log.pic_name || '-'}</td>
-                                <td class="py-3 px-4 text-slate-400 text-xs">${log.notes || '-'}</td>
-                                <td class="py-3 px-4 text-center">
-                                    <button onclick="deleteLog(${log.id})" class="text-rose-400 hover:text-rose-300 hover:underline text-xs font-semibold">Hapus</button>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-                })
-                .catch(err => console.error("Gagal memuat log:", err));
+        function filterLogsByMonth() {
+            selectedLogMonth = document.getElementById('logMonthFilter').value;
+            if (selectedLogMonth) {
+                filteredLogsData = allLogsData.filter(log => log.created_at && log.created_at.startsWith(selectedLogMonth));
+            } else {
+                filteredLogsData = [...allLogsData];
+            }
+            renderLogTable();
+        }
+
+        function resetLogMonthFilter() {
+            document.getElementById('logMonthFilter').value = '';
+            selectedLogMonth = '';
+            filteredLogsData = [...allLogsData];
+            renderLogTable();
+        }
+
+        function renderLogTable() {
+            const tbody = document.getElementById('logTableBody');
+            if (!filteredLogsData || filteredLogsData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-slate-500">Tidak ada riwayat transaksi pada periode ini.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = filteredLogsData.map(log => {
+                const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                const isIN = log.type === 'IN';
+                const badge = isIN ? `<span class="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-1 rounded-md font-bold border border-emerald-500/30">PENAMBAHAN</span>` 
+                                   : `<span class="bg-rose-500/20 text-rose-300 text-xs px-2.5 py-1 rounded-md font-bold border border-rose-500/30">PENGAMBILAN</span>`;
+                
+                const itemCode = log.inventory ? log.inventory.code : '-';
+                const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
+
+                return `
+                    <tr class="hover:bg-slate-700/40 transition duration-150">
+                        <td class="py-3 px-4 font-mono text-xs">${date}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-200">${itemCode} - ${itemName}</td>
+                        <td class="py-3 px-4 text-center">${badge}</td>
+                        <td class="py-3 px-4 text-center font-bold ${isIN ? 'text-emerald-400' : 'text-rose-400'}">${isIN ? '+' : '-'}${log.quantity}</td>
+                        <td class="py-3 px-4 font-medium text-blue-300">${log.pic_name || '-'}</td>
+                        <td class="py-3 px-4 text-slate-400 text-xs">${log.notes || '-'}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="deleteLog(${log.id})" class="text-rose-400 hover:text-rose-300 hover:underline text-xs font-semibold">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function deleteLog(logId) {
@@ -520,14 +549,15 @@
         function exportLogsToPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape');
+            let periodeText = selectedLogMonth ? `PERIODE: ${selectedLogMonth}` : 'SEMUA PERIODE';
 
             doc.setFontSize(14); doc.setFont("helvetica", "bold");
             doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
             doc.setFontSize(10); doc.setFont("helvetica", "normal");
-            doc.text("LAPORAN HISTORI TRANSAKSI INVENTARIS BARANG", 14, 22);
+            doc.text(`LAPORAN HISTORI TRANSAKSI INVENTARIS BARANG (${periodeText})`, 14, 22);
             doc.line(14, 25, 283, 25);
 
-            const tableRows = currentLogsData.map((log, index) => {
+            const tableRows = filteredLogsData.map((log, index) => {
                 const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
                 const itemCode = log.inventory ? log.inventory.code : '-';
                 const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
@@ -539,7 +569,7 @@
                 body: tableRows, startY: 28, theme: 'grid', headStyles: { fillColor: [30, 58, 138], halign: 'center' }
             });
 
-            doc.save(`Laporan_Histori_Transaksi_${new Date().toISOString().split('T')[0]}.pdf`);
+            doc.save(`Laporan_Histori_${selectedLogMonth || 'Semua'}.pdf`);
         }
 
         function exportExecutiveSummaryPDF() {
@@ -569,10 +599,6 @@
             doc.text("NIP. 197909212006042001", 210, finalY + 30);
 
             doc.save(`Laporan_Eksekutif_Sarpras_${new Date().toISOString().split('T')[0]}.pdf`);
-        }
-
-        function calculateFinalStock(item) {
-            return (item.initial || 0) + (item.inQty || 0) - (item.outQty || 0);
         }
 
         function filterData() {

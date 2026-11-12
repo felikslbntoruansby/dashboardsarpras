@@ -163,7 +163,7 @@
       </div>
     </div>
 
-    <!-- TABEL DATA HISTORI -->
+    <!-- TABEL DATA HISTORI DENGAN FILTER BULAN/TAHUN -->
     <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
       <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
         
@@ -176,9 +176,12 @@
           </button>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <input type="month" id="rtMonthFilter" onchange="renderFilteredTables()" class="bg-slate-950 border border-slate-700 text-indigo-400 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <button onclick="resetRtMonthFilter()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-3 py-2 rounded-xl border border-slate-700 transition">Semua Bulan</button>
+          
           <button id="btn-pdf-act" onclick="exportToPDF('ruangan')" class="px-4 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
-            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF Terfilter
           </button>
           <button id="btn-add-act" onclick="openModal('ruangan')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow transition">
             + Tambah Permohonan Ruangan
@@ -249,6 +252,7 @@
   <script>
     let ruanganData = [];
     let kendaraanData = [];
+    let selectedRtMonth = '';
     let comboRtChartInstance = null;
     let statusRtPieChartInstance = null;
     let topFacilityChartInstance = null;
@@ -300,9 +304,7 @@
           if (loader) {
             loader.classList.remove('opacity-0', 'pointer-events-none');
             setTimeout(() => { window.location.href = target; }, 400);
-          } else {
-            window.location.href = target;
-          }
+          } else { window.location.href = target; }
         });
       });
     }
@@ -318,9 +320,7 @@
         if (start >= targetVal) {
           el.innerText = targetVal.toLocaleString('id-ID');
           clearInterval(timer);
-        } else {
-          el.innerText = start.toLocaleString('id-ID');
-        }
+        } else { el.innerText = start.toLocaleString('id-ID'); }
       }, stepTime);
     }
 
@@ -355,79 +355,16 @@
     }
 
     async function loadAllData() {
-      await Promise.all([loadRuanganData(), loadKendaraanData()]);
-      updateKpis();
-      renderComboRtChart();
-      renderStatusRtPieChart();
-      renderTopFacilityChart();
-    }
-
-    async function loadRuanganData() {
       try {
-        const res = await fetch('/api/peminjaman-ruangan');
-        ruanganData = await res.json();
-        document.getElementById('count-ruangan').innerText = `${ruanganData.length} Data`;
-        const tbody = document.getElementById('tbody-ruangan');
-
-        if (!ruanganData || ruanganData.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-500">Belum ada peminjaman ruangan.</td></tr>`;
-        } else {
-          tbody.innerHTML = ruanganData.map(item => {
-            let statusColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-            if (item.status === 'Disetujui') statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-            else if (item.status === 'Ditolak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
-
-            return `
-              <tr class="hover:bg-slate-800/50 transition duration-150">
-                <td class="px-6 py-3.5 font-bold text-white">${item.nama_peminjam || '-'}</td>
-                <td class="px-6 py-3.5 font-semibold text-indigo-400">${item.ruangan || '-'}</td>
-                <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'} (${item.jam_mulai || '-'} - ${item.jam_selesai || '-'})</td>
-                <td class="px-6 py-3.5 text-xs text-slate-400">${item.keperluan || '-'}</td>
-                <td class="px-6 py-3.5"><span class="${statusColor} border text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
-                <td class="px-6 py-3.5 text-center space-x-2">
-                  <button onclick="editItem('ruangan', ${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
-                  <button onclick="deleteItem('ruangan', ${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
-                </td>
-              </tr>
-            `;
-          }).join('');
-        }
-      } catch (err) { console.error("Gagal muat data ruangan:", err); }
-    }
-
-    async function loadKendaraanData() {
-      try {
-        const res = await fetch('/api/peminjaman-kendaraan');
-        kendaraanData = await res.json();
-        document.getElementById('count-kendaraan').innerText = `${kendaraanData.length} Data`;
-        const tbody = document.getElementById('tbody-kendaraan');
-
-        if (!kendaraanData || kendaraanData.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-500">Belum ada peminjaman kendaraan.</td></tr>`;
-        } else {
-          tbody.innerHTML = kendaraanData.map(item => {
-            let statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-            if (item.status === 'Maintenance' || item.status === 'Ditolak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
-            else if (item.status === 'VIP-Transport' || item.status === 'Official Visit') statusColor = 'bg-purple-500/20 text-purple-300 border-purple-500/30';
-            else if (item.status === 'PU- Airport' || item.status === 'Transfer') statusColor = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
-            else if (item.status === 'DL') statusColor = 'bg-blue-500/20 text-blue-300 border-blue-500/30';
-
-            return `
-              <tr class="hover:bg-slate-800/50 transition duration-150">
-                <td class="px-6 py-3.5 font-bold text-white">${item.nama_driver || '-'}</td>
-                <td class="px-6 py-3.5 font-semibold text-emerald-400">${item.kendaraan || '-'}</td>
-                <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'}</td>
-                <td class="px-6 py-3.5 text-xs text-slate-400">${item.tujuan || '-'}</td>
-                <td class="px-6 py-3.5"><span class="${statusColor} border text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'DL'}</span></td>
-                <td class="px-6 py-3.5 text-center space-x-2">
-                  <button onclick="editItem('kendaraan', ${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
-                  <button onclick="deleteItem('kendaraan', ${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
-                </td>
-              </tr>
-            `;
-          }).join('');
-        }
-      } catch (err) { console.error("Gagal muat data kendaraan:", err); }
+        const [resRng, resKnd] = await Promise.all([fetch('/api/peminjaman-ruangan'), fetch('/api/peminjaman-kendaraan')]);
+        ruanganData = await resRng.json();
+        kendaraanData = await resKnd.json();
+        updateKpis();
+        renderComboRtChart();
+        renderStatusRtPieChart();
+        renderTopFacilityChart();
+        renderFilteredTables();
+      } catch (err) { console.error("Gagal muat data rumah tangga:", err); }
     }
 
     function updateKpis() {
@@ -508,29 +445,89 @@
       });
     }
 
+    function renderFilteredTables() {
+      selectedRtMonth = document.getElementById('rtMonthFilter').value;
+
+      const filteredRuangan = selectedRtMonth ? ruanganData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : ruanganData;
+      const filteredKendaraan = selectedRtMonth ? kendaraanData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : kendaraanData;
+
+      document.getElementById('count-ruangan').innerText = `${filteredRuangan.length} Data`;
+      document.getElementById('count-kendaraan').innerText = `${filteredKendaraan.length} Data`;
+
+      // Render Tabel Ruangan
+      const tbodyRng = document.getElementById('tbody-ruangan');
+      if (!filteredRuangan || filteredRuangan.length === 0) {
+        tbodyRng.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-500">Tidak ada peminjaman ruangan pada bulan ini.</td></tr>`;
+      } else {
+        tbodyRng.innerHTML = filteredRuangan.map(item => `
+          <tr class="hover:bg-slate-800/50 transition">
+            <td class="px-6 py-3.5 font-bold text-white">${item.nama_peminjam || '-'}</td>
+            <td class="px-6 py-3.5 font-semibold text-indigo-400">${item.ruangan || '-'}</td>
+            <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'} (${item.jam_mulai || ''} - ${item.jam_selesai || ''})</td>
+            <td class="px-6 py-3.5 text-xs text-slate-400">${item.keperluan || '-'}</td>
+            <td class="px-6 py-3.5"><span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
+            <td class="px-6 py-3.5 text-center space-x-2">
+              <button onclick="editItem('ruangan', ${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
+              <button onclick="deleteItem('ruangan', ${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Render Tabel Kendaraan
+      const tbodyKnd = document.getElementById('tbody-kendaraan');
+      if (!filteredKendaraan || filteredKendaraan.length === 0) {
+        tbodyKnd.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-500">Tidak ada operasional kendaraan pada bulan ini.</td></tr>`;
+      } else {
+        tbodyKnd.innerHTML = filteredKendaraan.map(item => `
+          <tr class="hover:bg-slate-800/50 transition">
+            <td class="px-6 py-3.5 font-bold text-white">${item.nama_driver || '-'}</td>
+            <td class="px-6 py-3.5 font-semibold text-emerald-400">${item.kendaraan || '-'}</td>
+            <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'}</td>
+            <td class="px-6 py-3.5 text-xs text-slate-400">${item.tujuan || '-'}</td>
+            <td class="px-6 py-3.5"><span class="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'DL'}</span></td>
+            <td class="px-6 py-3.5 text-center space-x-2">
+              <button onclick="editItem('kendaraan', ${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
+              <button onclick="deleteItem('kendaraan', ${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function resetRtMonthFilter() {
+      document.getElementById('rtMonthFilter').value = '';
+      selectedRtMonth = '';
+      renderFilteredTables();
+    }
+
     function exportToPDF(category) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
+      let periodeText = selectedRtMonth ? `PERIODE: ${selectedRtMonth}` : 'SEMUA PERIODE';
+
       doc.setFontSize(14); doc.setFont("helvetica", "bold");
       doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
       doc.setFontSize(10); doc.setFont("helvetica", "normal");
 
       if (category === 'ruangan') {
-        doc.text("LOG HISTORICAL PEMINJAMAN RUANGAN (RUMAH TANGGA)", 14, 22);
+        const filtered = selectedRtMonth ? ruanganData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : ruanganData;
+        doc.text(`LOG HISTORICAL PEMINJAMAN RUANGAN (${periodeText})`, 14, 22);
         doc.line(14, 25, 196, 25);
-        const rows = ruanganData.map((item, i) => [
+        const rows = filtered.map((item, i) => [
           i + 1, item.nama_peminjam || '-', item.ruangan || '-', `${item.tgl_pinjam} (${item.jam_mulai || ''}-${item.jam_selesai || ''})`, item.keperluan || '-', item.status || 'Diproses'
         ]);
         doc.autoTable({ head: [['No', 'Peminjam', 'Ruangan', 'Tanggal & Jam', 'Keperluan', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [99, 102, 241] } });
-        doc.save(`Historical_Peminjaman_Ruangan_${new Date().toISOString().split('T')[0]}.pdf`);
+        doc.save(`Peminjaman_Ruangan_${selectedRtMonth || 'Semua'}.pdf`);
       } else {
-        doc.text("LOG HISTORICAL OPERASIONAL KENDARAAN (RUMAH TANGGA)", 14, 22);
+        const filtered = selectedRtMonth ? kendaraanData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : kendaraanData;
+        doc.text(`LOG HISTORICAL OPERASIONAL KENDARAAN (${periodeText})`, 14, 22);
         doc.line(14, 25, 196, 25);
-        const rows = kendaraanData.map((item, i) => [
+        const rows = filtered.map((item, i) => [
           i + 1, item.nama_driver || '-', item.kendaraan || '-', item.tgl_pinjam || '-', item.tujuan || '-', item.status || 'DL'
         ]);
         doc.autoTable({ head: [['No', 'Driver', 'Kendaraan', 'Tanggal', 'Tujuan', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [16, 185, 129] } });
-        doc.save(`Historical_Operasional_Kendaraan_${new Date().toISOString().split('T')[0]}.pdf`);
+        doc.save(`Operasional_Kendaraan_${selectedRtMonth || 'Semua'}.pdf`);
       }
     }
 
