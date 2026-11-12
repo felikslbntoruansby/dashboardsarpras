@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <!-- Library XLSX untuk membaca file Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     @keyframes radarPulse {
@@ -152,9 +153,9 @@
       </div>
     </div>
 
-    <!-- FILTER TAB & PENCARIAN DENGAN FILTER BULAN/TAHUN -->
-    <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
-      <div class="flex items-center gap-2 overflow-x-auto pb-1" id="location-tabs">
+    <!-- FILTER TAB & PENCARIAN -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1" id="location-tabs">
         <button onclick="filterByLocation('SEMUA')" id="tab-SEMUA" class="tab-btn px-4 py-2 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow transition whitespace-nowrap">
           <i class="fa-solid fa-layer-group mr-1.5"></i> SEMUA GEDUNG
         </button>
@@ -172,18 +173,9 @@
         </button>
       </div>
 
-      <!-- FILTER BULAN TAHUN & SEARCH -->
-      <div class="flex flex-col sm:flex-row items-center gap-2">
-        <div class="relative w-full sm:w-auto">
-          <input type="month" id="monthFilter" onchange="handleMonthFilterChange()" class="w-full sm:w-auto bg-slate-950 border border-slate-700 text-cyan-400 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition cursor-pointer">
-        </div>
-        <button onclick="resetMonthFilter()" title="Reset Bulan" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl border border-slate-700 transition">
-          Semua Bulan
-        </button>
-        <div class="relative w-full sm:w-64">
-          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari gedung, kode, merk..." class="w-full bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
-        </div>
+      <div class="relative w-full md:w-72">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari gedung, kode, merk..." class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
       </div>
     </div>
 
@@ -191,14 +183,14 @@
     <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
       <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
         <h2 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-cyan-400"></i> Log Historical Maintenance AC <span id="activeFilterBadge" class="text-xs text-cyan-400 font-mono bg-cyan-950/80 border border-cyan-800 px-2 py-0.5 rounded-md">Semua Periode</span>
+          <i class="fa-solid fa-list-check text-cyan-400"></i> Log Historical Maintenance AC (Berurutan)
         </h2>
         <div class="flex items-center gap-2">
           <button onclick="openImportModal()" class="px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
             <i class="fa-solid fa-file-excel"></i> Import File Excel
           </button>
           <button onclick="exportToPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
-            <i class="fa-solid fa-file-pdf"></i> Cetak PDF Terfilter
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
           <button onclick="openModal()" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl shadow transition">
             + Tambah Data
@@ -226,10 +218,14 @@
         </table>
       </div>
 
+      <!-- BOTTOM BAR PAGINASI (20 DATA / HALAMAN) -->
       <div class="p-4 border-t border-slate-800 bg-slate-950/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-        <div class="text-slate-400" id="pagination-info">Menampilkan 0 - 0 dari 0 data</div>
+        <div class="text-slate-400" id="pagination-info">
+          Menampilkan 0 - 0 dari 0 data
+        </div>
         <div class="flex items-center space-x-1.5" id="pagination-controls"></div>
       </div>
+
     </div>
 
   </div>
@@ -272,7 +268,7 @@
     </div>
   </div>
 
-  <!-- MODAL IMPORT EXCEL -->
+  <!-- MODAL IMPORT EXCEL DATA AC.xlsx -->
   <div id="importModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
       <h3 class="text-lg font-extrabold text-white mb-2">Import Data AC dari Excel (.xlsx)</h3>
@@ -296,7 +292,6 @@
     let acData = [];
     let currentFilter = 'SEMUA';
     let searchQuery = '';
-    let selectedMonthYear = '';
     let currentPage = 1;
     const itemsPerPage = 20;
 
@@ -311,50 +306,11 @@
       { text: "Setiap fasilitas yang berfungsi baik membantu proses belajar mengajar berjalan lancar.", author: "Dedikasi Sarpras" }
     ];
 
-    document.addEventListener('DOMContentLoaded', async () => { 
+    document.addEventListener('DOMContentLoaded', () => { 
       initNavLoader();
       initQuote();
-      await loadSavedMonthFilter();
-      await loadAcData(); 
+      loadAcData(); 
     });
-
-    async function loadSavedMonthFilter() {
-      try {
-        const res = await fetch('/api/preferences/ac_month_filter');
-        const data = await res.json();
-        if (data && data.value) {
-          selectedMonthYear = data.value;
-          document.getElementById('monthFilter').value = selectedMonthYear;
-          updateMonthBadgeText(selectedMonthYear);
-        }
-      } catch (err) {
-        console.error("Gagal memuat preferensi filter bulan AC:", err);
-      }
-    }
-
-    async function saveMonthFilterToServer(val) {
-      try {
-        await fetch('/api/preferences/ac_month_filter', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ value: val })
-        });
-      } catch (err) {
-        console.error("Gagal menyimpan preferensi filter bulan AC:", err);
-      }
-    }
-
-    function updateMonthBadgeText(val) {
-      const badge = document.getElementById('activeFilterBadge');
-      if (val) {
-        const [y, m] = val.split('-');
-        const dateObj = new Date(y, m - 1);
-        const monthName = dateObj.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-        badge.innerText = `Periode: ${monthName}`;
-      } else {
-        badge.innerText = 'Semua Periode';
-      }
-    }
 
     function initNavLoader() {
       document.querySelectorAll('a.nav-link').forEach(link => {
@@ -444,23 +400,6 @@
       renderTable();
     }
 
-    async function handleMonthFilterChange() {
-      selectedMonthYear = document.getElementById('monthFilter').value;
-      updateMonthBadgeText(selectedMonthYear);
-      currentPage = 1;
-      renderTable();
-      await saveMonthFilterToServer(selectedMonthYear);
-    }
-
-    async function resetMonthFilter() {
-      document.getElementById('monthFilter').value = '';
-      selectedMonthYear = '';
-      updateMonthBadgeText('');
-      currentPage = 1;
-      renderTable();
-      await saveMonthFilterToServer('');
-    }
-
     function handleSearch() {
       searchQuery = document.getElementById('searchInput').value.toLowerCase();
       currentPage = 1;
@@ -472,16 +411,9 @@
         const loc = (item.lokasi || '').toUpperCase();
         const tabCategory = (item.kategori_gedung || '').toUpperCase();
         const matchesLoc = currentFilter === 'SEMUA' || loc.includes(currentFilter.toUpperCase()) || tabCategory.includes(currentFilter.toUpperCase());
-        
-        let matchesMonth = true;
-        if (selectedMonthYear && item.tgl_servis) {
-          matchesMonth = item.tgl_servis.startsWith(selectedMonthYear);
-        }
-
         const fullText = `${item.lokasi} ${item.kode_unit} ${item.jenis_pekerjaan} ${item.teknisi} ${item.status}`.toLowerCase();
         const matchesSearch = !searchQuery || fullText.includes(searchQuery);
-
-        return matchesLoc && matchesMonth && matchesSearch;
+        return matchesLoc && matchesSearch;
       });
     }
 
@@ -498,7 +430,7 @@
       const paginatedItems = filtered.slice(startIndex, endIndex);
 
       if (!filtered || filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-500">Data tidak ditemukan pada periode ini.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-500">Data tidak ditemukan.</td></tr>`;
         document.getElementById('pagination-info').innerText = 'Menampilkan 0 dari 0 data';
         document.getElementById('pagination-controls').innerHTML = '';
         return;
@@ -777,28 +709,49 @@
       const filteredData = getFilteredData();
 
       if (!filteredData || filteredData.length === 0) {
-        showToast("Tidak ada data AC yang sesuai untuk dicetak.", "error");
+        showToast("Tidak ada data AC yang sesuai dengan pencarian untuk dicetak.", "error");
         return;
       }
 
-      let periodeText = "Semua Periode";
-      if (selectedMonthYear) {
-        const [y, m] = selectedMonthYear.split('-');
-        const dateObj = new Date(y, m - 1);
-        periodeText = dateObj.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-      }
-
       const filterGedung = currentFilter !== 'SEMUA' ? ` (Gedung: ${currentFilter})` : '';
+      const searchInfo = searchQuery ? ` | Kata Kunci: "${searchQuery}"` : '';
 
       doc.setFontSize(15); doc.setFont("helvetica", "bold");
       doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
       doc.setFontSize(10); doc.setFont("helvetica", "normal");
-      doc.text(`LAPORAN MAINTENANCE & PEMELIHARAAN AC - PERIODE: ${periodeText.toUpperCase()}${filterGedung.toUpperCase()}`, 14, 22);
+      doc.text(`LAPORAN MAINTENANCE & PEMELIHARAAN AC${filterGedung.toUpperCase()}`, 14, 22);
       doc.setFontSize(8);
-      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Total Data: ${filteredData.length} Unit`, 14, 26);
+      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Total Data Ditemukan: ${filteredData.length} Unit${searchInfo}`, 14, 26);
       doc.line(14, 28, 196, 28);
 
       let currentY = 34;
+
+      doc.setFontSize(10); doc.setFont("helvetica", "bold");
+      doc.text("1. Ringkasan Status Maintenance Data Terfilter", 14, currentY);
+      currentY += 4;
+
+      const totalSelesai = filteredData.filter(i => i.status === 'Selesai' || !i.status || i.status === 'BAIK').length;
+      const totalProses = filteredData.filter(i => i.status === 'Proses').length;
+      const totalRusak = filteredData.filter(i => i.status === 'Rusak').length;
+
+      const kpiSummary = [
+        ['Total Terfilter', 'Selesai / Baik', 'Dalam Pengerjaan', 'Perlu Perhatian / Rusak'],
+        [`${filteredData.length} Data`, `${totalSelesai} Unit`, `${totalProses} Unit`, `${totalRusak} Unit`]
+      ];
+
+      doc.autoTable({
+        head: [kpiSummary[0]],
+        body: [kpiSummary[1]],
+        startY: currentY,
+        headStyles: { fillColor: [6, 182, 212] },
+        styles: { fontSize: 8, halign: 'center' }
+      });
+
+      currentY = doc.lastAutoTable.finalY + 8;
+
+      doc.setFontSize(10); doc.setFont("helvetica", "bold");
+      doc.text("2. Detail Data Pemeliharaan AC", 14, currentY);
+      currentY += 4;
 
       const rowsAc = filteredData.map((item, i) => [
         i + 1, item.kategori_gedung || '-', item.lokasi || '-', item.kode_unit || '-', item.tgl_servis || '-', item.jenis_pekerjaan || '-', item.teknisi || 'Tim K3 Sarpras', item.status || 'Selesai'
@@ -813,8 +766,9 @@
         columnStyles: { 0: { cellWidth: 8 }, 1: { cellWidth: 20 }, 2: { cellWidth: 30 }, 3: { cellWidth: 22 }, 4: { cellWidth: 20 }, 5: { cellWidth: 45 }, 6: { cellWidth: 22 }, 7: { cellWidth: 15 } }
       });
 
-      doc.save(`Laporan_Maintenance_AC_${selectedMonthYear || 'Semua_Periode'}.pdf`);
-      showToast(`Laporan PDF periode ${periodeText} berhasil diunduh!`, "success");
+      const fileSuffix = searchQuery ? `_${searchQuery.replace(/[^a-zA-Z0-9]/g, '_')}` : '';
+      doc.save(`Laporan_Maintenance_AC${fileSuffix}_${new Date().toISOString().split('T')[0]}.pdf`);
+      showToast("Laporan PDF data pencarian berhasil diunduh!", "success");
     }
   </script>
 </body>

@@ -21,48 +21,12 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname)));
 
 // Static Routing
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index_5.html')));
-app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index_5.html')));
-app.get('/index_5.html', (req, res) => res.sendFile(path.join(__dirname, 'index_5.html')));
-app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga_5.html')));
-app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga_5.html')));
-app.get('/rumahtangga_5.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga_5.html')));
-app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac_4.html')));
-app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac_4.html')));
-app.get('/ac_4.html', (req, res) => res.sendFile(path.join(__dirname, 'ac_4.html')));
-
-// =============================================================
-// API PREFERENCES (SIMPAN FILTER BULAN PERMANEN DI SUPABASE)
-// =============================================================
-
-app.get('/api/preferences/:key', async (req, res) => {
-    try {
-        const { key } = req.params;
-        const { data, error } = await supabase
-            .from('user_preferences')
-            .select('value')
-            .eq('key', key)
-            .single();
-        if (error) return res.json({ value: '' });
-        res.json({ value: data ? data.value : '' });
-    } catch (err) {
-        res.json({ value: '' });
-    }
-});
-
-app.post('/api/preferences/:key', async (req, res) => {
-    try {
-        const { key } = req.params;
-        const { value } = req.body;
-        const { error } = await supabase
-            .from('user_preferences')
-            .upsert({ key, value: value || '', updated_at: new Date().toISOString() }, { onConflict: 'key' });
-        if (error) throw error;
-        res.json({ message: 'Preferensi filter berhasil disimpan!', value: value || '' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
+app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
+app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
+app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 
 // FUNGSI KONVERSI FORMAT TANGGAL ISO (YYYY-MM-DD)
 function formatToIsoDate(val) {
@@ -407,7 +371,7 @@ app.get('/api/backup', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.use((req, res) => res.sendFile(path.join(__dirname, 'index_5.html')));
+app.use((req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 module.exports = app;
 

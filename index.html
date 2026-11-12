@@ -295,26 +295,26 @@
 
         async function loadSavedLogMonthFilter() {
             try {
-                const res = await fetch('/api/preferences/inv_log_month_filter');
+                const res = await fetch('/api/preferences/log_month_filter');
                 const data = await res.json();
                 if (data && data.value) {
                     selectedLogMonth = data.value;
                     document.getElementById('logMonthFilter').value = selectedLogMonth;
                 }
             } catch (err) {
-                console.error("Gagal memuat preferensi filter bulan inventaris:", err);
+                console.error("Gagal memuat preferensi filter bulan:", err);
             }
         }
 
         async function saveLogMonthFilterToServer(val) {
             try {
-                await fetch('/api/preferences/inv_log_month_filter', {
+                await fetch('/api/preferences/log_month_filter', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ value: val })
                 });
             } catch (err) {
-                console.error("Gagal menyimpan preferensi filter bulan inventaris:", err);
+                console.error("Gagal menyimpan preferensi filter bulan:", err);
             }
         }
 
