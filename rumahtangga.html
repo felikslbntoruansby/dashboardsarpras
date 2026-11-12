@@ -177,7 +177,7 @@
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <input type="month" id="rtMonthFilter" onchange="renderFilteredTables()" class="bg-slate-950 border border-slate-700 text-indigo-400 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="month" id="rtMonthFilter" onchange="renderFilteredTables(true)" class="bg-slate-950 border border-slate-700 text-indigo-400 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           <button onclick="resetRtMonthFilter()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-3 py-2 rounded-xl border border-slate-700 transition">Semua Bulan</button>
           
           <button id="btn-pdf-act" onclick="exportToPDF('ruangan')" class="px-4 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
@@ -289,11 +289,37 @@
       { text: "Mengabdi dengan ikhlas, melayani civitas akademika dengan sepenuh hati.", author: "Sarpras Poltekbang Surabaya" }
     ];
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       initQuote();
-      loadAllData();
       initNavLoader();
+      await loadSavedRtMonthFilter();
+      await loadAllData();
     });
+
+    async function loadSavedRtMonthFilter() {
+      try {
+        const res = await fetch('/api/preferences/rt_month_filter');
+        const data = await res.json();
+        if (data && data.value) {
+          selectedRtMonth = data.value;
+          document.getElementById('rtMonthFilter').value = selectedRtMonth;
+        }
+      } catch (err) {
+        console.error("Gagal memuat preferensi filter bulan Rumah Tangga:", err);
+      }
+    }
+
+    async function saveRtMonthFilterToServer(val) {
+      try {
+        await fetch('/api/preferences/rt_month_filter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ value: val })
+        });
+      } catch (err) {
+        console.error("Gagal menyimpan preferensi filter bulan Rumah Tangga:", err);
+      }
+    }
 
     function initNavLoader() {
       document.querySelectorAll('a.nav-link').forEach(link => {
@@ -363,7 +389,7 @@
         renderComboRtChart();
         renderStatusRtPieChart();
         renderTopFacilityChart();
-        renderFilteredTables();
+        renderFilteredTables(false);
       } catch (err) { console.error("Gagal muat data rumah tangga:", err); }
     }
 
@@ -445,7 +471,7 @@
       });
     }
 
-    function renderFilteredTables() {
+    async function renderFilteredTables(shouldSave = true) {
       selectedRtMonth = document.getElementById('rtMonthFilter').value;
 
       const filteredRuangan = selectedRtMonth ? ruanganData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : ruanganData;
@@ -493,12 +519,16 @@
           </tr>
         `).join('');
       }
+
+      if (shouldSave) {
+        await saveRtMonthFilterToServer(selectedRtMonth);
+      }
     }
 
-    function resetRtMonthFilter() {
+    async function resetRtMonthFilter() {
       document.getElementById('rtMonthFilter').value = '';
       selectedRtMonth = '';
-      renderFilteredTables();
+      await renderFilteredTables(true);
     }
 
     function exportToPDF(category) {

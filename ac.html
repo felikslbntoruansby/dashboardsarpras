@@ -311,11 +311,50 @@
       { text: "Setiap fasilitas yang berfungsi baik membantu proses belajar mengajar berjalan lancar.", author: "Dedikasi Sarpras" }
     ];
 
-    document.addEventListener('DOMContentLoaded', () => { 
+    document.addEventListener('DOMContentLoaded', async () => { 
       initNavLoader();
       initQuote();
-      loadAcData(); 
+      await loadSavedMonthFilter();
+      await loadAcData(); 
     });
+
+    async function loadSavedMonthFilter() {
+      try {
+        const res = await fetch('/api/preferences/ac_month_filter');
+        const data = await res.json();
+        if (data && data.value) {
+          selectedMonthYear = data.value;
+          document.getElementById('monthFilter').value = selectedMonthYear;
+          updateMonthBadgeText(selectedMonthYear);
+        }
+      } catch (err) {
+        console.error("Gagal memuat preferensi filter bulan AC:", err);
+      }
+    }
+
+    async function saveMonthFilterToServer(val) {
+      try {
+        await fetch('/api/preferences/ac_month_filter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ value: val })
+        });
+      } catch (err) {
+        console.error("Gagal menyimpan preferensi filter bulan AC:", err);
+      }
+    }
+
+    function updateMonthBadgeText(val) {
+      const badge = document.getElementById('activeFilterBadge');
+      if (val) {
+        const [y, m] = val.split('-');
+        const dateObj = new Date(y, m - 1);
+        const monthName = dateObj.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+        badge.innerText = `Periode: ${monthName}`;
+      } else {
+        badge.innerText = 'Semua Periode';
+      }
+    }
 
     function initNavLoader() {
       document.querySelectorAll('a.nav-link').forEach(link => {
@@ -405,27 +444,21 @@
       renderTable();
     }
 
-    function handleMonthFilterChange() {
+    async function handleMonthFilterChange() {
       selectedMonthYear = document.getElementById('monthFilter').value;
-      const badge = document.getElementById('activeFilterBadge');
-      if (selectedMonthYear) {
-        const [y, m] = selectedMonthYear.split('-');
-        const dateObj = new Date(y, m - 1);
-        const monthName = dateObj.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-        badge.innerText = `Periode: ${monthName}`;
-      } else {
-        badge.innerText = 'Semua Periode';
-      }
+      updateMonthBadgeText(selectedMonthYear);
       currentPage = 1;
       renderTable();
+      await saveMonthFilterToServer(selectedMonthYear);
     }
 
-    function resetMonthFilter() {
+    async function resetMonthFilter() {
       document.getElementById('monthFilter').value = '';
       selectedMonthYear = '';
-      document.getElementById('activeFilterBadge').innerText = 'Semua Periode';
+      updateMonthBadgeText('');
       currentPage = 1;
       renderTable();
+      await saveMonthFilterToServer('');
     }
 
     function handleSearch() {

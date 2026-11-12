@@ -173,7 +173,7 @@
                 </h2>
                 
                 <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap">
-                    <input type="month" id="logMonthFilter" onchange="filterLogsByMonth()" class="bg-slate-900 border border-slate-600 text-purple-400 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <input type="month" id="logMonthFilter" onchange="filterLogsByMonth(true)" class="bg-slate-900 border border-slate-600 text-purple-400 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
                     <button onclick="resetLogMonthFilter()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-xs px-3 py-2 rounded-xl border border-slate-600">Semua Bulan</button>
                     <button onclick="exportLogsToPDF()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow text-xs md:text-sm flex items-center gap-2 transition">
                         <i class="fa-solid fa-file-pdf"></i> Cetak PDF Histori Terfilter
@@ -287,10 +287,36 @@
         let healthPieChartInstance = null;
         let fastMovingChartInstance = null;
 
-        document.addEventListener("DOMContentLoaded", function() {
-            loadInventory();
+        document.addEventListener("DOMContentLoaded", async function() {
             initNavLoader();
+            await loadSavedLogMonthFilter();
+            loadInventory();
         });
+
+        async function loadSavedLogMonthFilter() {
+            try {
+                const res = await fetch('/api/preferences/inv_log_month_filter');
+                const data = await res.json();
+                if (data && data.value) {
+                    selectedLogMonth = data.value;
+                    document.getElementById('logMonthFilter').value = selectedLogMonth;
+                }
+            } catch (err) {
+                console.error("Gagal memuat preferensi filter bulan inventaris:", err);
+            }
+        }
+
+        async function saveLogMonthFilterToServer(val) {
+            try {
+                await fetch('/api/preferences/inv_log_month_filter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value: val })
+                });
+            } catch (err) {
+                console.error("Gagal menyimpan preferensi filter bulan inventaris:", err);
+            }
+        }
 
         function initNavLoader() {
             document.querySelectorAll('a.nav-link').forEach(link => {
@@ -485,11 +511,11 @@
                 .then(res => res.json())
                 .then(logs => {
                     allLogsData = Array.isArray(logs) ? logs : [];
-                    filterLogsByMonth();
+                    filterLogsByMonth(false);
                 });
         }
 
-        function filterLogsByMonth() {
+        async function filterLogsByMonth(shouldSave = true) {
             selectedLogMonth = document.getElementById('logMonthFilter').value;
             if (selectedLogMonth) {
                 filteredLogsData = allLogsData.filter(log => log.created_at && log.created_at.startsWith(selectedLogMonth));
@@ -497,13 +523,17 @@
                 filteredLogsData = [...allLogsData];
             }
             renderLogTable();
+            if (shouldSave) {
+                await saveLogMonthFilterToServer(selectedLogMonth);
+            }
         }
 
-        function resetLogMonthFilter() {
+        async function resetLogMonthFilter() {
             document.getElementById('logMonthFilter').value = '';
             selectedLogMonth = '';
             filteredLogsData = [...allLogsData];
             renderLogTable();
+            await saveLogMonthFilterToServer('');
         }
 
         function renderLogTable() {
