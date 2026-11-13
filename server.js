@@ -64,9 +64,8 @@ app.post('/api/preferences/:key', async (req, res) => {
 // FUNGSI KONVERSI FORMAT TANGGAL ISO (YYYY-MM-DD)
 function formatToIsoDate(val) {
     if (!val) return new Date().toISOString().split('T')[0];
-    
     const strVal = String(val).trim();
-    
+
     if (strVal.includes('/')) {
         const parts = strVal.split(' ')[0].split('/');
         if (parts.length === 3) {
@@ -77,7 +76,7 @@ function formatToIsoDate(val) {
             return `${year}-${month}-${day}`;
         }
     }
-    
+
     if (strVal.includes('-')) {
         const parts = strVal.split(' ')[0].split('-');
         if (parts.length === 3) {
@@ -89,12 +88,12 @@ function formatToIsoDate(val) {
             return `${year}-${month}-${day}`;
         }
     }
-    
+
     return new Date().toISOString().split('T')[0];
 }
 
 // =============================================================
-// API MAINTENANCE AC (SUPPORT BULK BATCH INSERT & KATEGORI GEDUNG)
+// API MAINTENANCE AC (SESUAI SKEMA SUPABASE LENGKAP)
 // =============================================================
 
 app.get('/api/maintenance-ac', async (req, res) => {
@@ -107,7 +106,7 @@ app.get('/api/maintenance-ac', async (req, res) => {
     }
 });
 
-// BULK INSERT PER BATCH LENGKAP KATEGORI GEDUNG
+// BULK INSERT PER BATCH SESUAI KOLOM TABEL
 app.post('/api/maintenance-ac/bulk', async (req, res) => {
     try {
         const { items } = req.body;
@@ -123,12 +122,21 @@ app.post('/api/maintenance-ac/bulk', async (req, res) => {
 
         const rowsToInsert = items.map(item => ({
             kategori_gedung: item.kategori_gedung || 'G. UMUM',
-            lokasi: item.lokasi || 'Ruangan Sarpras',
             kode_unit: item.kode_unit || 'AC-UNIT',
+            gedung: item.gedung || '',
+            lantai: item.lantai || '',
+            ruang: item.ruang || '',
+            no_urut: item.no_urut || '',
+            merk_ac: item.merk_ac || '',
+            type_ac: item.type_ac || '',
+            kapasitas: item.kapasitas || '',
+            freon: item.freon || '',
             tgl_servis: formatToIsoDate(item.tgl_servis),
-            jenis_pekerjaan: item.jenis_pekerjaan || 'Pemeliharaan AC',
-            teknisi: item.teknisi || 'Tim K3 Sarpras',
-            status: item.status || 'Selesai'
+            status: item.status || 'BAIK',
+            catatan: item.catatan || '',
+            lokasi: item.lokasi || `${item.gedung || ''} ${item.ruang ? '(' + item.ruang + ')' : ''}`.trim() || 'Ruangan Sarpras',
+            jenis_pekerjaan: item.jenis_pekerjaan || `${item.merk_ac || ''} ${item.type_ac || ''} ${item.kapasitas || ''}`.trim() || 'Pemeliharaan AC',
+            teknisi: item.teknisi || 'Tim K3 Sarpras'
         }));
 
         const BATCH_SIZE = 100;
@@ -156,10 +164,35 @@ app.post('/api/maintenance-ac/bulk', async (req, res) => {
 
 app.post('/api/maintenance-ac', async (req, res) => {
     try {
-        const { kategori_gedung, lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status } = req.body;
+        const {
+            kategori_gedung, kode_unit, gedung, lantai, ruang, no_urut,
+            merk_ac, type_ac, kapasitas, freon, tgl_servis, status,
+            catatan, lokasi, jenis_pekerjaan, teknisi
+        } = req.body;
+
+        const computedLokasi = lokasi || `${gedung || ''} ${lantai ? 'Lt.' + lantai : ''} ${ruang ? '(' + ruang + ')' : ''}`.trim();
+        const computedPekerjaan = jenis_pekerjaan || `${merk_ac || ''} ${type_ac || ''} ${kapasitas || ''} ${freon ? '(' + freon + ')' : ''}`.trim();
+
         const { data, error } = await supabase
             .from('maintenance_k3_ac')
-            .insert([{ kategori_gedung: kategori_gedung || 'G. UMUM', lokasi, kode_unit, tgl_servis: formatToIsoDate(tgl_servis), jenis_pekerjaan, teknisi, status: status || 'Selesai' }])
+            .insert([{
+                kategori_gedung: kategori_gedung || 'G. UMUM',
+                kode_unit,
+                gedung: gedung || '',
+                lantai: lantai || '',
+                ruang: ruang || '',
+                no_urut: no_urut || '',
+                merk_ac: merk_ac || '',
+                type_ac: type_ac || '',
+                kapasitas: kapasitas || '',
+                freon: freon || '',
+                tgl_servis: formatToIsoDate(tgl_servis),
+                status: status || 'BAIK',
+                catatan: catatan || '',
+                lokasi: computedLokasi,
+                jenis_pekerjaan: computedPekerjaan,
+                teknisi: teknisi || 'Tim K3 Sarpras'
+            }])
             .select();
         if (error) throw error;
         res.json({ message: "Berhasil!", data });
@@ -171,10 +204,35 @@ app.post('/api/maintenance-ac', async (req, res) => {
 app.put('/api/maintenance-ac/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { kategori_gedung, lokasi, kode_unit, tgl_servis, jenis_pekerjaan, teknisi, status } = req.body;
+        const {
+            kategori_gedung, kode_unit, gedung, lantai, ruang, no_urut,
+            merk_ac, type_ac, kapasitas, freon, tgl_servis, status,
+            catatan, lokasi, jenis_pekerjaan, teknisi
+        } = req.body;
+
+        const computedLokasi = lokasi || `${gedung || ''} ${lantai ? 'Lt.' + lantai : ''} ${ruang ? '(' + ruang + ')' : ''}`.trim();
+        const computedPekerjaan = jenis_pekerjaan || `${merk_ac || ''} ${type_ac || ''} ${kapasitas || ''} ${freon ? '(' + freon + ')' : ''}`.trim();
+
         const { data, error } = await supabase
             .from('maintenance_k3_ac')
-            .update({ kategori_gedung, lokasi, kode_unit, tgl_servis: formatToIsoDate(tgl_servis), jenis_pekerjaan, teknisi, status })
+            .update({
+                kategori_gedung,
+                kode_unit,
+                gedung,
+                lantai,
+                ruang,
+                no_urut,
+                merk_ac,
+                type_ac,
+                kapasitas,
+                freon,
+                tgl_servis: formatToIsoDate(tgl_servis),
+                status,
+                catatan,
+                lokasi: computedLokasi,
+                jenis_pekerjaan: computedPekerjaan,
+                teknisi
+            })
             .eq('id', id)
             .select();
         if (error) throw error;
@@ -199,7 +257,6 @@ app.delete('/api/maintenance-ac/:id', async (req, res) => {
 // API RUMAH TANGGA & INVENTORY
 // =============================================================
 
-// PEMINJAMAN RUANGAN (DENGAN TGL_SELESAI & TANPA JAM_SELESAI)
 app.get('/api/peminjaman-ruangan', async (req, res) => {
     try {
         const { data, error } = await supabase.from('peminjaman_ruangan').select('*').order('id', { ascending: false });
@@ -243,7 +300,6 @@ app.delete('/api/peminjaman-ruangan/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// PEMINJAMAN KENDARAAN
 app.get('/api/peminjaman-kendaraan', async (req, res) => {
     try {
         const { data, error } = await supabase.from('peminjaman_kendaraan').select('*').order('id', { ascending: false });
@@ -287,7 +343,6 @@ app.delete('/api/peminjaman-kendaraan/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// INVENTORY
 app.get('/api/inventory', async (req, res) => {
     try {
         const { data, error } = await supabase.from('inventory').select('*').order('id', { ascending: true });

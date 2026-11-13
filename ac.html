@@ -97,16 +97,16 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-cyan-500/40 transition duration-300">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Servis</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Unit AC</p>
           <i class="fa-solid fa-wrench text-cyan-400 text-xs"></i>
         </div>
         <h3 class="text-3xl font-black text-cyan-400 mt-2" id="kpi-total-ac">0</h3>
-        <p class="text-[11px] text-slate-500 mt-1">Kegiatan Maintenance</p>
+        <p class="text-[11px] text-slate-500 mt-1">Unit Terdaftar</p>
       </div>
 
       <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-emerald-500/40 transition duration-300">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Selesai / Baik</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Baik / Selesai</p>
           <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
         </div>
         <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-selesai-ac">0</h3>
@@ -136,7 +136,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
         <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-bar text-cyan-400"></i> Sebaran Maintenance AC per Gedung / Lokasi
+          <i class="fa-solid fa-chart-bar text-cyan-400"></i> Sebaran Unit AC per Gedung / Lokasi
         </h2>
         <div style="position: relative; height: 230px; width: 100%;">
           <canvas id="acLocationChart"></canvas>
@@ -175,7 +175,7 @@
 
       <div class="relative w-full md:w-72">
         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari gedung, kode, merk..." class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
+        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari gedung, ruang, kode, merk..." class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
       </div>
     </div>
 
@@ -183,7 +183,7 @@
     <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
       <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
         <h2 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-cyan-400"></i> Log Historical Maintenance AC (Berurutan)
+          <i class="fa-solid fa-list-check text-cyan-400"></i> Log Historical & Inventaris Maintenance AC
         </h2>
         <div class="flex items-center gap-2">
           <button onclick="openImportModal()" class="px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
@@ -203,17 +203,18 @@
           <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800">
             <tr>
               <th class="px-4 py-3.5 font-bold text-center">No</th>
-              <th class="px-6 py-3.5 font-bold">Gedung / Lokasi</th>
-              <th class="px-6 py-3.5 font-bold">Kode Unit AC</th>
-              <th class="px-6 py-3.5 font-bold">Tanggal Servis</th>
-              <th class="px-6 py-3.5 font-bold">Spesifikasi & Pekerjaan</th>
-              <th class="px-6 py-3.5 font-bold">Teknisi</th>
-              <th class="px-6 py-3.5 font-bold">Status</th>
-              <th class="px-6 py-3.5 font-bold text-center">Aksi</th>
+              <th class="px-5 py-3.5 font-bold">Kode Unit</th>
+              <th class="px-5 py-3.5 font-bold">Gedung / Lt / Ruang</th>
+              <th class="px-5 py-3.5 font-bold">Merk & Tipe</th>
+              <th class="px-5 py-3.5 font-bold">Kapasitas & Freon</th>
+              <th class="px-5 py-3.5 font-bold">Tgl Servis</th>
+              <th class="px-5 py-3.5 font-bold">Status</th>
+              <th class="px-5 py-3.5 font-bold">Catatan</th>
+              <th class="px-5 py-3.5 font-bold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbody-ac" class="divide-y divide-slate-800">
-            <tr><td colspan="8" class="text-center py-5 text-slate-500">Memuat data...</td></tr>
+            <tr><td colspan="9" class="text-center py-5 text-slate-500">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -230,36 +231,102 @@
 
   </div>
 
-  <!-- MODAL FORM INPUT/EDIT -->
-  <div id="acModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
-    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
-      <h3 id="modalTitle" class="text-lg font-extrabold text-white mb-4">Input Data Servis AC</h3>
+  <!-- MODAL FORM INPUT/EDIT LENGKAP -->
+  <div id="acModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-lg text-slate-100 my-8">
+      <h3 id="modalTitle" class="text-lg font-extrabold text-white mb-4">Input Data Unit & Servis AC</h3>
       <form id="acForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
         <input type="hidden" id="editId">
         
-        <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Kategori Gedung</label>
-          <select id="kategori_gedung" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
-            <option value="G. UMUM">G. UMUM (Gedung Utama / Perkantoran)</option>
-            <option value="G. LAB">G. LAB (Gedung Laboratorium Integrasi)</option>
-            <option value="G. ASRAMA">G. ASRAMA (Gedung Asrama Taruna)</option>
-            <option value="G. TPU">G. TPU (Gedung Teknik Penerbangan Umum)</option>
-          </select>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Kategori Gedung</label>
+            <select id="kategori_gedung" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+              <option value="G. UMUM">G. UMUM</option>
+              <option value="G. LAB">G. LAB</option>
+              <option value="G. ASRAMA">G. ASRAMA</option>
+              <option value="G. TPU">G. TPU</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Kode Unit AC</label>
+            <input type="text" id="kode_unit" required placeholder="Contoh: AC-UM-001" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
         </div>
-        
-        <div><label class="block text-xs font-bold mb-1 text-slate-300">Lokasi / Ruangan</label><input type="text" id="lokasi" required placeholder="Contoh: Ruang Direktur (Lt 1)" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
-        <div><label class="block text-xs font-bold mb-1 text-slate-300">Kode Unit AC</label><input type="text" id="kode_unit" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
-        <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Servis</label><input type="date" id="tgl_servis" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
-        <div><label class="block text-xs font-bold mb-1 text-slate-300">Jenis Pekerjaan</label><input type="text" id="jenis_pekerjaan" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
-        <div><label class="block text-xs font-bold mb-1 text-slate-300">Teknisi / Petugas</label><input type="text" id="teknisi" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></div>
-        <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Status Maintenance</label>
-          <select id="statusSelect" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
-            <option value="Selesai">Selesai / Baik</option>
-            <option value="Proses">Dalam Pengerjaan</option>
-            <option value="Rusak">Rusak / Perlu Diganti</option>
-          </select>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Gedung</label>
+            <input type="text" id="gedung" placeholder="GD. UMUM" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Lantai</label>
+            <input type="text" id="lantai" placeholder="Lt. 1" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">No. Urut</label>
+            <input type="text" id="no_urut" placeholder="1" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
         </div>
+
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Ruang / Lokasi Detail</label>
+          <input type="text" id="ruang" required placeholder="Contoh: Ruang Direktur" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Merk AC</label>
+            <input type="text" id="merk_ac" placeholder="Daikin / Panasonic" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Type AC</label>
+            <input type="text" id="type_ac" placeholder="Split / Standing / Cassette" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Kapasitas (PK)</label>
+            <input type="text" id="kapasitas" placeholder="1 PK / 2 PK" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Freon</label>
+            <input type="text" id="freon" placeholder="R32 / R410A / R22" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Servis</label>
+            <input type="date" id="tgl_servis" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
+            <select id="statusSelect" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+              <option value="BAIK">BAIK / Selesai</option>
+              <option value="Proses">Dalam Pengerjaan</option>
+              <option value="RUSAK">RUSAK / Perlu Perbaikan</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Jenis Pekerjaan</label>
+            <input type="text" id="jenis_pekerjaan" placeholder="Cuci AC / Isi Freon" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Teknisi</label>
+            <input type="text" id="teknisi" value="Tim K3 Sarpras" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Catatan</label>
+          <textarea id="catatan" rows="2" placeholder="Keterangan tambahan..." class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></textarea>
+        </div>
+
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
           <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
           <button type="submit" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-cyan-600/30">Simpan Data</button>
@@ -272,7 +339,7 @@
   <div id="importModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
       <h3 class="text-lg font-extrabold text-white mb-2">Import Data AC dari Excel (.xlsx)</h3>
-      <p class="text-xs text-slate-400 mb-4">Pilih file <strong class="text-cyan-400">DATA AC.xlsx</strong> untuk di-upload permanen ke Supabase.</p>
+      <p class="text-xs text-slate-400 mb-4">Pilih file <strong class="text-cyan-400">DATA AC.xlsx</strong> untuk di-upload permanen ke Supabase. Seluruh sheet gedung akan otomatis terbaca.</p>
       <form onsubmit="handleImportSubmit(event)" class="space-y-3">
         <div>
           <label class="block text-xs font-bold mb-1 text-slate-300">Pilih File Excel</label>
@@ -408,10 +475,11 @@
 
     function getFilteredData() {
       return acData.filter(item => {
-        const loc = (item.lokasi || '').toUpperCase();
+        const loc = `${item.lokasi || ''} ${item.gedung || ''}`.toUpperCase();
         const tabCategory = (item.kategori_gedung || '').toUpperCase();
-        const matchesLoc = currentFilter === 'SEMUA' || loc.includes(currentFilter.toUpperCase()) || tabCategory.includes(currentFilter.toUpperCase());
-        const fullText = `${item.lokasi} ${item.kode_unit} ${item.jenis_pekerjaan} ${item.teknisi} ${item.status}`.toLowerCase();
+        const filterNormalized = currentFilter.replace('G. ', '');
+        const matchesLoc = currentFilter === 'SEMUA' || loc.includes(filterNormalized) || tabCategory.includes(filterNormalized);
+        const fullText = `${item.lokasi} ${item.gedung} ${item.ruang} ${item.kode_unit} ${item.merk_ac} ${item.type_ac} ${item.kapasitas} ${item.freon} ${item.catatan} ${item.status}`.toLowerCase();
         const matchesSearch = !searchQuery || fullText.includes(searchQuery);
         return matchesLoc && matchesSearch;
       });
@@ -430,27 +498,36 @@
       const paginatedItems = filtered.slice(startIndex, endIndex);
 
       if (!filtered || filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-500">Data tidak ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-5 text-slate-500">Data tidak ditemukan.</td></tr>`;
         document.getElementById('pagination-info').innerText = 'Menampilkan 0 dari 0 data';
         document.getElementById('pagination-controls').innerHTML = '';
         return;
       }
 
       tbody.innerHTML = paginatedItems.map((item, index) => {
+        const statusUpper = (item.status || 'BAIK').toUpperCase();
         let statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-        if (item.status === 'Proses') statusColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-        else if (item.status === 'Rusak') statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+        if (statusUpper.includes('PROSES')) statusColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+        else if (statusUpper.includes('RUSAK') || statusUpper.includes('MATI')) statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+
+        const lokasiDisplay = item.gedung || item.ruang
+          ? `${item.gedung || item.kategori_gedung || '-'} ${item.lantai ? '• ' + item.lantai : ''} ${item.ruang ? '• ' + item.ruang : ''}`
+          : (item.lokasi || '-');
+
+        const merkTypeDisplay = `${item.merk_ac || '-'} ${item.type_ac ? '(' + item.type_ac + ')' : ''}`;
+        const kapFreonDisplay = `${item.kapasitas || '-'} ${item.freon ? '/ ' + item.freon : ''}`;
 
         return `
           <tr class="hover:bg-slate-800/50 transition">
-            <td class="px-4 py-3.5 text-center font-bold text-slate-400">${startIndex + index + 1}</td>
-            <td class="px-6 py-3.5 font-bold text-white">${item.lokasi || '-'}</td>
-            <td class="px-6 py-3.5 font-mono text-cyan-400">${item.kode_unit || '-'}</td>
-            <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_servis || '-'}</td>
-            <td class="px-6 py-3.5 text-slate-300">${item.jenis_pekerjaan || '-'}</td>
-            <td class="px-6 py-3.5 text-slate-400">${item.teknisi || 'Tim K3 Sarpras'}</td>
-            <td class="px-6 py-3.5"><span class="${statusColor} border text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'Selesai'}</span></td>
-            <td class="px-6 py-3.5 text-center space-x-2">
+            <td class="px-4 py-3.5 text-center font-bold text-slate-400">${item.no_urut || (startIndex + index + 1)}</td>
+            <td class="px-5 py-3.5 font-mono text-cyan-400 font-bold">${item.kode_unit || '-'}</td>
+            <td class="px-5 py-3.5 font-semibold text-white">${lokasiDisplay}</td>
+            <td class="px-5 py-3.5 text-slate-300">${merkTypeDisplay}</td>
+            <td class="px-5 py-3.5 text-slate-300">${kapFreonDisplay}</td>
+            <td class="px-5 py-3.5 text-xs font-mono text-slate-300">${item.tgl_servis || '-'}</td>
+            <td class="px-5 py-3.5"><span class="${statusColor} border text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'BAIK'}</span></td>
+            <td class="px-5 py-3.5 text-slate-400">${item.catatan || item.jenis_pekerjaan || '-'}</td>
+            <td class="px-5 py-3.5 text-center space-x-2">
               <button onclick="editItem(${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
               <button onclick="deleteItem(${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
             </td>
@@ -506,9 +583,15 @@
 
     function updateKpis() {
       const total = acData.length;
-      const selesai = acData.filter(i => i.status === 'Selesai' || !i.status || i.status === 'BAIK').length;
-      const proses = acData.filter(i => i.status === 'Proses').length;
-      const rusak = acData.filter(i => i.status === 'Rusak').length;
+      const selesai = acData.filter(i => {
+        const s = (i.status || 'BAIK').toUpperCase();
+        return s.includes('BAIK') || s.includes('SELESAI');
+      }).length;
+      const proses = acData.filter(i => (i.status || '').toUpperCase().includes('PROSES')).length;
+      const rusak = acData.filter(i => {
+        const s = (i.status || '').toUpperCase();
+        return s.includes('RUSAK') || s.includes('MATI') || s.includes('KENDALA');
+      }).length;
 
       animateCounter('kpi-total-ac', total);
       animateCounter('kpi-selesai-ac', selesai);
@@ -518,7 +601,7 @@
 
     function renderCharts() {
       const locCounts = {};
-      acData.forEach(i => { const key = i.lokasi || 'Lainnya'; locCounts[key] = (locCounts[key] || 0) + 1; });
+      acData.forEach(i => { const key = i.kategori_gedung || i.gedung || i.lokasi || 'Lainnya'; locCounts[key] = (locCounts[key] || 0) + 1; });
       const labels = Object.keys(locCounts).slice(0, 6);
       const values = Object.values(locCounts).slice(0, 6);
 
@@ -528,7 +611,7 @@
         type: 'bar',
         data: {
           labels: labels.length ? labels : ['Belum Ada Data'],
-          datasets: [{ label: 'Total Maintenance', data: values.length ? values : [0], backgroundColor: '#06b6d4', borderRadius: 4, barPercentage: 0.55 }]
+          datasets: [{ label: 'Total Unit AC', data: values.length ? values : [0], backgroundColor: '#06b6d4', borderRadius: 4, barPercentage: 0.55 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
@@ -537,16 +620,19 @@
         }
       });
 
-      const selesai = acData.filter(i => i.status === 'Selesai' || !i.status || i.status === 'BAIK').length;
-      const proses = acData.filter(i => i.status === 'Proses').length;
-      const rusak = acData.filter(i => i.status === 'Rusak').length;
+      const selesai = acData.filter(i => ['BAIK', 'SELESAI', ''].includes((i.status || 'BAIK').toUpperCase())).length;
+      const proses = acData.filter(i => (i.status || '').toUpperCase().includes('PROSES')).length;
+      const rusak = acData.filter(i => {
+        const s = (i.status || '').toUpperCase();
+        return s.includes('RUSAK') || s.includes('MATI');
+      }).length;
 
       const ctxPie = document.getElementById('acStatusPieChart').getContext('2d');
       if (statusPieChartInstance) statusPieChartInstance.destroy();
       statusPieChartInstance = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-          labels: ['Selesai', 'Proses', 'Rusak'],
+          labels: ['Baik / Selesai', 'Proses', 'Rusak'],
           datasets: [{ data: [selesai, proses, rusak], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#0f172a' }]
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } } }
@@ -555,14 +641,27 @@
 
     function openModal(editObj = null) {
       document.getElementById('editId').value = editObj ? editObj.id : '';
-      document.getElementById('modalTitle').innerText = editObj ? "Edit Data Servis AC" : "Input Data Servis AC";
+      document.getElementById('modalTitle').innerText = editObj ? "Edit Data Unit & Servis AC" : "Input Data Unit & Servis AC";
       document.getElementById('kategori_gedung').value = editObj ? (editObj.kategori_gedung || 'G. UMUM') : 'G. UMUM';
-      document.getElementById('lokasi').value = editObj ? editObj.lokasi : '';
-      document.getElementById('kode_unit').value = editObj ? editObj.kode_unit : '';
-      document.getElementById('tgl_servis').value = editObj ? editObj.tgl_servis : '';
-      document.getElementById('jenis_pekerjaan').value = editObj ? editObj.jenis_pekerjaan : '';
-      document.getElementById('teknisi').value = editObj ? editObj.teknisi : '';
-      document.getElementById('statusSelect').value = editObj ? editObj.status : 'Selesai';
+      document.getElementById('kode_unit').value = editObj ? (editObj.kode_unit || '') : '';
+      document.getElementById('gedung').value = editObj ? (editObj.gedung || '') : '';
+      document.getElementById('lantai').value = editObj ? (editObj.lantai || '') : '';
+      document.getElementById('no_urut').value = editObj ? (editObj.no_urut || '') : '';
+      document.getElementById('ruang').value = editObj ? (editObj.ruang || editObj.lokasi || '') : '';
+      document.getElementById('merk_ac').value = editObj ? (editObj.merk_ac || '') : '';
+      document.getElementById('type_ac').value = editObj ? (editObj.type_ac || '') : '';
+      document.getElementById('kapasitas').value = editObj ? (editObj.kapasitas || '') : '';
+      document.getElementById('freon').value = editObj ? (editObj.freon || '') : '';
+      document.getElementById('tgl_servis').value = editObj ? (editObj.tgl_servis || '') : new Date().toISOString().split('T')[0];
+      document.getElementById('jenis_pekerjaan').value = editObj ? (editObj.jenis_pekerjaan || '') : '';
+      document.getElementById('teknisi').value = editObj ? (editObj.teknisi || 'Tim K3 Sarpras') : 'Tim K3 Sarpras';
+      document.getElementById('catatan').value = editObj ? (editObj.catatan || '') : '';
+
+      const st = editObj ? (editObj.status || 'BAIK').toUpperCase() : 'BAIK';
+      if (st.includes('RUSAK')) document.getElementById('statusSelect').value = 'RUSAK';
+      else if (st.includes('PROSES')) document.getElementById('statusSelect').value = 'Proses';
+      else document.getElementById('statusSelect').value = 'BAIK';
+
       document.getElementById('acModal').classList.remove('hidden');
     }
 
@@ -603,6 +702,14 @@
       return new Date().toISOString().split('T')[0];
     }
 
+    function normalizeKategoriGedung(sheetName) {
+      const s = sheetName.toUpperCase();
+      if (s.includes('LAB')) return 'G. LAB';
+      if (s.includes('ASRAMA')) return 'G. ASRAMA';
+      if (s.includes('TPU')) return 'G. TPU';
+      return 'G. UMUM';
+    }
+
     async function handleImportSubmit(e) {
       e.preventDefault();
       const fileInput = document.getElementById('excelFileInput');
@@ -610,43 +717,66 @@
       if (!file) { showToast("Silakan pilih file Excel terlebih dahulu.", "error"); return; }
 
       const reader = new FileReader();
-      reader.onload = async function (e) {
+      reader.onload = async function (ev) {
         try {
-          const data = new Uint8Array(e.target.result);
+          const data = new Uint8Array(ev.target.result);
           const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-          const targetSheets = ['G. UMUM', 'G. LAB', 'G. ASRAMA', 'G. TPU'];
           let parsedItems = [];
 
-          targetSheets.forEach(sheetName => {
-            if (workbook.SheetNames.includes(sheetName)) {
-              const sheet = workbook.Sheets[sheetName];
-              const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          workbook.SheetNames.forEach(sheetName => {
+            const sheet = workbook.Sheets[sheetName];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            const kategoriGedung = normalizeKategoriGedung(sheetName);
 
-              for (let i = 2; i < rows.length; i++) {
-                const row = rows[i];
-                if (row && row[1] && row[1] !== 'Kode' && row[1] !== '.....') {
-                  const gedung = row[2] || '';
-                  const ruang = row[4] || '';
-                  const merk = row[6] || '';
-                  const tipe = row[7] || '';
-                  const catatan = row[12] || 'Pemeliharaan AC';
-                  const tglServis = parseExcelDate(row[10]);
+            for (let i = 1; i < rows.length; i++) {
+              const row = rows[i];
+              if (!row || row.length < 3) continue;
 
-                  parsedItems.push({
-                    kategori_gedung: sheetName,
-                    lokasi: `${gedung} ${ruang ? '(' + ruang + ')' : ''}`.trim(),
-                    kode_unit: String(row[1]).trim(),
-                    tgl_servis: tglServis,
-                    jenis_pekerjaan: `${merk} ${tipe} - ${catatan}`.trim(),
-                    teknisi: 'Tim K3 Sarpras',
-                    status: (row[11] === 'RUSAK') ? 'Rusak' : 'Selesai'
-                  });
-                }
+              const col0 = String(row[0] || '').trim();
+              const col1 = String(row[1] || '').trim();
+
+              if (!col1 || col1.toUpperCase() === 'KODE' || col1.toUpperCase().includes('KODE UNIT') || col1 === '.....') {
+                continue;
               }
+
+              const noUrut = col0;
+              const kodeUnit = col1;
+              const gedung = String(row[2] || sheetName).trim();
+              const lantai = String(row[3] || '').trim();
+              const ruang = String(row[4] || '').trim();
+              const merkAc = String(row[6] || '').trim();
+              const typeAc = String(row[7] || '').trim();
+              const kapasitas = String(row[8] || '').trim();
+              const freon = String(row[9] || '').trim();
+              const tglServis = parseExcelDate(row[10]);
+              const rawStatus = String(row[11] || 'BAIK').trim().toUpperCase();
+              const catatan = String(row[12] || '').trim();
+
+              parsedItems.push({
+                kategori_gedung: kategoriGedung,
+                kode_unit: kodeUnit,
+                gedung: gedung,
+                lantai: lantai,
+                ruang: ruang,
+                no_urut: noUrut,
+                merk_ac: merkAc,
+                type_ac: typeAc,
+                kapasitas: kapasitas,
+                freon: freon,
+                tgl_servis: tglServis,
+                status: rawStatus.includes('RUSAK') ? 'RUSAK' : 'BAIK',
+                catatan: catatan,
+                lokasi: `${gedung} ${lantai ? 'Lt.' + lantai : ''} ${ruang ? '(' + ruang + ')' : ''}`.trim(),
+                jenis_pekerjaan: `${merkAc} ${typeAc} ${kapasitas}`.trim() || 'Pemeliharaan AC',
+                teknisi: 'Tim K3 Sarpras'
+              });
             }
           });
 
-          if (parsedItems.length === 0) { showToast("Tidak ada data valid yang bisa dibaca dari file Excel ini.", "error"); return; }
+          if (parsedItems.length === 0) {
+            showToast("Tidak ada data valid yang bisa dibaca dari file Excel ini.", "error");
+            return;
+          }
 
           const res = await fetch('/api/maintenance-ac/bulk', {
             method: 'POST',
@@ -656,11 +786,15 @@
 
           const resJson = await res.json();
           if (res.ok) {
-            showToast(resJson.message || `Berhasil meng-import ${parsedItems.length} data AC per gedung!`, "success");
+            showToast(resJson.message || `Berhasil meng-import ${parsedItems.length} data AC!`, "success");
             closeImportModal();
             await loadAcData();
-          } else { showToast("Gagal menyimpan ke Database: " + (resJson.error || "Terjadi kesalahan server"), "error"); }
-        } catch (err) { showToast("Gagal memproses file Excel: " + err.message, "error"); }
+          } else {
+            showToast("Gagal menyimpan ke Database: " + (resJson.error || "Terjadi kesalahan server"), "error");
+          }
+        } catch (err) {
+          showToast("Gagal memproses file Excel: " + err.message, "error");
+        }
       };
       reader.readAsArrayBuffer(file);
     }
@@ -682,14 +816,30 @@
     async function handleFormSubmit(e) {
       e.preventDefault();
       const editId = document.getElementById('editId').value;
+      const gedung = document.getElementById('gedung').value;
+      const lantai = document.getElementById('lantai').value;
+      const ruang = document.getElementById('ruang').value;
+      const merk_ac = document.getElementById('merk_ac').value;
+      const type_ac = document.getElementById('type_ac').value;
+      const kapasitas = document.getElementById('kapasitas').value;
+
       const payload = {
         kategori_gedung: document.getElementById('kategori_gedung').value,
-        lokasi: document.getElementById('lokasi').value,
         kode_unit: document.getElementById('kode_unit').value,
+        gedung: gedung,
+        lantai: lantai,
+        ruang: ruang,
+        no_urut: document.getElementById('no_urut').value,
+        merk_ac: merk_ac,
+        type_ac: type_ac,
+        kapasitas: kapasitas,
+        freon: document.getElementById('freon').value,
         tgl_servis: document.getElementById('tgl_servis').value,
-        jenis_pekerjaan: document.getElementById('jenis_pekerjaan').value,
-        teknisi: document.getElementById('teknisi').value,
-        status: document.getElementById('statusSelect').value
+        status: document.getElementById('statusSelect').value,
+        catatan: document.getElementById('catatan').value,
+        lokasi: `${gedung} ${lantai ? 'Lt.' + lantai : ''} ${ruang ? '(' + ruang + ')' : ''}`.trim(),
+        jenis_pekerjaan: document.getElementById('jenis_pekerjaan').value || `${merk_ac} ${type_ac} ${kapasitas}`.trim(),
+        teknisi: document.getElementById('teknisi').value
       };
 
       const method = editId ? 'PUT' : 'POST';
@@ -705,7 +855,7 @@
 
     async function exportToPDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const doc = new jsPDF('l', 'mm', 'a4');
       const filteredData = getFilteredData();
 
       if (!filteredData || filteredData.length === 0) {
@@ -716,59 +866,38 @@
       const filterGedung = currentFilter !== 'SEMUA' ? ` (Gedung: ${currentFilter})` : '';
       const searchInfo = searchQuery ? ` | Kata Kunci: "${searchQuery}"` : '';
 
-      doc.setFontSize(15); doc.setFont("helvetica", "bold");
+      doc.setFontSize(14); doc.setFont("helvetica", "bold");
       doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
       doc.setFontSize(10); doc.setFont("helvetica", "normal");
-      doc.text(`LAPORAN MAINTENANCE & PEMELIHARAAN AC${filterGedung.toUpperCase()}`, 14, 22);
+      doc.text(`LAPORAN INVENTARIS & MAINTENANCE AC${filterGedung.toUpperCase()}`, 14, 21);
       doc.setFontSize(8);
-      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Total Data Ditemukan: ${filteredData.length} Unit${searchInfo}`, 14, 26);
-      doc.line(14, 28, 196, 28);
-
-      let currentY = 34;
-
-      doc.setFontSize(10); doc.setFont("helvetica", "bold");
-      doc.text("1. Ringkasan Status Maintenance Data Terfilter", 14, currentY);
-      currentY += 4;
-
-      const totalSelesai = filteredData.filter(i => i.status === 'Selesai' || !i.status || i.status === 'BAIK').length;
-      const totalProses = filteredData.filter(i => i.status === 'Proses').length;
-      const totalRusak = filteredData.filter(i => i.status === 'Rusak').length;
-
-      const kpiSummary = [
-        ['Total Terfilter', 'Selesai / Baik', 'Dalam Pengerjaan', 'Perlu Perhatian / Rusak'],
-        [`${filteredData.length} Data`, `${totalSelesai} Unit`, `${totalProses} Unit`, `${totalRusak} Unit`]
-      ];
-
-      doc.autoTable({
-        head: [kpiSummary[0]],
-        body: [kpiSummary[1]],
-        startY: currentY,
-        headStyles: { fillColor: [6, 182, 212] },
-        styles: { fontSize: 8, halign: 'center' }
-      });
-
-      currentY = doc.lastAutoTable.finalY + 8;
-
-      doc.setFontSize(10); doc.setFont("helvetica", "bold");
-      doc.text("2. Detail Data Pemeliharaan AC", 14, currentY);
-      currentY += 4;
+      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Total Data: ${filteredData.length} Unit${searchInfo}`, 14, 25);
+      doc.line(14, 27, 283, 27);
 
       const rowsAc = filteredData.map((item, i) => [
-        i + 1, item.kategori_gedung || '-', item.lokasi || '-', item.kode_unit || '-', item.tgl_servis || '-', item.jenis_pekerjaan || '-', item.teknisi || 'Tim K3 Sarpras', item.status || 'Selesai'
+        item.no_urut || (i + 1),
+        item.kode_unit || '-',
+        item.gedung || item.kategori_gedung || '-',
+        item.lantai || '-',
+        item.ruang || item.lokasi || '-',
+        `${item.merk_ac || '-'} ${item.type_ac || ''}`.trim(),
+        `${item.kapasitas || '-'} / ${item.freon || '-'}`,
+        item.tgl_servis || '-',
+        item.status || 'BAIK',
+        item.catatan || '-'
       ]);
 
       doc.autoTable({
-        head: [['No', 'Kategori', 'Lokasi', 'Kode Unit', 'Tanggal', 'Spesifikasi / Pekerjaan', 'Teknisi', 'Status']],
+        head: [['No', 'Kode Unit', 'Gedung', 'Lt', 'Ruang', 'Merk & Tipe', 'Kapasitas/Freon', 'Tgl Servis', 'Status', 'Catatan']],
         body: rowsAc,
-        startY: currentY,
-        headStyles: { fillColor: [15, 23, 42] },
-        styles: { fontSize: 7 },
-        columnStyles: { 0: { cellWidth: 8 }, 1: { cellWidth: 20 }, 2: { cellWidth: 30 }, 3: { cellWidth: 22 }, 4: { cellWidth: 20 }, 5: { cellWidth: 45 }, 6: { cellWidth: 22 }, 7: { cellWidth: 15 } }
+        startY: 31,
+        headStyles: { fillColor: [6, 182, 212] },
+        styles: { fontSize: 7 }
       });
 
       const fileSuffix = searchQuery ? `_${searchQuery.replace(/[^a-zA-Z0-9]/g, '_')}` : '';
       doc.save(`Laporan_Maintenance_AC${fileSuffix}_${new Date().toISOString().split('T')[0]}.pdf`);
-      showToast("Laporan PDF data pencarian berhasil diunduh!", "success");
+      showToast("Laporan PDF berhasil diunduh!", "success");
     }
   </script>
 </body>
