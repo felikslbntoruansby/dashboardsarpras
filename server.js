@@ -28,6 +28,39 @@ app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'ru
 app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 
+// API PREFERENSI FILTER BULAN (PERMANEN DI SUPABASE)
+app.get('/api/preferences/:key', async (req, res) => {
+    try {
+        const { key } = req.params;
+        const { data, error } = await supabase
+            .from('user_preferences')
+            .select('pref_value')
+            .eq('pref_key', key)
+            .single();
+        if (error || !data) return res.json({ value: '' });
+        res.json({ value: data.pref_value || '' });
+    } catch (err) {
+        res.json({ value: '' });
+    }
+});
+
+app.post('/api/preferences/:key', async (req, res) => {
+    try {
+        const { key } = req.params;
+        const { value } = req.body;
+        const { error } = await supabase
+            .from('user_preferences')
+            .upsert(
+                { pref_key: key, pref_value: value || '', updated_at: new Date().toISOString() },
+                { onConflict: 'pref_key' }
+            );
+        if (error) throw error;
+        res.json({ message: 'Preferensi tersimpan', value: value || '' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // FUNGSI KONVERSI FORMAT TANGGAL ISO (YYYY-MM-DD)
 function formatToIsoDate(val) {
     if (!val) return new Date().toISOString().split('T')[0];
@@ -166,7 +199,7 @@ app.delete('/api/maintenance-ac/:id', async (req, res) => {
 // API RUMAH TANGGA & INVENTORY
 // =============================================================
 
-// PEMINJAMAN RUANGAN
+// PEMINJAMAN RUANGAN (DENGAN TGL_SELESAI & TANPA JAM_SELESAI)
 app.get('/api/peminjaman-ruangan', async (req, res) => {
     try {
         const { data, error } = await supabase.from('peminjaman_ruangan').select('*').order('id', { ascending: false });
@@ -177,10 +210,10 @@ app.get('/api/peminjaman-ruangan', async (req, res) => {
 
 app.post('/api/peminjaman-ruangan', async (req, res) => {
     try {
-        const { nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status } = req.body;
+        const { nama_peminjam, ruangan, tgl_pinjam, tgl_selesai, jam_mulai, keperluan, status } = req.body;
         const { data, error } = await supabase
             .from('peminjaman_ruangan')
-            .insert([{ nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status: status || 'Diproses' }])
+            .insert([{ nama_peminjam, ruangan, tgl_pinjam, tgl_selesai, jam_mulai, keperluan, status: status || 'Diproses' }])
             .select();
         if (error) throw error;
         res.json({ message: "Berhasil!", data });
@@ -190,10 +223,10 @@ app.post('/api/peminjaman-ruangan', async (req, res) => {
 app.put('/api/peminjaman-ruangan/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status } = req.body;
+        const { nama_peminjam, ruangan, tgl_pinjam, tgl_selesai, jam_mulai, keperluan, status } = req.body;
         const { data, error } = await supabase
             .from('peminjaman_ruangan')
-            .update({ nama_peminjam, ruangan, tgl_pinjam, jam_mulai, jam_selesai, keperluan, status })
+            .update({ nama_peminjam, ruangan, tgl_pinjam, tgl_selesai, jam_mulai, keperluan, status })
             .eq('id', id)
             .select();
         if (error) throw error;

@@ -489,7 +489,7 @@
           <tr class="hover:bg-slate-800/50 transition">
             <td class="px-6 py-3.5 font-bold text-white">${item.nama_peminjam || '-'}</td>
             <td class="px-6 py-3.5 font-semibold text-indigo-400">${item.ruangan || '-'}</td>
-            <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'} (${item.jam_mulai || ''} - ${item.jam_selesai || ''})</td>
+            <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'} s/d ${item.tgl_selesai || '-'} ${item.jam_mulai ? `(${item.jam_mulai})` : ''}</td>
             <td class="px-6 py-3.5 text-xs text-slate-400">${item.keperluan || '-'}</td>
             <td class="px-6 py-3.5"><span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
             <td class="px-6 py-3.5 text-center space-x-2">
@@ -545,9 +545,9 @@
         doc.text(`LOG HISTORICAL PEMINJAMAN RUANGAN (${periodeText})`, 14, 22);
         doc.line(14, 25, 196, 25);
         const rows = filtered.map((item, i) => [
-          i + 1, item.nama_peminjam || '-', item.ruangan || '-', `${item.tgl_pinjam} (${item.jam_mulai || ''}-${item.jam_selesai || ''})`, item.keperluan || '-', item.status || 'Diproses'
+          i + 1, item.nama_peminjam || '-', item.ruangan || '-', `${item.tgl_pinjam || '-'} s/d ${item.tgl_selesai || '-'} ${item.jam_mulai ? `(${item.jam_mulai})` : ''}`, item.keperluan || '-', item.status || 'Diproses'
         ]);
-        doc.autoTable({ head: [['No', 'Peminjam', 'Ruangan', 'Tanggal & Jam', 'Keperluan', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [99, 102, 241] } });
+        doc.autoTable({ head: [['No', 'Peminjam', 'Ruangan', 'Tanggal & Jam Mulai', 'Keperluan', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [99, 102, 241] } });
         doc.save(`Peminjaman_Ruangan_${selectedRtMonth || 'Semua'}.pdf`);
       } else {
         const filtered = selectedRtMonth ? kendaraanData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : kendaraanData;
@@ -596,11 +596,11 @@
         fields.innerHTML = `
           <div><label class="block text-xs font-bold mb-1 text-slate-300">Nama Peminjam</label><input type="text" id="nama_peminjam" value="${editObj ? editObj.nama_peminjam : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
           <div><label class="block text-xs font-bold mb-1 text-slate-300">Nama Ruangan</label><input type="text" id="ruangan" value="${editObj ? editObj.ruangan : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: Aula Utama"></div>
-          <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
           <div class="grid grid-cols-2 gap-2">
-            <div><label class="block text-xs font-bold mb-1 text-slate-300">Jam Mulai</label><input type="time" id="jam_mulai" value="${editObj ? editObj.jam_mulai : ''}" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-            <div><label class="block text-xs font-bold mb-1 text-slate-300">Jam Selesai</label><input type="time" id="jam_selesai" value="${editObj ? editObj.jam_selesai : ''}" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
+            <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
+            <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Selesai</label><input type="date" id="tgl_selesai" value="${editObj && editObj.tgl_selesai ? editObj.tgl_selesai : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
           </div>
+          <div><label class="block text-xs font-bold mb-1 text-slate-300">Jam Mulai</label><input type="time" id="jam_mulai" value="${editObj ? editObj.jam_mulai : ''}" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
           <div><label class="block text-xs font-bold mb-1 text-slate-300">Keperluan</label><textarea id="keperluan" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">${editObj ? editObj.keperluan : ''}</textarea></div>
           <div>
             <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
@@ -689,8 +689,8 @@
           nama_peminjam: document.getElementById('nama_peminjam').value,
           ruangan: document.getElementById('ruangan').value,
           tgl_pinjam: document.getElementById('tgl_pinjam').value,
+          tgl_selesai: document.getElementById('tgl_selesai').value,
           jam_mulai: document.getElementById('jam_mulai').value,
-          jam_selesai: document.getElementById('jam_selesai').value,
           keperluan: document.getElementById('keperluan').value,
           status: document.getElementById('statusSelect').value
         };
