@@ -412,7 +412,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
           <button type="button" onclick="closeImportModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30">Mulai Import</button>
+          <button type="submit" id="btnSubmitImport" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30">Mulai Import</button>
         </div>
       </form>
     </div>
@@ -507,7 +507,7 @@
       setTimeout(() => {
         t.classList.add('opacity-0', 'translate-y-2');
         setTimeout(() => t.remove(), 300);
-      }, 3500);
+      }, 4000);
     }
 
     async function loadAcData() {
@@ -758,6 +758,38 @@
     }
     function closeScheduleModal() { document.getElementById('scheduleModal').classList.add('hidden'); }
 
+    // KIRIM DATA PER CHUNK 500 BARIS AGAR TIDAK MELEBIHI LIMIT 4.5MB VERCEL
+    async function sendBulkInChunks(items, initialAppend, progressBtn, defaultBtnLabel) {
+      const CHUNK_SIZE = 500;
+      const totalChunks = Math.ceil(items.length / CHUNK_SIZE);
+
+      for (let i = 0; i < totalChunks; i++) {
+        const chunk = items.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+        const chunkAppend = i === 0 ? initialAppend : true;
+
+        if (progressBtn) {
+          const sentCount = Math.min((i + 1) * CHUNK_SIZE, items.length).toLocaleString('id-ID');
+          const totalCount = items.length.toLocaleString('id-ID');
+          progressBtn.innerText = `Menyimpan paket ${i + 1}/${totalChunks} (${sentCount}/${totalCount})...`;
+        }
+
+        const res = await fetch('/api/maintenance-ac/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: chunk, append: chunkAppend })
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Gagal pada paket ${i + 1}: ${errText.slice(0, 120)}`);
+        }
+      }
+
+      if (progressBtn) {
+        progressBtn.innerText = defaultBtnLabel;
+      }
+    }
+
     async function handleGenerateSchedule(e) {
       e.preventDefault();
       if (!acData || acData.length === 0) {
@@ -811,22 +843,12 @@
       });
 
       btn.disabled = true;
-      btn.innerText = `Memproses ${generatedItems.length.toLocaleString('id-ID')} jadwal...`;
 
       try {
-        const res = await fetch('/api/maintenance-ac/bulk', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: generatedItems, append: isAppend })
-        });
-        const resJson = await res.json();
-        if (res.ok) {
-          showToast(`Sukses! ${uniqueUnits.length} unit AC direkap menjadi ${generatedItems.length.toLocaleString('id-ID')} jadwal (20x cuci).`, "success");
-          closeScheduleModal();
-          await loadAcData();
-        } else {
-          showToast("Gagal membuat jadwal: " + (resJson.error || "Error server"), "error");
-        }
+        await sendBulkInChunks(generatedItems, isAppend, btn, "Buat 20x Jadwal");
+        showToast(`Sukses! ${uniqueUnits.length} unit AC direkap menjadi ${generatedItems.length.toLocaleString('id-ID')} jadwal (20x cuci).`, "success");
+        closeScheduleModal();
+        await loadAcData();
       } catch (err) {
         showToast("Error: " + err.message, "error");
       } finally {
@@ -904,6 +926,7 @@
     async function handleImportSubmit(e) {
       e.preventDefault();
       const fileInput = document.getElementById('excelFileInput');
+      const btn = document.getElementById('btnSubmitImport');
       const file = fileInput ? fileInput.files[0] : null;
       if (!file) { showToast("Silakan pilih file Excel terlebih dahulu.", "error"); return; }
 
@@ -969,22 +992,16 @@
             return;
           }
 
-          const res = await fetch('/api/maintenance-ac/bulk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: parsedItems, append: false })
-          });
-
-          const resJson = await res.json();
-          if (res.ok) {
-            showToast(resJson.message || `Berhasil meng-import ${parsedItems.length} data AC!`, "success");
-            closeImportModal();
-            await loadAcData();
-          } else {
-            showToast("Gagal menyimpan ke Database: " + (resJson.error || "Terjadi kesalahan server"), "error");
-          }
+          btn.disabled = true;
+          await sendBulkInChunks(parsedItems, false, btn, "Mulai Import");
+          showToast(`Berhasil meng-import ${parsedItems.length.toLocaleString('id-ID')} data AC ke Supabase!`, "success");
+          closeImportModal();
+          await loadAcData();
         } catch (err) {
           showToast("Gagal memproses file Excel: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "Mulai Import";
         }
       };
       reader.readAsArrayBuffer(file);
