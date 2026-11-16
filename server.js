@@ -93,31 +93,50 @@ function formatToIsoDate(val) {
 }
 
 // =============================================================
-// API MAINTENANCE AC (SESUAI SKEMA SUPABASE LENGKAP)
+// API MAINTENANCE AC (SESUAI SKEMA SUPABASE & JADWAL 20X)
 // =============================================================
 
 app.get('/api/maintenance-ac', async (req, res) => {
     try {
-        const { data, error } = await supabase.from('maintenance_k3_ac').select('*').order('id', { ascending: true });
-        if (error) return res.json([]);
-        res.json(data || []);
+        let allData = [];
+        let from = 0;
+        const step = 1000;
+
+        while (true) {
+            const { data, error } = await supabase
+                .from('maintenance_k3_ac')
+                .select('*')
+                .order('id', { ascending: true })
+                .range(from, from + step - 1);
+
+            if (error) break;
+            if (!data || data.length === 0) break;
+
+            allData = allData.concat(data);
+            if (data.length < step) break;
+            from += step;
+        }
+
+        res.json(allData);
     } catch (err) {
         res.json([]);
     }
 });
 
-// BULK INSERT PER BATCH SESUAI KOLOM TABEL
+// BULK INSERT PER BATCH SESUAI KOLOM TABEL (SUPPORT REPLACE & APPEND)
 app.post('/api/maintenance-ac/bulk', async (req, res) => {
     try {
-        const { items } = req.body;
+        const { items, append } = req.body;
 
         if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ error: "Data array 'items' kosong atau tidak valid!" });
         }
 
-        const { error: deleteError } = await supabase.from('maintenance_k3_ac').delete().neq('id', 0);
-        if (deleteError) {
-            console.error("Gagal menghapus data lama:", deleteError);
+        if (!append) {
+            const { error: deleteError } = await supabase.from('maintenance_k3_ac').delete().neq('id', 0);
+            if (deleteError) {
+                console.error("Gagal menghapus data lama:", deleteError);
+            }
         }
 
         const rowsToInsert = items.map(item => ({
@@ -139,7 +158,7 @@ app.post('/api/maintenance-ac/bulk', async (req, res) => {
             teknisi: item.teknisi || 'Tim K3 Sarpras'
         }));
 
-        const BATCH_SIZE = 100;
+        const BATCH_SIZE = 250;
         let insertedTotal = 0;
 
         for (let i = 0; i < rowsToInsert.length; i += BATCH_SIZE) {
