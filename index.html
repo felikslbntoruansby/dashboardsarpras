@@ -62,37 +62,64 @@
         </div>
 
         <!-- SPANDUK ALERT STOK MINIMUM -->
-        <div id="stockAlertBanner" class="hidden bg-amber-500/10 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-lg backdrop-blur">
+        <div id="stockAlertBanner" onclick="openInvKpiModal('KRITIS')" role="button" class="cursor-pointer hidden bg-amber-500/10 hover:bg-amber-500/15 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-lg backdrop-blur transition">
             <div class="flex items-center">
                 <div class="py-1"><i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mr-3"></i></div>
                 <div>
-                    <p class="font-bold text-amber-400 text-sm">Peringatan Stok Kritis Minimum Barang!</p>
+                    <p class="font-bold text-amber-400 text-sm">Peringatan Stok Kritis Minimum Barang! <span class="text-[11px] underline ml-1">(Klik untuk lihat rincian & restok)</span></p>
                     <p id="stockAlertList" class="text-xs text-amber-300/80 mt-0.5">Memuat daftar barang...</p>
                 </div>
             </div>
         </div>
 
-        <!-- SEKSI 1: BI SCORECARDS -->
+        <!-- SEKSI 1: BI SCORECARDS (4 KARTU INTERAKTIF DAPAT DIKLIK) -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-blue-500/40 shadow-xl transition-all duration-300 group">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-blue-300 transition">Total Jenis Barang</p>
+            <div onclick="openInvKpiModal('ALL')" role="button" tabindex="0" class="cursor-pointer bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-blue-400 shadow-xl transition-all duration-300 group active:scale-[0.99]">
+                <div class="flex justify-between items-start">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-blue-300 transition">Total Jenis Barang</p>
+                    <i class="fa-solid fa-boxes-stacked text-blue-400 text-xs"></i>
+                </div>
                 <h3 class="text-3xl font-black text-blue-400 mt-2" id="kpi-total-items">0</h3>
-                <p class="text-[11px] text-slate-500 mt-1">Item Terdaftar di Master</p>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-slate-500">Item Terdaftar di Master</p>
+                    <span class="text-[10px] text-blue-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+                </div>
             </div>
-            <div class="bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-emerald-500/40 shadow-xl transition-all duration-300 group">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-emerald-300 transition">Total Akumulasi Stok</p>
+
+            <div onclick="openInvKpiModal('STOCK')" role="button" tabindex="0" class="cursor-pointer bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-emerald-400 shadow-xl transition-all duration-300 group active:scale-[0.99]">
+                <div class="flex justify-between items-start">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-emerald-300 transition">Total Akumulasi Stok</p>
+                    <i class="fa-solid fa-layer-group text-emerald-400 text-xs"></i>
+                </div>
                 <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-total-stock">0</h3>
-                <p class="text-[11px] text-emerald-500/80 mt-1">Unit Siap Pakai</p>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-emerald-500/80">Unit Siap Pakai</p>
+                    <span class="text-[10px] text-emerald-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+                </div>
             </div>
-            <div class="bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-rose-500/40 shadow-xl transition-all duration-300 group">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-rose-300 transition">Barang Keluar (Terpakai)</p>
+
+            <div onclick="openInvKpiModal('OUT')" role="button" tabindex="0" class="cursor-pointer bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-rose-400 shadow-xl transition-all duration-300 group active:scale-[0.99]">
+                <div class="flex justify-between items-start">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-rose-300 transition">Barang Keluar (Terpakai)</p>
+                    <i class="fa-solid fa-dolly text-rose-400 text-xs"></i>
+                </div>
                 <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-total-out">0</h3>
-                <p class="text-[11px] text-rose-500/80 mt-1">Total Distribusi Unit</p>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-rose-500/80">Total Distribusi Unit</p>
+                    <span class="text-[10px] text-rose-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+                </div>
             </div>
-            <div class="bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-amber-500/40 shadow-xl transition-all duration-300 group">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-amber-300 transition">Barang Kritis (< 5 Unit)</p>
+
+            <div onclick="openInvKpiModal('KRITIS')" role="button" tabindex="0" class="cursor-pointer bg-slate-800 hover:bg-slate-700/80 p-5 rounded-2xl border border-slate-700 hover:border-amber-400 shadow-xl transition-all duration-300 group active:scale-[0.99]">
+                <div class="flex justify-between items-start">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-amber-300 transition">Barang Kritis (< 5 Unit)</p>
+                    <i class="fa-solid fa-triangle-exclamation text-amber-400 text-xs"></i>
+                </div>
                 <h3 class="text-3xl font-black text-amber-400 mt-2" id="kpi-kritis-count">0</h3>
-                <p class="text-[11px] text-amber-500/80 mt-1">Perlu Restok Segera</p>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-amber-500/80">Perlu Restok Segera</p>
+                    <span class="text-[10px] text-amber-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+                </div>
             </div>
         </div>
 
@@ -202,6 +229,52 @@
         </div>
     </div>
 
+    <!-- MODAL RINCIAN DATA DARI KLIK KARTU KPI INVENTARIS -->
+    <div id="invKpiModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-5xl text-slate-100 my-8 flex flex-col max-h-[90vh]">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
+                <div>
+                    <span id="invKpiBadge" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">RINCIAN INVENTARIS</span>
+                    <h3 id="invKpiTitle" class="text-lg font-extrabold text-white mt-1">Daftar Data Inventaris</h3>
+                    <p id="invKpiSubtitle" class="text-xs text-slate-400">Rincian barang berdasarkan kartu KPI yang dipilih.</p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <select id="invOutViewMode" onchange="renderInvKpiModalTable()" class="hidden bg-slate-800 border border-slate-700 text-rose-300 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none">
+                        <option value="LOGS">Tampilan Riwayat Transaksi Keluar</option>
+                        <option value="SUMMARY">Tampilan Rekap Per Barang</option>
+                    </select>
+                    <button onclick="exportInvKpiPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+                    </button>
+                    <button onclick="closeInvKpiModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-xl text-xs font-bold">
+                        <i class="fa-solid fa-xmark mr-1"></i> Tutup
+                    </button>
+                </div>
+            </div>
+
+            <!-- PENCARIAN DALAM MODAL KPI -->
+            <div class="my-3">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="invKpiSearch" oninput="renderInvKpiModalTable()" placeholder="Cari kode barang, nama barang, pengambil, atau catatan..." class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <!-- TABEL ISI MODAL KPI -->
+            <div class="overflow-auto flex-1 border border-slate-800 rounded-xl">
+                <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
+                    <thead id="invKpiThead" class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800 sticky top-0"></thead>
+                    <tbody id="invKpiTbody" class="divide-y divide-slate-800"></tbody>
+                </table>
+            </div>
+
+            <div class="pt-3 mt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                <span id="invKpiFooterInfo">Total: 0 data</span>
+                <span>Gunakan tombol "+ Restok" atau "- Ambil" untuk langsung memperbarui stok.</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Master Barang -->
     <div id="itemModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
@@ -243,7 +316,7 @@
     </div>
 
     <!-- Modal Form Transaksi -->
-    <div id="transModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
+    <div id="transModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex justify-center items-center z-[60] p-4">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
             <h2 id="transModalTitle" class="text-xl font-bold mb-4 text-white">Transaksi Barang</h2>
             <form id="transForm" class="space-y-3">
@@ -282,6 +355,7 @@
         let currentPage = 1;
         const rowsPerPage = 10;
         let selectedLogMonth = '';
+        let activeInvKpiType = null; // 'ALL' | 'STOCK' | 'OUT' | 'KRITIS'
 
         let stockChartInstance = null;
         let healthPieChartInstance = null;
@@ -363,6 +437,7 @@
                     loadLogs();
                     renderHealthPieChart();
                     renderFastMovingChart();
+                    if (activeInvKpiType) renderInvKpiModalTable();
                 })
                 .catch(err => {
                     console.error("Gagal memuat data:", err);
@@ -397,6 +472,215 @@
             } else {
                 banner.classList.add('hidden');
             }
+        }
+
+        // =========================================================================
+        // MODAL RINCIAN DATA SAAT KLIK KARTU KPI INVENTARIS
+        // =========================================================================
+        function openInvKpiModal(type) {
+            activeInvKpiType = type;
+            document.getElementById('invKpiSearch').value = '';
+            const badge = document.getElementById('invKpiBadge');
+            const title = document.getElementById('invKpiTitle');
+            const sub = document.getElementById('invKpiSubtitle');
+            const outModeSelect = document.getElementById('invOutViewMode');
+
+            outModeSelect.classList.add('hidden');
+
+            if (type === 'ALL') {
+                badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30";
+                badge.innerText = "TOTAL JENIS BARANG";
+                title.innerText = `Seluruh Master Barang Terdaftar (${inventory.length} Jenis)`;
+                sub.innerText = "Menampilkan seluruh daftar inventaris beserta rincian stok awal, masuk, keluar, dan stok akhir.";
+            } else if (type === 'STOCK') {
+                const readyItems = inventory.filter(i => calculateFinalStock(i) > 0);
+                const totalUnits = readyItems.reduce((s, i) => s + calculateFinalStock(i), 0);
+                badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                badge.innerText = "TOTAL AKUMULASI STOK";
+                title.innerText = `Daftar Stok Siap Pakai (${totalUnits.toLocaleString('id-ID')} Unit dari ${readyItems.length} Jenis)`;
+                sub.innerText = "Diurutkan berdasarkan jumlah unit siap pakai terbanyak.";
+            } else if (type === 'OUT') {
+                outModeSelect.classList.remove('hidden');
+                outModeSelect.value = 'LOGS';
+                badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30";
+                badge.innerText = "BARANG KELUAR (TERPAKAI)";
+                title.innerText = "Rincian Distribusi & Pengambilan Barang";
+                sub.innerText = "Menampilkan histori transaksi pengambilan barang (OUT) atau rekap total keluar per jenis barang.";
+            } else if (type === 'KRITIS') {
+                const kritisItems = inventory.filter(i => calculateFinalStock(i) < 5);
+                badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                badge.innerText = "BARANG KRITIS (< 5 UNIT)";
+                title.innerText = `Daftar Barang Perlu Restok Segera (${kritisItems.length} Jenis)`;
+                sub.innerText = "Barang dengan sisa stok kurang dari 5 unit atau habis. Klik '+ Restok' untuk menambah stok.";
+            }
+
+            renderInvKpiModalTable();
+            document.getElementById('invKpiModal').classList.remove('hidden');
+        }
+
+        function closeInvKpiModal() {
+            activeInvKpiType = null;
+            document.getElementById('invKpiModal').classList.add('hidden');
+        }
+
+        function getInvKpiFilteredRows() {
+            const kw = (document.getElementById('invKpiSearch').value || '').toLowerCase();
+
+            if (activeInvKpiType === 'OUT' && document.getElementById('invOutViewMode').value === 'LOGS') {
+                return allLogsData
+                    .filter(log => log.type === 'OUT')
+                    .filter(log => {
+                        const code = log.inventory ? log.inventory.code : '';
+                        const name = log.inventory ? log.inventory.name : '';
+                        return `${code} ${name} ${log.pic_name} ${log.notes}`.toLowerCase().includes(kw);
+                    });
+            }
+
+            let base = [...inventory];
+            if (activeInvKpiType === 'STOCK') {
+                base = base.filter(i => calculateFinalStock(i) > 0).sort((a, b) => calculateFinalStock(b) - calculateFinalStock(a));
+            } else if (activeInvKpiType === 'OUT') {
+                base = base.filter(i => (i.outQty || 0) > 0).sort((a, b) => (b.outQty || 0) - (a.outQty || 0));
+            } else if (activeInvKpiType === 'KRITIS') {
+                base = base.filter(i => calculateFinalStock(i) < 5).sort((a, b) => calculateFinalStock(a) - calculateFinalStock(b));
+            }
+
+            if (kw) {
+                base = base.filter(i => `${i.code} ${i.name}`.toLowerCase().includes(kw));
+            }
+            return base;
+        }
+
+        function renderInvKpiModalTable() {
+            const thead = document.getElementById('invKpiThead');
+            const tbody = document.getElementById('invKpiTbody');
+            const rows = getInvKpiFilteredRows();
+            const isOutLogs = activeInvKpiType === 'OUT' && document.getElementById('invOutViewMode').value === 'LOGS';
+
+            if (isOutLogs) {
+                thead.innerHTML = `
+                    <tr>
+                        <th class="px-4 py-3 font-bold text-center">No</th>
+                        <th class="px-4 py-3 font-bold">Waktu & Tanggal</th>
+                        <th class="px-4 py-3 font-bold">Kode</th>
+                        <th class="px-4 py-3 font-bold">Nama Barang</th>
+                        <th class="px-4 py-3 font-bold text-center">Jumlah Keluar</th>
+                        <th class="px-4 py-3 font-bold">Pengambil / Petugas</th>
+                        <th class="px-4 py-3 font-bold">Catatan / Keperluan</th>
+                    </tr>
+                `;
+                document.getElementById('invKpiFooterInfo').innerText = `Menampilkan ${rows.length} transaksi barang keluar`;
+
+                if (rows.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-500">Belum ada riwayat transaksi barang keluar.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = rows.map((log, i) => {
+                    const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                    const code = log.inventory ? log.inventory.code : '-';
+                    const name = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
+                    return `
+                        <tr class="hover:bg-slate-800/60 transition">
+                            <td class="px-4 py-3 text-center font-bold text-slate-400">${i + 1}</td>
+                            <td class="px-4 py-3 font-mono text-xs">${date}</td>
+                            <td class="px-4 py-3 font-mono text-cyan-300">${code}</td>
+                            <td class="px-4 py-3 font-semibold text-white">${name}</td>
+                            <td class="px-4 py-3 text-center font-black text-rose-400">-${log.quantity}</td>
+                            <td class="px-4 py-3 text-blue-300 font-medium">${log.pic_name || '-'}</td>
+                            <td class="px-4 py-3 text-slate-400">${log.notes || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+                return;
+            }
+
+            thead.innerHTML = `
+                <tr>
+                    <th class="px-4 py-3 font-bold text-center">No</th>
+                    <th class="px-4 py-3 font-bold">Kode</th>
+                    <th class="px-4 py-3 font-bold">Nama Barang</th>
+                    <th class="px-4 py-3 font-bold text-center">Stok Awal</th>
+                    <th class="px-4 py-3 font-bold text-center">Masuk</th>
+                    <th class="px-4 py-3 font-bold text-center">Keluar</th>
+                    <th class="px-4 py-3 font-bold text-center">Stok Akhir</th>
+                    <th class="px-4 py-3 font-bold text-center">Aksi Cepat</th>
+                </tr>
+            `;
+
+            const totalFinalUnits = rows.reduce((s, item) => s + calculateFinalStock(item), 0);
+            document.getElementById('invKpiFooterInfo').innerText = `Menampilkan ${rows.length} jenis barang • Total Stok Akhir: ${totalFinalUnits.toLocaleString('id-ID')} unit`;
+
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500">Tidak ada barang pada kategori ini.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = rows.map((item, i) => {
+                const finalStock = calculateFinalStock(item);
+                const textClass = finalStock <= 0 ? "text-rose-400 font-black" : (finalStock < 5 ? "text-amber-400 font-black" : "text-emerald-400 font-black");
+                const safeName = (item.name || '').replace(/'/g, "\\'");
+
+                return `
+                    <tr class="hover:bg-slate-800/60 transition">
+                        <td class="px-4 py-3 text-center font-bold text-slate-400">${i + 1}</td>
+                        <td class="px-4 py-3 font-mono text-xs text-cyan-300">${item.code || '-'}</td>
+                        <td class="px-4 py-3 font-semibold text-white">${item.name || '-'} ${finalStock <= 0 ? '<span class="text-[10px] text-rose-400 font-bold">(HABIS)</span>' : ''}</td>
+                        <td class="px-4 py-3 text-center">${item.initial || 0}</td>
+                        <td class="px-4 py-3 text-center text-emerald-400">+${item.inQty || 0}</td>
+                        <td class="px-4 py-3 text-center text-rose-400">-${item.outQty || 0}</td>
+                        <td class="px-4 py-3 text-center ${textClass}">${finalStock}</td>
+                        <td class="px-4 py-3 text-center space-x-1">
+                            <button onclick="openTransModal(${item.id}, '${safeName}', 'IN')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-2.5 py-1 rounded-lg font-bold">+ Restok</button>
+                            <button onclick="openTransModal(${item.id}, '${safeName}', 'OUT')" class="bg-amber-600 hover:bg-amber-500 text-white text-[11px] px-2.5 py-1 rounded-lg font-bold">- Ambil</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportInvKpiPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+            const rows = getInvKpiFilteredRows();
+            if (!rows.length) {
+                alert("Tidak ada data untuk dicetak.");
+                return;
+            }
+
+            const titleText = document.getElementById('invKpiTitle').innerText;
+            doc.setFontSize(14); doc.setFont("helvetica", "bold");
+            doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
+            doc.setFontSize(10); doc.setFont("helvetica", "normal");
+            doc.text(titleText.toUpperCase(), 14, 22);
+            doc.line(14, 25, 283, 25);
+
+            const isOutLogs = activeInvKpiType === 'OUT' && document.getElementById('invOutViewMode').value === 'LOGS';
+            if (isOutLogs) {
+                const body = rows.map((log, i) => [
+                    i + 1,
+                    log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-',
+                    log.inventory ? log.inventory.code : '-',
+                    log.inventory ? log.inventory.name : `ID ${log.inventory_id}`,
+                    log.quantity,
+                    log.pic_name || '-',
+                    log.notes || '-'
+                ]);
+                doc.autoTable({
+                    head: [['No', 'Waktu & Tanggal', 'Kode', 'Nama Barang', 'Jumlah Keluar', 'Pengambil', 'Catatan']],
+                    body, startY: 28, theme: 'grid', headStyles: { fillColor: [190, 18, 60] }
+                });
+            } else {
+                const body = rows.map((item, i) => [
+                    i + 1, item.code || '-', item.name || '-', item.initial || 0, item.inQty || 0, item.outQty || 0, calculateFinalStock(item)
+                ]);
+                doc.autoTable({
+                    head: [['No', 'Kode Barang', 'Nama Barang', 'Stok Awal', 'Masuk', 'Keluar', 'Stok Akhir']],
+                    body, startY: 28, theme: 'grid', headStyles: { fillColor: [30, 58, 138] }
+                });
+            }
+
+            doc.save(`Laporan_Inventaris_${activeInvKpiType}_${new Date().toISOString().split('T')[0]}.pdf`);
         }
 
         function renderChart() {
@@ -512,6 +796,7 @@
                 .then(logs => {
                     allLogsData = Array.isArray(logs) ? logs : [];
                     filterLogsByMonth(false);
+                    if (activeInvKpiType === 'OUT') renderInvKpiModalTable();
                 });
         }
 
@@ -667,6 +952,7 @@
                 let rowClass = finalStock <= 0 ? "bg-rose-500/10 hover:bg-rose-500/20" : "hover:bg-slate-700/40";
                 let textClass = finalStock <= 0 ? "text-rose-400 font-bold" : (finalStock < 10 ? "text-amber-400 font-bold" : "text-emerald-400 font-bold");
                 let statusText = finalStock <= 0 ? " (HABIS)" : "";
+                const safeName = (item.name || '').replace(/'/g, "\\'");
 
                 tableBody.innerHTML += `
                     <tr class="border-b border-slate-700/50 ${rowClass} transition duration-150">
@@ -677,8 +963,8 @@
                         <td class="py-3 px-5 text-center text-rose-400 font-medium">-${item.outQty || 0}</td>
                         <td class="py-3 px-5 text-center ${textClass}">${finalStock}</td>
                         <td class="py-3 px-5 text-center space-x-1">
-                            <button onclick="openTransModal(${item.id}, '${item.name}', 'IN')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2.5 py-1 rounded-lg font-bold shadow">+ Restok</button>
-                            <button onclick="openTransModal(${item.id}, '${item.name}', 'OUT')" class="bg-amber-600 hover:bg-amber-500 text-white text-xs px-2.5 py-1 rounded-lg font-bold shadow">- Ambil</button>
+                            <button onclick="openTransModal(${item.id}, '${safeName}', 'IN')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2.5 py-1 rounded-lg font-bold shadow">+ Restok</button>
+                            <button onclick="openTransModal(${item.id}, '${safeName}', 'OUT')" class="bg-amber-600 hover:bg-amber-500 text-white text-xs px-2.5 py-1 rounded-lg font-bold shadow">- Ambil</button>
                         </td>
                         <td class="py-3 px-5 text-center">
                             <button onclick="editItem(${item.id})" class="text-blue-400 hover:underline text-xs mr-2 font-semibold">Edit</button>
