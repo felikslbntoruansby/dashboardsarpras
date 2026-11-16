@@ -3,12 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Rumah Tangga - Sarpras Poltekbang</title>
+  <title>Dashboard Layanan Rumah Tangga - Sarpras Poltekbang</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    @keyframes radarPulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.3; }
+      100% { transform: scale(0.9); opacity: 0.8; }
+    }
+    .radar-pulse { animation: radarPulse 3s infinite ease-in-out; }
+  </style>
 </head>
 <body class="bg-slate-950 font-sans text-slate-100 p-4 md:p-6 min-h-screen antialiased">
 
@@ -16,120 +24,132 @@
   <div id="pageLoader" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
     <div class="relative flex flex-col items-center">
       <div class="relative">
-        <div class="absolute -inset-4 rounded-full bg-indigo-500/20 blur-xl animate-pulse"></div>
-        <i class="fa-solid fa-plane-up text-5xl text-indigo-400 animate-bounce"></i>
+        <div class="absolute -inset-4 rounded-full bg-blue-500/20 blur-xl radar-pulse"></div>
+        <i class="fa-solid fa-plane-up text-5xl text-blue-400 animate-bounce"></i>
       </div>
       <h3 class="mt-6 text-sm font-bold tracking-widest text-slate-200 uppercase flex items-center gap-2">
-        <i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i> Memuat Layanan Sarpras...
+        <i class="fa-solid fa-circle-notch animate-spin text-blue-400"></i> Memuat Layanan Sarpras...
       </h3>
       <p class="text-[11px] text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya</p>
       <div class="w-48 bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden border border-slate-700">
-        <div class="bg-gradient-to-r from-indigo-500 to-blue-500 h-full w-full animate-pulse"></div>
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full w-full animate-pulse"></div>
       </div>
     </div>
   </div>
 
   <div class="max-w-7xl mx-auto space-y-6">
-    
-    <!-- HEADER UTAMA DENGAN GLOW PULSE -->
-    <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-xl overflow-hidden">
-      <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="flex items-center space-x-4 z-10">
-        <div class="relative bg-gradient-to-tr from-indigo-600 to-blue-500 p-3.5 rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center">
-          <span class="absolute -inset-1 rounded-xl bg-indigo-400/20 animate-ping"></span>
-          <i class="fa-solid fa-building-user text-white text-2xl relative z-10"></i>
+    <!-- HEADER UTAMA -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-xl relative overflow-hidden">
+      <div class="absolute right-0 top-0 -mr-10 -mt-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex items-center space-x-4">
+        <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 p-3.5 rounded-xl shadow-lg shadow-blue-500/20 flex items-center justify-center">
+          <i class="fa-solid fa-building-user text-white text-2xl"></i>
         </div>
         <div>
-          <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">BIDANG UMUM</p>
-          <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-white flex items-center gap-3">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-blue-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-plane text-[9px]"></i> BIDANG UMUM
+          </p>
+          <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-white">
             Dashboard Layanan Rumah Tangga
           </h1>
           <p class="text-xs text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase</p>
         </div>
       </div>
-      
-      <!-- Navigasi Menu Multi-Module -->
-      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto z-10">
-        <a href="/" class="nav-link px-3.5 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition">
+
+      <!-- NAVIGASI MENU -->
+      <div class="flex items-center space-x-2 w-full md:w-auto">
+        <a href="/" class="nav-link px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition hover:border-indigo-400">
           <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
         </a>
-        <a href="/rumah-tangga" class="nav-link px-3.5 py-2 bg-blue-600 text-white font-semibold text-xs rounded-xl shadow">
+        <a href="/rumah-tangga" class="nav-link px-4 py-2 bg-blue-600 text-white font-semibold text-xs rounded-xl shadow shadow-blue-600/30">
           <i class="fa-solid fa-building-user mr-1"></i> Rumah Tangga
         </a>
-        <a href="/ac" class="nav-link px-3.5 py-2 bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-xs font-semibold rounded-xl transition">
+        <a href="/ac" class="nav-link px-4 py-2 bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-xs font-semibold rounded-xl transition hover:border-cyan-400">
           <i class="fa-solid fa-snowflake mr-1"></i> Maintenance AC
         </a>
       </div>
     </div>
 
     <!-- WIDGET MOTIVASI HARIAN -->
-    <div class="bg-gradient-to-r from-indigo-950/60 via-slate-900 to-blue-950/60 p-4 rounded-2xl border border-indigo-500/20 shadow-lg flex items-center gap-4 backdrop-blur-md">
-      <div class="bg-indigo-500/20 text-indigo-400 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-indigo-500/30">
+    <div class="bg-gradient-to-r from-blue-950/60 via-slate-900 to-indigo-950/60 p-4 rounded-2xl border border-blue-500/20 shadow-lg flex items-center gap-4 backdrop-blur-md hover:border-blue-500/40 transition">
+      <div class="bg-blue-500/20 text-blue-400 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-blue-500/30">
         <i class="fa-solid fa-quote-left text-xl"></i>
       </div>
       <div class="flex-1">
         <div class="flex items-center gap-2">
-          <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-indigo-500/30">MOTIVASI HARIAN RUMAH TANGGA</span>
+          <span class="bg-blue-500/20 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-500/30">MOTIVASI HARIAN RUMAH TANGGA</span>
           <span id="quoteDate" class="text-[10px] text-slate-400"></span>
         </div>
         <p id="quoteText" class="text-xs md:text-sm font-medium text-slate-200 mt-1 italic">
           "Pelayanan terbaik lahir dari koordinasi yang solid dan sikap ramah."
         </p>
-        <p id="quoteAuthor" class="text-[11px] font-bold text-indigo-400 mt-0.5">— Tim Rumah Tangga Poltekbang</p>
+        <p id="quoteAuthor" class="text-[11px] font-bold text-blue-400 mt-0.5">— Tim Rumah Tangga Poltekbang</p>
       </div>
       <button onclick="changeQuote()" title="Ganti Motivasi" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl text-xs transition border border-slate-700 active:scale-95">
-        <i class="fa-solid fa-rotate text-indigo-400"></i>
+        <i class="fa-solid fa-rotate text-blue-400"></i>
       </button>
     </div>
 
-    <!-- SEKSI 1: BI SCORECARDS DENGAN COUNTER ANIMATED -->
+    <!-- SEKSI 1: KPI SCORECARDS (DAPAT DIKLIK UNTUK MELIHAT RINCIAN DATA) -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-slate-900/80 hover:bg-slate-800/90 p-5 rounded-2xl border border-slate-800 hover:border-blue-500/40 shadow-xl transition-all duration-300 group">
+      <div onclick="openRtKpiModal('TOTAL')" role="button" tabindex="0" class="cursor-pointer group bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-blue-400 hover:bg-slate-900 transition duration-300 active:scale-[0.99]">
         <div class="flex justify-between items-start">
           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-blue-300 transition">Total Layanan</p>
-          <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400"><i class="fa-solid fa-folder-open text-xs"></i></div>
+          <i class="fa-solid fa-folder-open text-blue-400 text-xs"></i>
         </div>
-        <h3 class="text-3xl font-black text-blue-400 mt-2" id="kpi-total-layanan">0</h3>
-        <p class="text-[11px] text-slate-500 mt-1">Permohonan Terdaftar</p>
+        <h3 class="text-3xl font-black text-blue-400 mt-2" id="kpi-total-rt">0</h3>
+        <div class="flex items-center justify-between mt-1">
+          <p class="text-[11px] text-slate-500">Permohonan Terdaftar</p>
+          <span class="text-[10px] text-blue-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+        </div>
       </div>
 
-      <div class="bg-slate-900/80 hover:bg-slate-800/90 p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/40 shadow-xl transition-all duration-300 group">
+      <div onclick="openRtKpiModal('DISETUJUI')" role="button" tabindex="0" class="cursor-pointer group bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-emerald-400 hover:bg-slate-900 transition duration-300 active:scale-[0.99]">
         <div class="flex justify-between items-start">
           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-emerald-300 transition">Permohonan Disetujui</p>
-          <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400"><i class="fa-solid fa-circle-check text-xs"></i></div>
+          <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
         </div>
-        <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-disetujui">0</h3>
-        <p class="text-[11px] text-emerald-500/80 mt-1">Status Disetujui / Aktif</p>
+        <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-disetujui-rt">0</h3>
+        <div class="flex items-center justify-between mt-1">
+          <p class="text-[11px] text-emerald-500/80">Status Disetujui / Aktif</p>
+          <span class="text-[10px] text-emerald-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+        </div>
       </div>
 
-      <div class="bg-slate-900/80 hover:bg-slate-800/90 p-5 rounded-2xl border border-slate-800 hover:border-amber-500/40 shadow-xl transition-all duration-300 group">
+      <div onclick="openRtKpiModal('PROSES')" role="button" tabindex="0" class="cursor-pointer group bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-amber-400 hover:bg-slate-900 transition duration-300 active:scale-[0.99]">
         <div class="flex justify-between items-start">
           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-amber-300 transition">Sedang Diproses</p>
-          <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400"><i class="fa-solid fa-clock text-xs"></i></div>
+          <i class="fa-solid fa-clock text-amber-400 text-xs"></i>
         </div>
-        <h3 class="text-3xl font-black text-amber-400 mt-2" id="kpi-diproses">0</h3>
-        <p class="text-[11px] text-amber-500/80 mt-1">Menunggu Verifikasi</p>
+        <h3 class="text-3xl font-black text-amber-400 mt-2" id="kpi-proses-rt">0</h3>
+        <div class="flex items-center justify-between mt-1">
+          <p class="text-[11px] text-amber-500/80">Menunggu Verifikasi</p>
+          <span class="text-[10px] text-amber-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+        </div>
       </div>
 
-      <div class="bg-slate-900/80 hover:bg-slate-800/90 p-5 rounded-2xl border border-slate-800 hover:border-rose-500/40 shadow-xl transition-all duration-300 group">
+      <div onclick="openRtKpiModal('MAINTENANCE')" role="button" tabindex="0" class="cursor-pointer group bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-rose-400 hover:bg-slate-900 transition duration-300 active:scale-[0.99]">
         <div class="flex justify-between items-start">
           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-rose-300 transition">Maintenance / Ditolak</p>
-          <div class="p-2 bg-rose-500/10 rounded-lg text-rose-400"><i class="fa-solid fa-triangle-exclamation text-xs"></i></div>
+          <i class="fa-solid fa-triangle-exclamation text-rose-400 text-xs"></i>
         </div>
-        <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-ditolak">0</h3>
-        <p class="text-[11px] text-rose-500/80 mt-1">Kendala / Perawatan</p>
+        <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-maintenance-rt">0</h3>
+        <div class="flex items-center justify-between mt-1">
+          <p class="text-[11px] text-rose-500/80">Kendala / Perawatan</p>
+          <span class="text-[10px] text-rose-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+        </div>
       </div>
     </div>
 
-    <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK -->
+    <!-- SEKSI 2: GRAFIK ANALYTICS -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
         <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-column text-indigo-400"></i> Analytics Komparasi Peminjaman Ruangan & Kendaraan
+          <i class="fa-solid fa-chart-column text-blue-400"></i> Analytics Komparasi Peminjaman Ruangan & Kendaraan
         </h2>
         <div style="position: relative; height: 230px; width: 100%;">
-          <canvas id="comboRtChart"></canvas>
+          <canvas id="rtComboChart"></canvas>
         </div>
       </div>
 
@@ -138,188 +158,265 @@
           <i class="fa-solid fa-chart-pie text-emerald-400"></i> Rasio Persetujuan Layanan Rumah Tangga
         </h2>
         <div style="position: relative; height: 230px; width: 100%;">
-          <canvas id="statusRtPieChart"></canvas>
+          <canvas id="rtPieChart"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- SEKSI 3: BAR CHART HORISONTAL -->
-    <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-          <i class="fa-solid fa-fire text-indigo-400"></i> Analytics Ruangan & Armada Paling Sering Dipinjam
-        </h2>
-        <div class="flex items-center gap-4 text-xs font-semibold">
-          <span class="flex items-center gap-1.5 text-indigo-400">
-            <span class="w-3 h-3 rounded-sm bg-indigo-500 inline-block"></span> Ruangan
-          </span>
-          <span class="flex items-center gap-1.5 text-emerald-400">
-            <span class="w-3 h-3 rounded-sm bg-emerald-500 inline-block"></span> Kendaraan
-          </span>
-        </div>
-      </div>
-      <div style="position: relative; height: 200px; width: 100%;">
-        <canvas id="topFacilityChart"></canvas>
-      </div>
-    </div>
-
-    <!-- TABEL DATA HISTORI DENGAN FILTER BULAN/TAHUN -->
+    <!-- SEKSI 3: TABEL PEMINJAMAN RUANGAN -->
     <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
       <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
-        
-        <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
-          <button onclick="switchTab('ruangan')" id="tab-btn-ruangan" class="px-4 py-2 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow">
-            <i class="fa-solid fa-building-user mr-1.5"></i> Peminjaman Ruangan (<span id="count-ruangan">0 Data</span>)
+        <h2 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-door-open text-blue-400"></i> Daftar Peminjaman Ruangan & Aula
+        </h2>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="searchRuangan" oninput="renderRuanganTable()" placeholder="Cari peminjam / ruangan..." class="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <button onclick="exportRuanganPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
-          <button onclick="switchTab('kendaraan')" id="tab-btn-kendaraan" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">
-            <i class="fa-solid fa-car-side mr-1.5"></i> Operasional Kendaraan (<span id="count-kendaraan">0 Data</span>)
-          </button>
-        </div>
-
-        <div class="flex items-center gap-2 flex-wrap">
-          <input type="month" id="rtMonthFilter" onchange="renderFilteredTables(true)" class="bg-slate-950 border border-slate-700 text-indigo-400 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <button onclick="resetRtMonthFilter()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-3 py-2 rounded-xl border border-slate-700 transition">Semua Bulan</button>
-          
-          <button id="btn-pdf-act" onclick="exportToPDF('ruangan')" class="px-4 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
-            <i class="fa-solid fa-file-pdf"></i> Cetak PDF Terfilter
-          </button>
-          <button id="btn-add-act" onclick="openModal('ruangan')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow transition">
-            + Tambah Permohonan Ruangan
+          <button onclick="openRuanganModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow transition">
+            + Pinjam Ruangan
           </button>
         </div>
       </div>
 
-      <!-- TABEL 1: RUANGAN -->
-      <section id="section-ruangan" class="overflow-x-auto">
+      <div class="overflow-x-auto">
         <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
           <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800">
             <tr>
-              <th class="px-6 py-3.5 font-bold">Nama Peminjam</th>
-              <th class="px-6 py-3.5 font-bold">Ruangan</th>
-              <th class="px-6 py-3.5 font-bold">Tanggal & Waktu</th>
-              <th class="px-6 py-3.5 font-bold">Keperluan</th>
-              <th class="px-6 py-3.5 font-bold">Status</th>
-              <th class="px-6 py-3.5 font-bold text-center">Aksi</th>
+              <th class="px-4 py-3.5 font-bold text-center">No</th>
+              <th class="px-5 py-3.5 font-bold">Nama Peminjam</th>
+              <th class="px-5 py-3.5 font-bold">Ruangan / Aula</th>
+              <th class="px-5 py-3.5 font-bold">Tanggal Pinjam</th>
+              <th class="px-5 py-3.5 font-bold">Jam</th>
+              <th class="px-5 py-3.5 font-bold">Keperluan</th>
+              <th class="px-5 py-3.5 font-bold">Status</th>
+              <th class="px-5 py-3.5 font-bold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbody-ruangan" class="divide-y divide-slate-800">
-            <tr><td colspan="6" class="text-center py-5 text-slate-500">Memuat data...</td></tr>
+            <tr><td colspan="8" class="text-center py-5 text-slate-500">Memuat data ruangan...</td></tr>
           </tbody>
         </table>
-      </section>
+      </div>
+    </div>
 
-      <!-- TABEL 2: KENDARAAN -->
-      <section id="section-kendaraan" class="hidden overflow-x-auto">
+    <!-- SEKSI 4: TABEL PEMINJAMAN KENDARAAN DINAS -->
+    <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
+      <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
+        <h2 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-car-side text-indigo-400"></i> Daftar Peminjaman Kendaraan Dinas
+        </h2>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="searchKendaraan" oninput="renderKendaraanTable()" placeholder="Cari driver / kendaraan..." class="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <button onclick="exportKendaraanPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+          </button>
+          <button onclick="openKendaraanModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow transition">
+            + Pinjam Kendaraan
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
         <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
           <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800">
             <tr>
-              <th class="px-6 py-3.5 font-bold">Driver / Pengemudi</th>
-              <th class="px-6 py-3.5 font-bold">Kendaraan</th>
-              <th class="px-6 py-3.5 font-bold">Tanggal</th>
-              <th class="px-6 py-3.5 font-bold">Tujuan</th>
-              <th class="px-6 py-3.5 font-bold">Status</th>
-              <th class="px-6 py-3.5 font-bold text-center">Aksi</th>
+              <th class="px-4 py-3.5 font-bold text-center">No</th>
+              <th class="px-5 py-3.5 font-bold">Nama Peminjam / Driver</th>
+              <th class="px-5 py-3.5 font-bold">Kendaraan</th>
+              <th class="px-5 py-3.5 font-bold">Tanggal Pinjam</th>
+              <th class="px-5 py-3.5 font-bold">Tujuan</th>
+              <th class="px-5 py-3.5 font-bold">Status</th>
+              <th class="px-5 py-3.5 font-bold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbody-kendaraan" class="divide-y divide-slate-800">
-            <tr><td colspan="6" class="text-center py-5 text-slate-500">Memuat data...</td></tr>
+            <tr><td colspan="7" class="text-center py-5 text-slate-500">Memuat data kendaraan...</td></tr>
           </tbody>
         </table>
-      </section>
+      </div>
     </div>
 
   </div>
 
-  <!-- MODAL FORM TAMBAH / EDIT DATA -->
-  <div id="dataModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
-    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
-      <h3 id="modalTitle" class="text-lg font-extrabold text-white mb-4">Input Data</h3>
-      <form id="genericForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
-        <input type="hidden" id="formCategory">
-        <input type="hidden" id="editId">
-        <div id="formFields" class="space-y-3"></div>
+  <!-- MODAL RINCIAN DATA DARI KLIK KARTU KPI RUMAH TANGGA -->
+  <div id="rtKpiModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-5xl text-slate-100 my-8 flex flex-col max-h-[90vh]">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
+        <div>
+          <span id="rtKpiBadge" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">RINCIAN PERMOHONAN</span>
+          <h3 id="rtKpiTitle" class="text-lg font-extrabold text-white mt-1">Daftar Permohonan Layanan Rumah Tangga</h3>
+          <p id="rtKpiSubtitle" class="text-xs text-slate-400">Gabungan data peminjaman ruangan & kendaraan dinas sesuai kategori kartu KPI.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportRtKpiPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+          </button>
+          <button onclick="closeRtKpiModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-xl text-xs font-bold">
+            <i class="fa-solid fa-xmark mr-1"></i> Tutup
+          </button>
+        </div>
+      </div>
+
+      <!-- FILTER PENCARIAN & JENIS LAYANAN DI DALAM MODAL KPI -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="rtKpiSearch" oninput="renderRtKpiModalTable()" placeholder="Cari nama peminjam, ruangan, kendaraan, keperluan..." class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <select id="rtKpiCategoryFilter" onchange="renderRtKpiModalTable()" class="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="ALL">Semua Jenis Layanan (Ruangan & Kendaraan)</option>
+          <option value="RUANGAN">Hanya Peminjaman Ruangan</option>
+          <option value="KENDARAAN">Hanya Peminjaman Kendaraan</option>
+        </select>
+      </div>
+
+      <!-- TABEL ISI MODAL KPI -->
+      <div class="overflow-auto flex-1 border border-slate-800 rounded-xl">
+        <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
+          <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800 sticky top-0">
+            <tr>
+              <th class="px-4 py-3 font-bold text-center">No</th>
+              <th class="px-4 py-3 font-bold">Jenis Layanan</th>
+              <th class="px-4 py-3 font-bold">Nama Peminjam / Driver</th>
+              <th class="px-4 py-3 font-bold">Fasilitas / Kendaraan</th>
+              <th class="px-4 py-3 font-bold">Tanggal & Waktu</th>
+              <th class="px-4 py-3 font-bold">Keperluan / Tujuan</th>
+              <th class="px-4 py-3 font-bold">Status</th>
+              <th class="px-4 py-3 font-bold text-center">Aksi Cepat</th>
+            </tr>
+          </thead>
+          <tbody id="rtKpiTbody" class="divide-y divide-slate-800"></tbody>
+        </table>
+      </div>
+
+      <div class="pt-3 mt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+        <span id="rtKpiFooterInfo">Total: 0 data</span>
+        <span>Klik "Setujui" untuk langsung memverifikasi permohonan yang sedang diproses.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL FORM PEMINJAMAN RUANGAN -->
+  <div id="ruanganModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100 my-8">
+      <h3 id="ruanganModalTitle" class="text-lg font-extrabold text-white mb-4">Form Peminjaman Ruangan</h3>
+      <form onsubmit="handleRuanganSubmit(event)" class="space-y-3">
+        <input type="hidden" id="editRuanganId">
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Nama Peminjam / Unit</label>
+          <input type="text" id="r_nama_peminjam" required placeholder="Contoh: Subbag Umum" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Ruangan / Aula</label>
+          <input type="text" id="r_ruangan" required placeholder="Contoh: Aula Dirgantara" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Mulai</label>
+            <input type="date" id="r_tgl_pinjam" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Selesai</label>
+            <input type="date" id="r_tgl_selesai" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Jam Mulai - Selesai</label>
+            <input type="text" id="r_jam_mulai" placeholder="08.00 - 12.00" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
+            <select id="r_status" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="Disetujui">Disetujui</option>
+              <option value="Diproses">Diproses</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Ditolak">Ditolak</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Keperluan</label>
+          <textarea id="r_keperluan" rows="2" required placeholder="Rapat koordinasi / Seminar..." class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+        </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
-          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-600/30">Simpan Data</button>
+          <button type="button" onclick="closeRuanganModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30">Simpan</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- CONTAINER TOAST NOTIFICATION -->
+  <!-- MODAL FORM PEMINJAMAN KENDARAAN -->
+  <div id="kendaraanModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100 my-8">
+      <h3 id="kendaraanModalTitle" class="text-lg font-extrabold text-white mb-4">Form Peminjaman Kendaraan</h3>
+      <form onsubmit="handleKendaraanSubmit(event)" class="space-y-3">
+        <input type="hidden" id="editKendaraanId">
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Nama Peminjam / Driver</label>
+          <input type="text" id="k_nama_driver" required placeholder="Contoh: Bpk. Ahmad" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Kendaraan Dinas</label>
+          <input type="text" id="k_kendaraan" required placeholder="Contoh: Innova Zenix / Hiace" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label>
+            <input type="date" id="k_tgl_pinjam" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
+            <select id="k_status" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+              <option value="Disetujui">Disetujui</option>
+              <option value="Diproses">Diproses</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Ditolak">Ditolak</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Tujuan / Keperluan</label>
+          <textarea id="k_tujuan" rows="2" required placeholder="Dinas Luar Bandara Juanda..." class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeKendaraanModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-600/30">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
   <script>
     let ruanganData = [];
     let kendaraanData = [];
-    let selectedRtMonth = '';
-    let comboRtChartInstance = null;
-    let statusRtPieChartInstance = null;
-    let topFacilityChartInstance = null;
+    let activeRtKpiType = null; // 'TOTAL' | 'DISETUJUI' | 'PROSES' | 'MAINTENANCE'
 
-    const defaultDrivers = [
-      "Anang Rivai Indarmawan",
-      "Arief Sulaiman",
-      "Indra Setiawan",
-      "M. Ghozali Z",
-      "Nur Wahyudi",
-      "Prasetyo Adi Wiyono",
-      "Pujas Didik Wahyudi",
-      "Wismoyo Tri Wibowo"
-    ].sort();
-
-    const defaultVehicles = [
-      "Ambulance Hiace",
-      "Ambulance Hilux",
-      "Bus Besar",
-      "Bus Kecil",
-      "Evalia",
-      "Fortuner",
-      "Hiace",
-      "Innova L 1303 BP",
-      "Innova L 1304 BP",
-      "Triton",
-      "Truck Pick Up"
-    ].sort();
+    let rtComboChartInstance = null;
+    let rtPieChartInstance = null;
 
     const quotes = [
       { text: "Pelayanan terbaik lahir dari koordinasi yang solid dan sikap ramah.", author: "Tim Rumah Tangga Poltekbang" },
-      { text: "Pengelolaan fasilitas yang tertata rapi mendukung produktivitas bersama.", author: "Bagian Rumah Tangga" },
-      { text: "Komunikasi yang lancar membuat setiap permohonan dapat diproses dengan cepat.", author: "Insan Perhubungan" },
-      { text: "Mengabdi dengan ikhlas, melayani civitas akademika dengan sepenuh hati.", author: "Sarpras Poltekbang Surabaya" }
+      { text: "Kesiapan sarana dan transportasi mendukung kelancaran setiap agenda kampus.", author: "Bidang Umum Poltekbang Surabaya" },
+      { text: "Ketelitian dalam penjadwalan mencegah bentrok dan meningkatkan kepuasan civitas.", author: "Sarpras & Rumah Tangga" }
     ];
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      initQuote();
+    document.addEventListener('DOMContentLoaded', () => {
       initNavLoader();
-      await loadSavedRtMonthFilter();
-      await loadAllData();
+      initQuote();
+      loadAllRtData();
     });
-
-    async function loadSavedRtMonthFilter() {
-      try {
-        const res = await fetch('/api/preferences/rt_month_filter');
-        const data = await res.json();
-        if (data && data.value) {
-          selectedRtMonth = data.value;
-          document.getElementById('rtMonthFilter').value = selectedRtMonth;
-        }
-      } catch (err) {
-        console.error("Gagal memuat preferensi filter bulan Rumah Tangga:", err);
-      }
-    }
-
-    async function saveRtMonthFilterToServer(val) {
-      try {
-        await fetch('/api/preferences/rt_month_filter', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ value: val })
-        });
-      } catch (err) {
-        console.error("Gagal menyimpan preferensi filter bulan Rumah Tangga:", err);
-      }
-    }
 
     function initNavLoader() {
       document.querySelectorAll('a.nav-link').forEach(link => {
@@ -329,25 +426,10 @@
           const loader = document.getElementById('pageLoader');
           if (loader) {
             loader.classList.remove('opacity-0', 'pointer-events-none');
-            setTimeout(() => { window.location.href = target; }, 400);
+            setTimeout(() => { window.location.href = target; }, 350);
           } else { window.location.href = target; }
         });
       });
-    }
-
-    function animateCounter(id, targetVal) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      let start = 0;
-      const duration = 800;
-      const stepTime = Math.max(Math.floor(duration / (targetVal || 1)), 20);
-      const timer = setInterval(() => {
-        start += Math.ceil(targetVal / (duration / stepTime));
-        if (start >= targetVal) {
-          el.innerText = targetVal.toLocaleString('id-ID');
-          clearInterval(timer);
-        } else { el.innerText = start.toLocaleString('id-ID'); }
-      }, stepTime);
     }
 
     function initQuote() {
@@ -377,354 +459,485 @@
       setTimeout(() => {
         t.classList.add('opacity-0', 'translate-y-2');
         setTimeout(() => t.remove(), 300);
-      }, 3500);
+      }, 4000);
     }
 
-    async function loadAllData() {
+    function animateCounter(id, targetVal) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let start = 0;
+      const duration = 700;
+      const stepTime = 20;
+      const steps = duration / stepTime;
+      const increment = (targetVal - start) / steps;
+      let current = start;
+      const timer = setInterval(() => {
+        current += increment;
+        if ((increment >= 0 && current >= targetVal) || (increment < 0 && current <= targetVal)) {
+          el.innerText = targetVal.toLocaleString('id-ID');
+          clearInterval(timer);
+        } else {
+          el.innerText = Math.floor(current).toLocaleString('id-ID');
+        }
+      }, stepTime);
+    }
+
+    async function loadAllRtData() {
       try {
-        const [resRng, resKnd] = await Promise.all([fetch('/api/peminjaman-ruangan'), fetch('/api/peminjaman-kendaraan')]);
-        ruanganData = await resRng.json();
-        kendaraanData = await resKnd.json();
+        const [resR, resK] = await Promise.all([
+          fetch('/api/peminjaman-ruangan'),
+          fetch('/api/peminjaman-kendaraan')
+        ]);
+        ruanganData = await resR.json();
+        kendaraanData = await resK.json();
+
         updateKpis();
-        renderComboRtChart();
-        renderStatusRtPieChart();
-        renderTopFacilityChart();
-        renderFilteredTables(false);
-      } catch (err) { console.error("Gagal muat data rumah tangga:", err); }
+        renderCharts();
+        renderRuanganTable();
+        renderKendaraanTable();
+        if (activeRtKpiType) renderRtKpiModalTable();
+      } catch (err) {
+        console.error("Gagal memuat data rumah tangga:", err);
+      }
+    }
+
+    function classifyStatus(statusStr) {
+      const s = (statusStr || '').toUpperCase();
+      if (s.includes('MAINTENANCE') || s.includes('TOLAK') || s.includes('RUSAK') || s.includes('KENDALA')) return 'MAINTENANCE';
+      if (s.includes('PROSES') || s.includes('TUNGGU') || s.includes('PENDING')) return 'PROSES';
+      return 'DISETUJUI';
+    }
+
+    function getUnifiedServices() {
+      const listR = (ruanganData || []).map(r => ({
+        rawId: r.id,
+        jenis: 'RUANGAN',
+        peminjam: r.nama_peminjam || '-',
+        fasilitas: r.ruangan || '-',
+        tanggal: `${r.tgl_pinjam || '-'}${r.tgl_selesai && r.tgl_selesai !== r.tgl_pinjam ? ' s/d ' + r.tgl_selesai : ''}${r.jam_mulai ? ' (' + r.jam_mulai + ')' : ''}`,
+        keperluan: r.keperluan || '-',
+        status: r.status || 'Disetujui',
+        kategoriStatus: classifyStatus(r.status),
+        original: r
+      }));
+
+      const listK = (kendaraanData || []).map(k => ({
+        rawId: k.id,
+        jenis: 'KENDARAAN',
+        peminjam: k.nama_driver || '-',
+        fasilitas: k.kendaraan || '-',
+        tanggal: k.tgl_pinjam || '-',
+        keperluan: k.tujuan || '-',
+        status: k.status || 'Disetujui',
+        kategoriStatus: classifyStatus(k.status),
+        original: k
+      }));
+
+      return [...listR, ...listK];
     }
 
     function updateKpis() {
-      const total = ruanganData.length + kendaraanData.length;
-      const disetujui = ruanganData.filter(i => i.status === 'Disetujui').length + kendaraanData.filter(i => i.status !== 'Maintenance').length;
-      const diproses = ruanganData.filter(i => i.status === 'Diproses').length;
-      const ditolak = ruanganData.filter(i => i.status === 'Ditolak').length + kendaraanData.filter(i => i.status === 'Maintenance').length;
+      const unified = getUnifiedServices();
+      const total = unified.length;
+      const disetujui = unified.filter(i => i.kategoriStatus === 'DISETUJUI').length;
+      const proses = unified.filter(i => i.kategoriStatus === 'PROSES').length;
+      const maint = unified.filter(i => i.kategoriStatus === 'MAINTENANCE').length;
 
-      animateCounter('kpi-total-layanan', total);
-      animateCounter('kpi-disetujui', disetujui);
-      animateCounter('kpi-diproses', diproses);
-      animateCounter('kpi-ditolak', ditolak);
+      animateCounter('kpi-total-rt', total);
+      animateCounter('kpi-disetujui-rt', disetujui);
+      animateCounter('kpi-proses-rt', proses);
+      animateCounter('kpi-maintenance-rt', maint);
     }
 
-    function renderComboRtChart() {
-      const ctx = document.getElementById('comboRtChart').getContext('2d');
-      if (comboRtChartInstance) comboRtChartInstance.destroy();
+    function renderCharts() {
+      const rOk = ruanganData.filter(r => classifyStatus(r.status) === 'DISETUJUI').length;
+      const rProc = ruanganData.filter(r => classifyStatus(r.status) !== 'DISETUJUI').length;
+      const kOk = kendaraanData.filter(k => classifyStatus(k.status) === 'DISETUJUI').length;
+      const kProc = kendaraanData.filter(k => classifyStatus(k.status) !== 'DISETUJUI').length;
 
-      comboRtChartInstance = new Chart(ctx, {
-        type: 'bar',
+      const ctxCombo = document.getElementById('rtComboChart').getContext('2d');
+      if (rtComboChartInstance) rtComboChartInstance.destroy();
+      rtComboChartInstance = new Chart(ctxCombo, {
         data: {
-          labels: ['Peminjaman Ruangan', 'Operasional Kendaraan'],
+          labels: ['Peminjaman Ruangan', 'Peminjaman Kendaraan'],
           datasets: [
-            { type: 'bar', label: 'Permohonan Disetujui / Aktif', data: [ruanganData.filter(i => i.status === 'Disetujui').length, kendaraanData.filter(i => i.status !== 'Maintenance').length], backgroundColor: '#10b981', borderRadius: 4, barPercentage: 0.55 },
-            { type: 'bar', label: 'Diproses / Maintenance', data: [ruanganData.filter(i => i.status === 'Diproses').length, kendaraanData.filter(i => i.status === 'Maintenance').length], backgroundColor: '#f59e0b', borderRadius: 4, barPercentage: 0.55 },
-            { type: 'line', label: 'Total Permohonan Masuk', data: [ruanganData.length, kendaraanData.length], borderColor: '#6366f1', borderWidth: 2, fill: false, tension: 0.2 }
+            { type: 'bar', label: 'Permohonan Disetujui / Aktif', data: [rOk, kOk], backgroundColor: '#10b981', borderRadius: 6, barPercentage: 0.45 },
+            { type: 'bar', label: 'Diproses / Maintenance', data: [rProc, kProc], backgroundColor: '#f59e0b', borderRadius: 6, barPercentage: 0.45 },
+            { type: 'line', label: 'Total Permohonan Masuk', data: [ruanganData.length, kendaraanData.length], borderColor: '#6366f1', backgroundColor: '#6366f1', tension: 0.3 }
           ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } },
-          scales: { x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } } }
+          scales: { x: { ticks: { color: '#cbd5e1' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#cbd5e1' }, grid: { color: '#1e293b' } } }
         }
       });
-    }
 
-    function renderStatusRtPieChart() {
-      const disetujui = ruanganData.filter(i => i.status === 'Disetujui').length + kendaraanData.filter(i => i.status !== 'Maintenance').length;
-      const diproses = ruanganData.filter(i => i.status === 'Diproses').length;
-      const ditolak = ruanganData.filter(i => i.status === 'Ditolak').length + kendaraanData.filter(i => i.status === 'Maintenance').length;
+      const unified = getUnifiedServices();
+      const disetujui = unified.filter(i => i.kategoriStatus === 'DISETUJUI').length;
+      const proses = unified.filter(i => i.kategoriStatus === 'PROSES').length;
+      const maint = unified.filter(i => i.kategoriStatus === 'MAINTENANCE').length;
 
-      const ctx = document.getElementById('statusRtPieChart').getContext('2d');
-      if (statusRtPieChartInstance) statusRtPieChartInstance.destroy();
-
-      statusRtPieChartInstance = new Chart(ctx, {
+      const ctxPie = document.getElementById('rtPieChart').getContext('2d');
+      if (rtPieChartInstance) rtPieChartInstance.destroy();
+      rtPieChartInstance = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-          labels: ['Disetujui / Aktif', 'Diproses', 'Ditolak / Maintenance'],
-          datasets: [{ data: [disetujui, diproses, ditolak], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#0f172a' }]
+          labels: ['Disetujui / Aktif', 'Diproses', 'Maintenance / Ditolak'],
+          datasets: [{ data: [disetujui, proses, maint], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#0f172a' }]
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { size: 11 } } } } }
       });
     }
 
-    function renderTopFacilityChart() {
-      const facilityCounts = {};
-      ruanganData.forEach(i => { const key = `[Ruang] ${i.ruangan || 'Lainnya'}`; facilityCounts[key] = (facilityCounts[key] || 0) + 1; });
-      kendaraanData.forEach(i => { const key = `[Armada] ${i.kendaraan || 'Lainnya'}`; facilityCounts[key] = (facilityCounts[key] || 0) + 1; });
+    // =========================================================================
+    // MODAL RINCIAN DATA SAAT KLIK KARTU KPI RUMAH TANGGA
+    // =========================================================================
+    function openRtKpiModal(type) {
+      activeRtKpiType = type;
+      document.getElementById('rtKpiSearch').value = '';
+      document.getElementById('rtKpiCategoryFilter').value = 'ALL';
 
-      const labels = Object.keys(facilityCounts).slice(0, 5);
-      const values = Object.values(facilityCounts).slice(0, 5);
-      const backgroundColors = labels.map(label => label.startsWith('[Ruang]') ? '#6366f1' : '#10b981');
+      const badge = document.getElementById('rtKpiBadge');
+      const title = document.getElementById('rtKpiTitle');
+      const sub = document.getElementById('rtKpiSubtitle');
 
-      const ctx = document.getElementById('topFacilityChart').getContext('2d');
-      if (topFacilityChartInstance) topFacilityChartInstance.destroy();
+      if (type === 'TOTAL') {
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30";
+        badge.innerText = "TOTAL LAYANAN TERDAFTAR";
+        title.innerText = "Seluruh Permohonan Layanan Rumah Tangga";
+        sub.innerText = "Menampilkan semua permohonan peminjaman ruangan & kendaraan dinas yang tercatat.";
+      } else if (type === 'DISETUJUI') {
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        badge.innerText = "PERMOHONAN DISETUJUI";
+        title.innerText = "Daftar Permohonan yang Telah Disetujui / Aktif";
+        sub.innerText = "Permohonan peminjaman ruangan dan kendaraan yang telah disetujui.";
+      } else if (type === 'PROSES') {
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+        badge.innerText = "SEDANG DIPROSES";
+        title.innerText = "Permohonan Menunggu Verifikasi / Diproses";
+        sub.innerText = "Klik tombol 'Setujui' pada kolom Aksi Cepat untuk langsung menyetujui permohonan.";
+      } else if (type === 'MAINTENANCE') {
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30";
+        badge.innerText = "MAINTENANCE / DITOLAK";
+        title.innerText = "Daftar Fasilitas Maintenance atau Permohonan Ditolak";
+        sub.innerText = "Menampilkan ruangan/kendaraan yang sedang dalam perawatan atau permohonan yang ditolak.";
+      }
 
-      topFacilityChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels.length ? labels : ['Belum Ada Data'],
-          datasets: [{ label: 'Total Permohonan', data: values.length ? values : [0], backgroundColor: labels.length ? backgroundColors : '#6366f1', borderRadius: 4, barPercentage: 0.55 }]
-        },
-        options: {
-          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { color: '#1e293b' } } }
+      renderRtKpiModalTable();
+      document.getElementById('rtKpiModal').classList.remove('hidden');
+    }
+
+    function closeRtKpiModal() {
+      activeRtKpiType = null;
+      document.getElementById('rtKpiModal').classList.add('hidden');
+    }
+
+    function getFilteredRtKpiList() {
+      const keyword = document.getElementById('rtKpiSearch').value.toLowerCase();
+      const catFilter = document.getElementById('rtKpiCategoryFilter').value;
+
+      return getUnifiedServices().filter(item => {
+        if (activeRtKpiType !== 'TOTAL' && item.kategoriStatus !== activeRtKpiType) return false;
+        if (catFilter !== 'ALL' && item.jenis !== catFilter) return false;
+        if (keyword) {
+          const full = `${item.jenis} ${item.peminjam} ${item.fasilitas} ${item.tanggal} ${item.keperluan} ${item.status}`.toLowerCase();
+          if (!full.includes(keyword)) return false;
         }
+        return true;
       });
     }
 
-    async function renderFilteredTables(shouldSave = true) {
-      selectedRtMonth = document.getElementById('rtMonthFilter').value;
+    function renderRtKpiModalTable() {
+      const tbody = document.getElementById('rtKpiTbody');
+      const list = getFilteredRtKpiList();
+      document.getElementById('rtKpiFooterInfo').innerText = `Menampilkan ${list.length} data permohonan`;
 
-      const filteredRuangan = selectedRtMonth ? ruanganData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : ruanganData;
-      const filteredKendaraan = selectedRtMonth ? kendaraanData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : kendaraanData;
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500">Tidak ada data permohonan pada kategori ini.</td></tr>`;
+        return;
+      }
 
-      document.getElementById('count-ruangan').innerText = `${filteredRuangan.length} Data`;
-      document.getElementById('count-kendaraan').innerText = `${filteredKendaraan.length} Data`;
+      tbody.innerHTML = list.map((item, i) => {
+        const jenisBadge = item.jenis === 'RUANGAN'
+          ? `<span class="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-bold"><i class="fa-solid fa-door-open mr-1"></i>Ruangan</span>`
+          : `<span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded text-[10px] font-bold"><i class="fa-solid fa-car-side mr-1"></i>Kendaraan</span>`;
 
-      // Render Tabel Ruangan
-      const tbodyRng = document.getElementById('tbody-ruangan');
-      if (!filteredRuangan || filteredRuangan.length === 0) {
-        tbodyRng.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-500">Tidak ada peminjaman ruangan pada bulan ini.</td></tr>`;
-      } else {
-        tbodyRng.innerHTML = filteredRuangan.map(item => `
+        let stColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+        if (item.kategoriStatus === 'PROSES') stColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+        else if (item.kategoriStatus === 'MAINTENANCE') stColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+
+        const approveBtn = item.kategoriStatus === 'PROSES'
+          ? `<button onclick="quickApproveService('${item.jenis}', ${item.rawId})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">Setujui</button>`
+          : `<span class="text-slate-500 text-[11px]">-</span>`;
+
+        return `
           <tr class="hover:bg-slate-800/50 transition">
-            <td class="px-6 py-3.5 font-bold text-white">${item.nama_peminjam || '-'}</td>
-            <td class="px-6 py-3.5 font-semibold text-indigo-400">${item.ruangan || '-'}</td>
-            <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'} s/d ${item.tgl_selesai || '-'} ${item.jam_mulai ? `(${item.jam_mulai})` : ''}</td>
-            <td class="px-6 py-3.5 text-xs text-slate-400">${item.keperluan || '-'}</td>
-            <td class="px-6 py-3.5"><span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'Diproses'}</span></td>
-            <td class="px-6 py-3.5 text-center space-x-2">
-              <button onclick="editItem('ruangan', ${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
-              <button onclick="deleteItem('ruangan', ${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
-            </td>
+            <td class="px-4 py-3 text-center font-bold text-slate-400">${i + 1}</td>
+            <td class="px-4 py-3">${jenisBadge}</td>
+            <td class="px-4 py-3 font-semibold text-white">${item.peminjam}</td>
+            <td class="px-4 py-3 text-cyan-300 font-bold">${item.fasilitas}</td>
+            <td class="px-4 py-3 font-mono text-amber-300">${item.tanggal}</td>
+            <td class="px-4 py-3 text-slate-300">${item.keperluan}</td>
+            <td class="px-4 py-3"><span class="${stColor} border text-[10px] px-2.5 py-0.5 rounded-md font-bold">${item.status}</span></td>
+            <td class="px-4 py-3 text-center">${approveBtn}</td>
           </tr>
-        `).join('');
-      }
-
-      // Render Tabel Kendaraan
-      const tbodyKnd = document.getElementById('tbody-kendaraan');
-      if (!filteredKendaraan || filteredKendaraan.length === 0) {
-        tbodyKnd.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-500">Tidak ada operasional kendaraan pada bulan ini.</td></tr>`;
-      } else {
-        tbodyKnd.innerHTML = filteredKendaraan.map(item => `
-          <tr class="hover:bg-slate-800/50 transition">
-            <td class="px-6 py-3.5 font-bold text-white">${item.nama_driver || '-'}</td>
-            <td class="px-6 py-3.5 font-semibold text-emerald-400">${item.kendaraan || '-'}</td>
-            <td class="px-6 py-3.5 text-xs font-mono text-slate-300">${item.tgl_pinjam || '-'}</td>
-            <td class="px-6 py-3.5 text-xs text-slate-400">${item.tujuan || '-'}</td>
-            <td class="px-6 py-3.5"><span class="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'DL'}</span></td>
-            <td class="px-6 py-3.5 text-center space-x-2">
-              <button onclick="editItem('kendaraan', ${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
-              <button onclick="deleteItem('kendaraan', ${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
-            </td>
-          </tr>
-        `).join('');
-      }
-
-      if (shouldSave) {
-        await saveRtMonthFilterToServer(selectedRtMonth);
-      }
-    }
-
-    async function resetRtMonthFilter() {
-      document.getElementById('rtMonthFilter').value = '';
-      selectedRtMonth = '';
-      await renderFilteredTables(true);
-    }
-
-    function exportToPDF(category) {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let periodeText = selectedRtMonth ? `PERIODE: ${selectedRtMonth}` : 'SEMUA PERIODE';
-
-      doc.setFontSize(14); doc.setFont("helvetica", "bold");
-      doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
-      doc.setFontSize(10); doc.setFont("helvetica", "normal");
-
-      if (category === 'ruangan') {
-        const filtered = selectedRtMonth ? ruanganData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : ruanganData;
-        doc.text(`LOG HISTORICAL PEMINJAMAN RUANGAN (${periodeText})`, 14, 22);
-        doc.line(14, 25, 196, 25);
-        const rows = filtered.map((item, i) => [
-          i + 1, item.nama_peminjam || '-', item.ruangan || '-', `${item.tgl_pinjam || '-'} s/d ${item.tgl_selesai || '-'} ${item.jam_mulai ? `(${item.jam_mulai})` : ''}`, item.keperluan || '-', item.status || 'Diproses'
-        ]);
-        doc.autoTable({ head: [['No', 'Peminjam', 'Ruangan', 'Tanggal & Jam Mulai', 'Keperluan', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [99, 102, 241] } });
-        doc.save(`Peminjaman_Ruangan_${selectedRtMonth || 'Semua'}.pdf`);
-      } else {
-        const filtered = selectedRtMonth ? kendaraanData.filter(i => i.tgl_pinjam && i.tgl_pinjam.startsWith(selectedRtMonth)) : kendaraanData;
-        doc.text(`LOG HISTORICAL OPERASIONAL KENDARAAN (${periodeText})`, 14, 22);
-        doc.line(14, 25, 196, 25);
-        const rows = filtered.map((item, i) => [
-          i + 1, item.nama_driver || '-', item.kendaraan || '-', item.tgl_pinjam || '-', item.tujuan || '-', item.status || 'DL'
-        ]);
-        doc.autoTable({ head: [['No', 'Driver', 'Kendaraan', 'Tanggal', 'Tujuan', 'Status']], body: rows, startY: 28, headStyles: { fillColor: [16, 185, 129] } });
-        doc.save(`Operasional_Kendaraan_${selectedRtMonth || 'Semua'}.pdf`);
-      }
-    }
-
-    function switchTab(tabName) {
-      document.getElementById('section-ruangan').classList.toggle('hidden', tabName !== 'ruangan');
-      document.getElementById('section-kendaraan').classList.toggle('hidden', tabName !== 'kendaraan');
-      const btnRng = document.getElementById('tab-btn-ruangan');
-      const btnKnd = document.getElementById('tab-btn-kendaraan');
-      const btnPdf = document.getElementById('btn-pdf-act');
-      const btnAdd = document.getElementById('btn-add-act');
-
-      if (tabName === 'ruangan') {
-        btnRng.className = 'px-4 py-2 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow';
-        btnKnd.className = 'px-4 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition';
-        btnPdf.setAttribute('onclick', "exportToPDF('ruangan')");
-        btnAdd.setAttribute('onclick', "openModal('ruangan')");
-        btnAdd.innerHTML = '+ Tambah Permohonan Ruangan';
-        btnAdd.className = 'px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow transition';
-      } else {
-        btnRng.className = 'px-4 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition';
-        btnKnd.className = 'px-4 py-2 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow';
-        btnPdf.setAttribute('onclick', "exportToPDF('kendaraan')");
-        btnAdd.setAttribute('onclick', "openModal('kendaraan')");
-        btnAdd.innerHTML = '+ Tambah Kendaraan';
-        btnAdd.className = 'px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow transition';
-      }
-    }
-
-    function openModal(category, editObj = null) {
-      document.getElementById('formCategory').value = category;
-      document.getElementById('editId').value = editObj ? editObj.id : '';
-      const fields = document.getElementById('formFields');
-      
-      if (category === 'ruangan') {
-        document.getElementById('modalTitle').innerText = editObj ? "Edit Permohonan Ruangan" : "Permohonan Peminjaman Ruangan";
-        fields.innerHTML = `
-          <div><label class="block text-xs font-bold mb-1 text-slate-300">Nama Peminjam</label><input type="text" id="nama_peminjam" value="${editObj ? editObj.nama_peminjam : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-          <div><label class="block text-xs font-bold mb-1 text-slate-300">Nama Ruangan</label><input type="text" id="ruangan" value="${editObj ? editObj.ruangan : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: Aula Utama"></div>
-          <div class="grid grid-cols-2 gap-2">
-            <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label><input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-            <div><label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Selesai</label><input type="date" id="tgl_selesai" value="${editObj && editObj.tgl_selesai ? editObj.tgl_selesai : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-          </div>
-          <div><label class="block text-xs font-bold mb-1 text-slate-300">Jam Mulai</label><input type="time" id="jam_mulai" value="${editObj ? editObj.jam_mulai : ''}" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-          <div><label class="block text-xs font-bold mb-1 text-slate-300">Keperluan</label><textarea id="keperluan" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">${editObj ? editObj.keperluan : ''}</textarea></div>
-          <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
-            <select id="statusSelect" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
-              <option value="Diproses" ${editObj && editObj.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
-              <option value="Disetujui" ${editObj && editObj.status === 'Disetujui' ? 'selected' : ''}>Disetujui</option>
-              <option value="Ditolak" ${editObj && editObj.status === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
-            </select>
-          </div>
         `;
-      } else if (category === 'kendaraan') {
-        document.getElementById('modalTitle').innerText = editObj ? "Edit Permohonan Kendaraan" : "Permohonan Peminjaman Kendaraan";
-        
-        const driverOptions = defaultDrivers.map(d => `<option value="${d}"></option>`).join('');
-        const vehicleOptions = defaultVehicles.map(v => `<option value="${v}"></option>`).join('');
-
-        fields.innerHTML = `
-          <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Nama Driver / Pengemudi</label>
-            <input type="text" id="nama_driver" list="driverList" value="${editObj ? editObj.nama_driver : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Pilih dari daftar atau ketik nama driver baru...">
-            <datalist id="driverList">${driverOptions}</datalist>
-          </div>
-          <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Kendaraan</label>
-            <input type="text" id="kendaraan" list="vehicleList" value="${editObj ? editObj.kendaraan : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Pilih kendaraan atau ketik unit baru...">
-            <datalist id="vehicleList">${vehicleOptions}</datalist>
-          </div>
-          <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label>
-            <input type="date" id="tgl_pinjam" value="${editObj ? editObj.tgl_pinjam : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Tujuan Dinas</label>
-            <input type="text" id="tujuan" value="${editObj ? editObj.tujuan : ''}" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
-            <select id="statusSelect" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
-              <option value="DL" ${editObj && editObj.status === 'DL' ? 'selected' : ''}>DL (Dinas Luar)</option>
-              <option value="Maintenance" ${editObj && editObj.status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
-              <option value="Official Visit" ${editObj && editObj.status === 'Official Visit' ? 'selected' : ''}>Official Visit</option>
-              <option value="VIP-Transport" ${editObj && editObj.status === 'VIP-Transport' ? 'selected' : ''}>VIP-Transport</option>
-              <option value="Transfer" ${editObj && editObj.status === 'Transfer' ? 'selected' : ''}>Transfer</option>
-              <option value="PU- Airport" ${editObj && editObj.status === 'PU- Airport' ? 'selected' : ''}>PU- Airport</option>
-            </select>
-          </div>
-        `;
-      }
-      document.getElementById('dataModal').classList.remove('hidden');
+      }).join('');
     }
 
-    function closeModal() { document.getElementById('dataModal').classList.add('hidden'); }
-
-    function editItem(category, id) {
-      if (category === 'ruangan') {
-        const item = ruanganData.find(i => i.id === id);
-        if (item) openModal('ruangan', item);
-      } else {
-        const item = kendaraanData.find(i => i.id === id);
-        if (item) openModal('kendaraan', item);
-      }
-    }
-
-    async function deleteItem(category, id) {
-      if (confirm("Hapus data ini dari database?")) {
-        const url = category === 'ruangan' ? `/api/peminjaman-ruangan/${id}` : `/api/peminjaman-kendaraan/${id}`;
-        try {
-          const res = await fetch(url, { method: 'DELETE' });
+    async function quickApproveService(jenis, id) {
+      try {
+        if (jenis === 'RUANGAN') {
+          const item = ruanganData.find(r => r.id === id);
+          if (!item) return;
+          const res = await fetch(`/api/peminjaman-ruangan/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...item, status: 'Disetujui' })
+          });
           if (res.ok) {
-            showToast("Data berhasil dihapus!", 'success');
-            await loadAllData();
-          } else {
-            showToast("Gagal menghapus data.", 'error');
+            showToast(`Peminjaman ${item.ruangan} oleh ${item.nama_peminjam} telah Disetujui!`, "success");
+            await loadAllRtData();
           }
-        } catch (err) { showToast("Error: " + err.message, 'error'); }
+        } else {
+          const item = kendaraanData.find(k => k.id === id);
+          if (!item) return;
+          const res = await fetch(`/api/peminjaman-kendaraan/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...item, status: 'Disetujui' })
+          });
+          if (res.ok) {
+            showToast(`Peminjaman ${item.kendaraan} oleh ${item.nama_driver} telah Disetujui!`, "success");
+            await loadAllRtData();
+          }
+        }
+      } catch (err) {
+        showToast("Gagal menyetujui permohonan: " + err.message, "error");
       }
     }
 
-    async function handleFormSubmit(e) {
+    function exportRtKpiPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('l', 'mm', 'a4');
+      const list = getFilteredRtKpiList();
+      if (!list.length) {
+        showToast("Tidak ada data untuk dicetak.", "error");
+        return;
+      }
+
+      const titleText = document.getElementById('rtKpiTitle').innerText;
+      doc.setFontSize(13); doc.setFont("helvetica", "bold");
+      doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 14);
+      doc.setFontSize(10); doc.setFont("helvetica", "normal");
+      doc.text(titleText.toUpperCase(), 14, 20);
+      doc.setFontSize(8);
+      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Total Data: ${list.length}`, 14, 24);
+      doc.line(14, 26, 283, 26);
+
+      const rows = list.map((item, i) => [
+        i + 1, item.jenis, item.peminjam, item.fasilitas, item.tanggal, item.keperluan, item.status
+      ]);
+
+      doc.autoTable({
+        head: [['No', 'Layanan', 'Peminjam / Driver', 'Fasilitas / Kendaraan', 'Tanggal & Waktu', 'Keperluan / Tujuan', 'Status']],
+        body: rows,
+        startY: 29,
+        headStyles: { fillColor: [37, 99, 235] },
+        styles: { fontSize: 7.5 }
+      });
+
+      doc.save(`Laporan_Rumah_Tangga_${activeRtKpiType}_${new Date().toISOString().split('T')[0]}.pdf`);
+      showToast("Laporan PDF berhasil diunduh!", "success");
+    }
+
+    // =========================================================================
+    // RENDER & CRUD TABEL RUANGAN
+    // =========================================================================
+    function getStatusBadge(status) {
+      const cat = classifyStatus(status);
+      if (cat === 'PROSES') return `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${status}</span>`;
+      if (cat === 'MAINTENANCE') return `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${status}</span>`;
+      return `<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${status || 'Disetujui'}</span>`;
+    }
+
+    function renderRuanganTable() {
+      const tbody = document.getElementById('tbody-ruangan');
+      const kw = (document.getElementById('searchRuangan').value || '').toLowerCase();
+      const filtered = ruanganData.filter(r => `${r.nama_peminjam} ${r.ruangan} ${r.keperluan} ${r.status}`.toLowerCase().includes(kw));
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-500">Belum ada data peminjaman ruangan.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((r, i) => `
+        <tr class="hover:bg-slate-800/50 transition">
+          <td class="px-4 py-3.5 text-center font-bold text-slate-400">${i + 1}</td>
+          <td class="px-5 py-3.5 font-semibold text-white">${r.nama_peminjam || '-'}</td>
+          <td class="px-5 py-3.5 font-bold text-blue-400">${r.ruangan || '-'}</td>
+          <td class="px-5 py-3.5 font-mono text-amber-300">${r.tgl_pinjam || '-'}${r.tgl_selesai && r.tgl_selesai !== r.tgl_pinjam ? ' s/d ' + r.tgl_selesai : ''}</td>
+          <td class="px-5 py-3.5 text-slate-300">${r.jam_mulai || '-'}</td>
+          <td class="px-5 py-3.5 text-slate-300">${r.keperluan || '-'}</td>
+          <td class="px-5 py-3.5">${getStatusBadge(r.status)}</td>
+          <td class="px-5 py-3.5 text-center space-x-2">
+            <button onclick="openRuanganModal(${r.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
+            <button onclick="deleteRuangan(${r.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openRuanganModal(id = null) {
+      const obj = id ? ruanganData.find(r => r.id === id) : null;
+      document.getElementById('editRuanganId').value = obj ? obj.id : '';
+      document.getElementById('ruanganModalTitle').innerText = obj ? 'Edit Peminjaman Ruangan' : 'Form Peminjaman Ruangan';
+      document.getElementById('r_nama_peminjam').value = obj ? obj.nama_peminjam : '';
+      document.getElementById('r_ruangan').value = obj ? obj.ruangan : '';
+      document.getElementById('r_tgl_pinjam').value = obj ? obj.tgl_pinjam : new Date().toISOString().split('T')[0];
+      document.getElementById('r_tgl_selesai').value = obj ? (obj.tgl_selesai || obj.tgl_pinjam) : new Date().toISOString().split('T')[0];
+      document.getElementById('r_jam_mulai').value = obj ? (obj.jam_mulai || '') : '';
+      document.getElementById('r_status').value = obj ? (obj.status || 'Disetujui') : 'Disetujui';
+      document.getElementById('r_keperluan').value = obj ? (obj.keperluan || '') : '';
+      document.getElementById('ruanganModal').classList.remove('hidden');
+    }
+
+    function closeRuanganModal() { document.getElementById('ruanganModal').classList.add('hidden'); }
+
+    async function handleRuanganSubmit(e) {
       e.preventDefault();
-      const category = document.getElementById('formCategory').value;
-      const editId = document.getElementById('editId').value;
+      const id = document.getElementById('editRuanganId').value;
+      const payload = {
+        nama_peminjam: document.getElementById('r_nama_peminjam').value,
+        ruangan: document.getElementById('r_ruangan').value,
+        tgl_pinjam: document.getElementById('r_tgl_pinjam').value,
+        tgl_selesai: document.getElementById('r_tgl_selesai').value,
+        jam_mulai: document.getElementById('r_jam_mulai').value,
+        status: document.getElementById('r_status').value,
+        keperluan: document.getElementById('r_keperluan').value
+      };
+      const res = await fetch(id ? `/api/peminjaman-ruangan/${id}` : '/api/peminjaman-ruangan', {
+        method: id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        closeRuanganModal();
+        showToast(id ? "Data ruangan diperbarui!" : "Peminjaman ruangan ditambahkan!", "success");
+        await loadAllRtData();
+      }
+    }
 
-      if (category === 'ruangan') {
-        const payload = {
-          nama_peminjam: document.getElementById('nama_peminjam').value,
-          ruangan: document.getElementById('ruangan').value,
-          tgl_pinjam: document.getElementById('tgl_pinjam').value,
-          tgl_selesai: document.getElementById('tgl_selesai').value,
-          jam_mulai: document.getElementById('jam_mulai').value,
-          keperluan: document.getElementById('keperluan').value,
-          status: document.getElementById('statusSelect').value
-        };
-
-        const method = editId ? 'PUT' : 'POST';
-        const url = editId ? `/api/peminjaman-ruangan/${editId}` : '/api/peminjaman-ruangan';
-        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    async function deleteRuangan(id) {
+      if (confirm("Hapus data peminjaman ruangan ini?")) {
+        const res = await fetch(`/api/peminjaman-ruangan/${id}`, { method: 'DELETE' });
         if (res.ok) {
-          closeModal();
-          showToast(editId ? "Permohonan ruangan diubah!" : "Permohonan ruangan ditambah!", 'success');
-          await loadAllData();
-        } else {
-          showToast("Gagal menyimpan data ruangan.", 'error');
-        }
-      } else if (category === 'kendaraan') {
-        const payload = {
-          nama_driver: document.getElementById('nama_driver').value,
-          kendaraan: document.getElementById('kendaraan').value,
-          tgl_pinjam: document.getElementById('tgl_pinjam').value,
-          tujuan: document.getElementById('tujuan').value,
-          status: document.getElementById('statusSelect').value
-        };
-
-        const method = editId ? 'PUT' : 'POST';
-        const url = editId ? `/api/peminjaman-kendaraan/${editId}` : '/api/peminjaman-kendaraan';
-        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        if (res.ok) {
-          closeModal();
-          showToast(editId ? "Permohonan kendaraan diubah!" : "Permohonan kendaraan ditambah!", 'success');
-          await loadAllData();
-        } else {
-          showToast("Gagal menyimpan data kendaraan.", 'error');
+          showToast("Data ruangan dihapus!", "success");
+          await loadAllRtData();
         }
       }
+    }
+
+    // =========================================================================
+    // RENDER & CRUD TABEL KENDARAAN
+    // =========================================================================
+    function renderKendaraanTable() {
+      const tbody = document.getElementById('tbody-kendaraan');
+      const kw = (document.getElementById('searchKendaraan').value || '').toLowerCase();
+      const filtered = kendaraanData.filter(k => `${k.nama_driver} ${k.kendaraan} ${k.tujuan} ${k.status}`.toLowerCase().includes(kw));
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-slate-500">Belum ada data peminjaman kendaraan.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((k, i) => `
+        <tr class="hover:bg-slate-800/50 transition">
+          <td class="px-4 py-3.5 text-center font-bold text-slate-400">${i + 1}</td>
+          <td class="px-5 py-3.5 font-semibold text-white">${k.nama_driver || '-'}</td>
+          <td class="px-5 py-3.5 font-bold text-indigo-400">${k.kendaraan || '-'}</td>
+          <td class="px-5 py-3.5 font-mono text-amber-300">${k.tgl_pinjam || '-'}</td>
+          <td class="px-5 py-3.5 text-slate-300">${k.tujuan || '-'}</td>
+          <td class="px-5 py-3.5">${getStatusBadge(k.status)}</td>
+          <td class="px-5 py-3.5 text-center space-x-2">
+            <button onclick="openKendaraanModal(${k.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
+            <button onclick="deleteKendaraan(${k.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openKendaraanModal(id = null) {
+      const obj = id ? kendaraanData.find(k => k.id === id) : null;
+      document.getElementById('editKendaraanId').value = obj ? obj.id : '';
+      document.getElementById('kendaraanModalTitle').innerText = obj ? 'Edit Peminjaman Kendaraan' : 'Form Peminjaman Kendaraan';
+      document.getElementById('k_nama_driver').value = obj ? obj.nama_driver : '';
+      document.getElementById('k_kendaraan').value = obj ? obj.kendaraan : '';
+      document.getElementById('k_tgl_pinjam').value = obj ? obj.tgl_pinjam : new Date().toISOString().split('T')[0];
+      document.getElementById('k_status').value = obj ? (obj.status || 'Disetujui') : 'Disetujui';
+      document.getElementById('k_tujuan').value = obj ? (obj.tujuan || '') : '';
+      document.getElementById('kendaraanModal').classList.remove('hidden');
+    }
+
+    function closeKendaraanModal() { document.getElementById('kendaraanModal').classList.add('hidden'); }
+
+    async function handleKendaraanSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('editKendaraanId').value;
+      const payload = {
+        nama_driver: document.getElementById('k_nama_driver').value,
+        kendaraan: document.getElementById('k_kendaraan').value,
+        tgl_pinjam: document.getElementById('k_tgl_pinjam').value,
+        status: document.getElementById('k_status').value,
+        tujuan: document.getElementById('k_tujuan').value
+      };
+      const res = await fetch(id ? `/api/peminjaman-kendaraan/${id}` : '/api/peminjaman-kendaraan', {
+        method: id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        closeKendaraanModal();
+        showToast(id ? "Data kendaraan diperbarui!" : "Peminjaman kendaraan ditambahkan!", "success");
+        await loadAllRtData();
+      }
+    }
+
+    async function deleteKendaraan(id) {
+      if (confirm("Hapus data peminjaman kendaraan ini?")) {
+        const res = await fetch(`/api/peminjaman-kendaraan/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast("Data kendaraan dihapus!", "success");
+          await loadAllRtData();
+        }
+      }
+    }
+
+    function exportRuanganPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('l', 'mm', 'a4');
+      doc.setFontSize(13); doc.setFont("helvetica", "bold");
+      doc.text("LAPORAN PEMINJAMAN RUANGAN - POLTEKBANG SURABAYA", 14, 15);
+      doc.autoTable({
+        head: [['No', 'Peminjam', 'Ruangan', 'Tanggal', 'Jam', 'Keperluan', 'Status']],
+        body: ruanganData.map((r, i) => [i + 1, r.nama_peminjam, r.ruangan, r.tgl_pinjam, r.jam_mulai || '-', r.keperluan, r.status]),
+        startY: 20, headStyles: { fillColor: [37, 99, 235] }, styles: { fontSize: 8 }
+      });
+      doc.save(`Laporan_Ruangan_${new Date().toISOString().split('T')[0]}.pdf`);
+    }
+
+    function exportKendaraanPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('l', 'mm', 'a4');
+      doc.setFontSize(13); doc.setFont("helvetica", "bold");
+      doc.text("LAPORAN PEMINJAMAN KENDARAAN DINAS - POLTEKBANG SURABAYA", 14, 15);
+      doc.autoTable({
+        head: [['No', 'Peminjam / Driver', 'Kendaraan', 'Tanggal', 'Tujuan', 'Status']],
+        body: kendaraanData.map((k, i) => [i + 1, k.nama_driver, k.kendaraan, k.tgl_pinjam, k.tujuan, k.status]),
+        startY: 20, headStyles: { fillColor: [79, 70, 229] }, styles: { fontSize: 8 }
+      });
+      doc.save(`Laporan_Kendaraan_${new Date().toISOString().split('T')[0]}.pdf`);
     }
   </script>
 </body>
