@@ -17,6 +17,10 @@
       100% { transform: scale(0.9); opacity: 0.8; }
     }
     .radar-pulse { animation: radarPulse 3s infinite ease-in-out; }
+    /* Sticky kolom kiri agar kode & lokasi unit tetap terlihat saat scroll horizontal ke Cuci 20 */
+    .sticky-col-1 { position: sticky; left: 0; z-index: 10; background-color: #0f172a; }
+    .sticky-col-2 { position: sticky; left: 48px; z-index: 10; background-color: #0f172a; }
+    tr:hover .sticky-col-1, tr:hover .sticky-col-2 { background-color: #1e293b; }
   </style>
 </head>
 <body class="bg-slate-950 font-sans text-slate-100 p-4 md:p-6 min-h-screen antialiased">
@@ -52,9 +56,9 @@
             <i class="fa-solid fa-plane text-[9px]"></i> TEKNIK & MAINTENANCE
           </p>
           <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-white flex items-center gap-3">
-            Dashboard Maintenance & Pemeliharaan AC
+            Dashboard Maintenance & Jadwal Cuci Per-Unit AC
           </h1>
-          <p class="text-xs text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya • Jadwal 20x Servis & Cuci Real-time</p>
+          <p class="text-xs text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya • Rekap Matriks 20x Service & Cuci per Unit AC</p>
         </div>
       </div>
       
@@ -96,25 +100,25 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-cyan-500/40 transition duration-300">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Jadwal / Unit</p>
-          <i class="fa-solid fa-wrench text-cyan-400 text-xs"></i>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Unit AC</p>
+          <i class="fa-solid fa-snowflake text-cyan-400 text-xs"></i>
         </div>
-        <h3 class="text-3xl font-black text-cyan-400 mt-2" id="kpi-total-ac">0</h3>
-        <p class="text-[11px] text-slate-500 mt-1" id="kpi-unique-ac">0 Unit AC Unik</p>
+        <h3 class="text-3xl font-black text-cyan-400 mt-2" id="kpi-unique-ac">0</h3>
+        <p class="text-[11px] text-slate-500 mt-1" id="kpi-total-sched">0 Total Slot Jadwal</p>
       </div>
 
       <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-emerald-500/40 transition duration-300">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Baik / Selesai Cuci</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Selesai Dicuci</p>
           <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
         </div>
         <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-selesai-ac">0</h3>
-        <p class="text-[11px] text-emerald-500/80 mt-1">Sudah Diservis</p>
+        <p class="text-[11px] text-emerald-500/80 mt-1">Slot Cuci Selesai / Baik</p>
       </div>
 
       <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-indigo-500/40 transition duration-300">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Terjadwal / Proses</p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Jadwal Mendatang</p>
           <i class="fa-solid fa-calendar-check text-indigo-400 text-xs"></i>
         </div>
         <h3 class="text-3xl font-black text-indigo-400 mt-2" id="kpi-proses-ac">0</h3>
@@ -127,7 +131,7 @@
           <i class="fa-solid fa-triangle-exclamation text-rose-400 text-xs"></i>
         </div>
         <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-rusak-ac">0</h3>
-        <p class="text-[11px] text-rose-500/80 mt-1">AC Rusak / Kendala</p>
+        <p class="text-[11px] text-rose-500/80 mt-1">Unit AC Rusak / Kendala</p>
       </div>
     </div>
 
@@ -135,7 +139,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
         <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-bar text-cyan-400"></i> Sebaran Jadwal & Unit AC per Gedung
+          <i class="fa-solid fa-chart-bar text-cyan-400"></i> Sebaran Jumlah Unit AC per Gedung
         </h2>
         <div style="position: relative; height: 230px; width: 100%;">
           <canvas id="acLocationChart"></canvas>
@@ -144,7 +148,7 @@
 
       <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
         <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-emerald-400"></i> Progres Kelayakan & Jadwal Cuci
+          <i class="fa-solid fa-chart-pie text-emerald-400"></i> Progres Realisasi Cuci AC
         </h2>
         <div style="position: relative; height: 230px; width: 100%;">
           <canvas id="acStatusPieChart"></canvas>
@@ -152,7 +156,7 @@
       </div>
     </div>
 
-    <!-- FILTER TAB GEDUNG, SIKLUS 1-20 & PENCARIAN -->
+    <!-- FILTER TAB GEDUNG & PENCARIAN -->
     <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
       <div class="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-1" id="location-tabs">
         <button onclick="filterByLocation('SEMUA')" id="tab-SEMUA" class="tab-btn px-4 py-2 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow transition whitespace-nowrap">
@@ -172,44 +176,21 @@
         </button>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-        <select id="cycleFilter" onchange="handleSearch()" class="bg-slate-900 border border-slate-800 text-indigo-300 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <option value="ALL">Semua Siklus (1–20x)</option>
-          <option value="Siklus 1/20">Cuci ke-1 (1/20)</option>
-          <option value="Siklus 2/20">Cuci ke-2 (2/20)</option>
-          <option value="Siklus 3/20">Cuci ke-3 (3/20)</option>
-          <option value="Siklus 4/20">Cuci ke-4 (4/20)</option>
-          <option value="Siklus 5/20">Cuci ke-5 (5/20)</option>
-          <option value="Siklus 6/20">Cuci ke-6 (6/20)</option>
-          <option value="Siklus 7/20">Cuci ke-7 (7/20)</option>
-          <option value="Siklus 8/20">Cuci ke-8 (8/20)</option>
-          <option value="Siklus 9/20">Cuci ke-9 (9/20)</option>
-          <option value="Siklus 10/20">Cuci ke-10 (10/20)</option>
-          <option value="Siklus 11/20">Cuci ke-11 (11/20)</option>
-          <option value="Siklus 12/20">Cuci ke-12 (12/20)</option>
-          <option value="Siklus 13/20">Cuci ke-13 (13/20)</option>
-          <option value="Siklus 14/20">Cuci ke-14 (14/20)</option>
-          <option value="Siklus 15/20">Cuci ke-15 (15/20)</option>
-          <option value="Siklus 16/20">Cuci ke-16 (16/20)</option>
-          <option value="Siklus 17/20">Cuci ke-17 (17/20)</option>
-          <option value="Siklus 18/20">Cuci ke-18 (18/20)</option>
-          <option value="Siklus 19/20">Cuci ke-19 (19/20)</option>
-          <option value="Siklus 20/20">Cuci ke-20 (20/20)</option>
-        </select>
-
-        <div class="relative flex-1 sm:w-64">
-          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari kode, ruang, tanggal..." class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
-        </div>
+      <div class="relative w-full lg:w-80">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari kode unit, gedung, ruang, merk..." class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
       </div>
     </div>
 
-    <!-- SEKSI 3: TABEL DATA MAINTENANCE AC DENGAN PAGINASI -->
+    <!-- SEKSI 3: TABEL MATRIKS JADWAL SERVICE & CUCI PER-UNIT AC -->
     <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
       <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
-        <h2 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-cyan-400"></i> Log Historical & Jadwal 20x Service/Cuci AC
-        </h2>
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-table-columns text-cyan-400"></i> Rekap Jadwal Service & Cuci Per-Unit AC (Cuci 1 s/d Cuci 20)
+          </h2>
+          <p class="text-[11px] text-slate-400 mt-0.5">Klik pada kotak tanggal cuci untuk menandai <span class="text-emerald-400 font-bold">Selesai</span> / <span class="text-indigo-300 font-bold">Terjadwal</span>. Geser tabel ke kanan untuk melihat Cuci 1–20.</p>
+        </div>
         <div class="flex flex-wrap items-center gap-2">
           <button onclick="openScheduleModal()" class="px-3.5 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
             <i class="fa-solid fa-calendar-check"></i> Generate Jadwal 20x
@@ -221,36 +202,26 @@
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
           <button onclick="openModal()" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl shadow transition">
-            + Tambah Data
+            + Tambah Unit
           </button>
         </div>
       </div>
 
       <div class="overflow-x-auto">
         <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
-          <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800">
-            <tr>
-              <th class="px-4 py-3.5 font-bold text-center">No</th>
-              <th class="px-5 py-3.5 font-bold">Kode Unit</th>
-              <th class="px-5 py-3.5 font-bold">Gedung / Lt / Ruang</th>
-              <th class="px-5 py-3.5 font-bold">Merk & Tipe</th>
-              <th class="px-5 py-3.5 font-bold">Kapasitas & Freon</th>
-              <th class="px-5 py-3.5 font-bold">Tgl Jadwal / Servis</th>
-              <th class="px-5 py-3.5 font-bold">Status</th>
-              <th class="px-5 py-3.5 font-bold">Catatan / Siklus Cuci</th>
-              <th class="px-5 py-3.5 font-bold text-center">Aksi</th>
-            </tr>
+          <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800" id="thead-matrix">
+            <!-- Header diisi dinamis termasuk Cuci 1 s/d Cuci 20 -->
           </thead>
           <tbody id="tbody-ac" class="divide-y divide-slate-800">
-            <tr><td colspan="9" class="text-center py-5 text-slate-500">Memuat data...</td></tr>
+            <tr><td colspan="26" class="text-center py-5 text-slate-500">Memuat data unit AC...</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- BOTTOM BAR PAGINASI (20 DATA / HALAMAN) -->
+      <!-- BOTTOM BAR PAGINASI (20 UNIT AC / HALAMAN) -->
       <div class="p-4 border-t border-slate-800 bg-slate-950/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
         <div class="text-slate-400" id="pagination-info">
-          Menampilkan 0 - 0 dari 0 data
+          Menampilkan 0 - 0 dari 0 unit AC
         </div>
         <div class="flex items-center space-x-1.5" id="pagination-controls"></div>
       </div>
@@ -259,7 +230,7 @@
 
   </div>
 
-  <!-- MODAL FORM INPUT/EDIT LENGKAP -->
+  <!-- MODAL FORM INPUT/EDIT UNIT AC -->
   <div id="acModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
     <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-lg text-slate-100 my-8">
       <h3 id="modalTitle" class="text-lg font-extrabold text-white mb-4">Input Data Unit & Servis AC</h3>
@@ -340,17 +311,6 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Jenis Pekerjaan</label>
-            <input type="text" id="jenis_pekerjaan" placeholder="Service & Cuci AC" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Teknisi</label>
-            <input type="text" id="teknisi" value="Tim K3 Sarpras" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none">
-          </div>
-        </div>
-
         <div>
           <label class="block text-xs font-bold mb-1 text-slate-300">Catatan</label>
           <textarea id="catatan" rows="2" placeholder="Keterangan tambahan..." class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-cyan-500 outline-none"></textarea>
@@ -364,20 +324,20 @@
     </div>
   </div>
 
-  <!-- MODAL GENERATE JADWAL 20X SERVIS & CUCI -->
+  <!-- MODAL GENERATE JADWAL 20X SERVIS & CUCI PER-UNIT AC -->
   <div id="scheduleModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100">
       <h3 class="text-lg font-extrabold text-white mb-2 flex items-center gap-2">
-        <i class="fa-solid fa-calendar-days text-indigo-400"></i> Generate Jadwal 20x Servis & Cuci
+        <i class="fa-solid fa-calendar-days text-indigo-400"></i> Generate Jadwal Cuci Per-Unit AC
       </h3>
-      <p class="text-xs text-slate-400 mb-4">Sistem akan otomatis merekap <strong class="text-indigo-300">20 jadwal service & cuci</strong> untuk masing-masing unit AC yang terdaftar di database.</p>
+      <p class="text-xs text-slate-400 mb-4">Setiap unit AC akan otomatis dibuatkan jadwal <strong class="text-indigo-300">Cuci 1 sampai Cuci 20</strong> dalam satu baris rekap matriks.</p>
       <form onsubmit="handleGenerateSchedule(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Servis ke-1 (Mulai)</label>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Cuci ke-1 (Mulai)</label>
           <input type="date" id="schedStartDate" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Interval Antar Servis</label>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Interval Antar Cuci</label>
           <select id="schedInterval" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
             <option value="14">Setiap 14 Hari (2 Minggu Sekali)</option>
             <option value="30" selected>Setiap 30 Hari (1 Bulan Sekali)</option>
@@ -386,15 +346,15 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Mode Rekap Database</label>
-          <select id="schedMode" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
-            <option value="replace">Ganti Data Lama dengan 20 Siklus Jadwal Baru</option>
-            <option value="append">Tambahkan ke Riwayat Data yang Sudah Ada</option>
+          <label class="block text-xs font-bold mb-1 text-slate-300">Jumlah Siklus Cuci per AC</label>
+          <select id="schedCycles" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="10">10 Kali Service & Cuci per AC</option>
+            <option value="20" selected>20 Kali Service & Cuci per AC</option>
           </select>
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
           <button type="button" onclick="closeScheduleModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" id="btnSubmitSchedule" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-600/30">Buat 20x Jadwal</button>
+          <button type="submit" id="btnSubmitSchedule" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-600/30">Buat Jadwal Per-AC</button>
         </div>
       </form>
     </div>
@@ -422,9 +382,11 @@
 
   <script>
     let acData = [];
+    let groupedUnits = []; // 1 objek = 1 unit AC dengan array schedules[0..19]
+    let maxCycles = 20;
+
     let currentFilter = 'SEMUA';
     let searchQuery = '';
-    let cycleFilter = 'ALL';
     let currentPage = 1;
     const itemsPerPage = 20;
 
@@ -442,8 +404,28 @@
     document.addEventListener('DOMContentLoaded', () => { 
       initNavLoader();
       initQuote();
+      renderMatrixHeader();
       loadAcData(); 
     });
+
+    function renderMatrixHeader() {
+      const thead = document.getElementById('thead-matrix');
+      let cycleCols = '';
+      for (let c = 1; c <= maxCycles; c++) {
+        cycleCols += `<th class="px-3 py-3.5 font-bold text-center text-indigo-300 bg-indigo-950/30 border-l border-slate-800">Cuci ${c}</th>`;
+      }
+      thead.innerHTML = `
+        <tr>
+          <th class="px-3 py-3.5 font-bold text-center sticky-col-1 w-12">No</th>
+          <th class="px-4 py-3.5 font-bold sticky-col-2">Kode Unit AC</th>
+          <th class="px-4 py-3.5 font-bold">Gedung / Lt / Ruang</th>
+          <th class="px-4 py-3.5 font-bold">Merk & Kapasitas</th>
+          <th class="px-4 py-3.5 font-bold text-center">Kondisi Unit</th>
+          ${cycleCols}
+          <th class="px-4 py-3.5 font-bold text-center border-l border-slate-800">Aksi</th>
+        </tr>
+      `;
+    }
 
     function initNavLoader() {
       document.querySelectorAll('a.nav-link').forEach(link => {
@@ -510,12 +492,59 @@
       }, 4000);
     }
 
+    // KELOMPOKKAN DATA SUPABASE PER UNIT AC (1 BARIS = 1 UNIT AC, BERISI JADWAL CUCI 1..20)
+    function buildGroupedUnits(rawRows) {
+      const map = new Map();
+      let detectedMaxCycle = 10;
+
+      rawRows.forEach(row => {
+        const key = row.kode_unit || `${row.gedung}-${row.ruang}-${row.no_urut}`;
+        if (!map.has(key)) {
+          map.set(key, {
+            baseRow: row,
+            kategori_gedung: row.kategori_gedung || 'G. UMUM',
+            kode_unit: row.kode_unit || '-',
+            gedung: row.gedung || '',
+            lantai: row.lantai || '',
+            ruang: row.ruang || '',
+            no_urut: row.no_urut || '',
+            merk_ac: row.merk_ac || '',
+            type_ac: row.type_ac || '',
+            kapasitas: row.kapasitas || '',
+            freon: row.freon || '',
+            lokasi: row.lokasi || '',
+            schedules: []
+          });
+        }
+        const unitObj = map.get(key);
+        unitObj.schedules.push(row);
+      });
+
+      const list = Array.from(map.values());
+      list.forEach(u => {
+        // Urutkan jadwal unit berdasarkan siklus atau id/tanggal
+        u.schedules.sort((a, b) => {
+          const mA = (a.jenis_pekerjaan || a.catatan || '').match(/(\d+)\s*\/\s*(\d+)/);
+          const mB = (b.jenis_pekerjaan || b.catatan || '').match(/(\d+)\s*\/\s*(\d+)/);
+          if (mA && mB) return parseInt(mA[1], 10) - parseInt(mB[1], 10);
+          return a.id - b.id;
+        });
+        if (u.schedules.length > detectedMaxCycle) {
+          detectedMaxCycle = Math.min(20, u.schedules.length);
+        }
+      });
+
+      maxCycles = detectedMaxCycle > 10 ? 20 : (detectedMaxCycle > 1 ? detectedMaxCycle : 20);
+      renderMatrixHeader();
+      return list;
+    }
+
     async function loadAcData() {
       try {
         const res = await fetch('/api/maintenance-ac');
         const rawData = await res.json();
         acData = (rawData || []).sort((a, b) => a.id - b.id);
-        currentPage = 1;
+        groupedUnits = buildGroupedUnits(acData);
         renderTable();
         updateKpis();
         renderCharts();
@@ -535,31 +564,35 @@
 
     function handleSearch() {
       searchQuery = document.getElementById('searchInput').value.toLowerCase();
-      cycleFilter = document.getElementById('cycleFilter').value;
       currentPage = 1;
       renderTable();
     }
 
-    function getFilteredData() {
-      return acData.filter(item => {
-        const loc = `${item.lokasi || ''} ${item.gedung || ''}`.toUpperCase();
-        const tabCategory = (item.kategori_gedung || '').toUpperCase();
+    function getFilteredUnits() {
+      return groupedUnits.filter(unit => {
+        const loc = `${unit.lokasi || ''} ${unit.gedung || ''}`.toUpperCase();
+        const tabCategory = (unit.kategori_gedung || '').toUpperCase();
         const filterNormalized = currentFilter.replace('G. ', '');
         const matchesLoc = currentFilter === 'SEMUA' || loc.includes(filterNormalized) || tabCategory.includes(filterNormalized);
 
-        const jobNote = `${item.jenis_pekerjaan || ''} ${item.catatan || ''}`;
-        const matchesCycle = cycleFilter === 'ALL' || jobNote.includes(cycleFilter);
-
-        const fullText = `${item.lokasi} ${item.gedung} ${item.ruang} ${item.kode_unit} ${item.merk_ac} ${item.type_ac} ${item.kapasitas} ${item.freon} ${item.tgl_servis} ${item.catatan} ${item.jenis_pekerjaan} ${item.status}`.toLowerCase();
+        const schedDates = unit.schedules.map(s => s.tgl_servis).join(' ');
+        const fullText = `${unit.lokasi} ${unit.gedung} ${unit.ruang} ${unit.kode_unit} ${unit.merk_ac} ${unit.type_ac} ${unit.kapasitas} ${unit.freon} ${schedDates}`.toLowerCase();
         const matchesSearch = !searchQuery || fullText.includes(searchQuery);
 
-        return matchesLoc && matchesCycle && matchesSearch;
+        return matchesLoc && matchesSearch;
       });
+    }
+
+    function formatShortDate(iso) {
+      if (!iso) return '-';
+      const parts = iso.split('-');
+      if (parts.length !== 3) return iso;
+      return `${parts[2]}/${parts[1]}/${parts[0].slice(2)}`;
     }
 
     function renderTable() {
       const tbody = document.getElementById('tbody-ac');
-      const filtered = getFilteredData();
+      const filtered = getFilteredUnits();
       const totalItems = filtered.length;
       const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
 
@@ -567,46 +600,61 @@
 
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-      const paginatedItems = filtered.slice(startIndex, endIndex);
+      const paginatedUnits = filtered.slice(startIndex, endIndex);
 
       if (!filtered || filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-5 text-slate-500">Data tidak ditemukan.</td></tr>`;
-        document.getElementById('pagination-info').innerText = 'Menampilkan 0 dari 0 data';
+        tbody.innerHTML = `<tr><td colspan="${6 + maxCycles}" class="text-center py-6 text-slate-500">Belum ada unit AC ditemukan. Silakan Import Excel atau Generate Jadwal.</td></tr>`;
+        document.getElementById('pagination-info').innerText = 'Menampilkan 0 dari 0 unit AC';
         document.getElementById('pagination-controls').innerHTML = '';
         return;
       }
 
-      tbody.innerHTML = paginatedItems.map((item, index) => {
-        const statusUpper = (item.status || 'BAIK').toUpperCase();
-        let statusColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-        if (statusUpper.includes('TERJADWAL') || statusUpper.includes('PROSES')) {
-          statusColor = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
-        } else if (statusUpper.includes('RUSAK') || statusUpper.includes('MATI')) {
-          statusColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+      tbody.innerHTML = paginatedUnits.map((unit, index) => {
+        const hasRusak = unit.schedules.some(s => (s.status || '').toUpperCase().includes('RUSAK'));
+        const badgeCondition = hasRusak
+          ? `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded font-bold">RUSAK</span>`
+          : `<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded font-bold">BAIK</span>`;
+
+        const lokasiDisplay = unit.gedung || unit.ruang
+          ? `${unit.gedung || unit.kategori_gedung || '-'} ${unit.lantai ? '• ' + unit.lantai : ''} ${unit.ruang ? '• ' + unit.ruang : ''}`
+          : (unit.lokasi || '-');
+
+        const merkKapDisplay = `${unit.merk_ac || '-'} ${unit.kapasitas ? '(' + unit.kapasitas + ')' : ''}`;
+
+        let cycleCells = '';
+        for (let c = 0; c < maxCycles; c++) {
+          const sched = unit.schedules[c];
+          if (!sched) {
+            cycleCells += `<td class="px-2.5 py-3 text-center text-slate-600 border-l border-slate-800/70">-</td>`;
+          } else {
+            const st = (sched.status || '').toUpperCase();
+            const isDone = st.includes('BAIK') || st.includes('SELESAI');
+            const pillStyle = isDone
+              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30'
+              : 'bg-indigo-500/20 text-indigo-200 border-indigo-500/40 hover:bg-indigo-500/30';
+            const iconStatus = isDone ? '<i class="fa-solid fa-check text-[9px] mr-1"></i>' : '';
+
+            cycleCells += `
+              <td class="px-2 py-2.5 text-center border-l border-slate-800/70">
+                <button onclick="toggleScheduleStatus(${sched.id})" title="Klik untuk ubah status Cuci ke-${c + 1} (${sched.tgl_servis})" class="${pillStyle} border px-2 py-1 rounded-lg text-[10px] font-mono font-bold transition active:scale-95">
+                  ${iconStatus}${formatShortDate(sched.tgl_servis)}
+                </button>
+              </td>
+            `;
+          }
         }
-
-        const lokasiDisplay = item.gedung || item.ruang
-          ? `${item.gedung || item.kategori_gedung || '-'} ${item.lantai ? '• ' + item.lantai : ''} ${item.ruang ? '• ' + item.ruang : ''}`
-          : (item.lokasi || '-');
-
-        const merkTypeDisplay = `${item.merk_ac || '-'} ${item.type_ac ? '(' + item.type_ac + ')' : ''}`;
-        const kapFreonDisplay = `${item.kapasitas || '-'} ${item.freon ? '/ ' + item.freon : ''}`;
-        const isScheduled = statusUpper.includes('TERJADWAL') || statusUpper.includes('PROSES');
 
         return `
           <tr class="hover:bg-slate-800/50 transition">
-            <td class="px-4 py-3.5 text-center font-bold text-slate-400">${startIndex + index + 1}</td>
-            <td class="px-5 py-3.5 font-mono text-cyan-400 font-bold">${item.kode_unit || '-'}</td>
-            <td class="px-5 py-3.5 font-semibold text-white">${lokasiDisplay}</td>
-            <td class="px-5 py-3.5 text-slate-300">${merkTypeDisplay}</td>
-            <td class="px-5 py-3.5 text-slate-300">${kapFreonDisplay}</td>
-            <td class="px-5 py-3.5 text-xs font-mono text-amber-300 font-bold">${item.tgl_servis || '-'}</td>
-            <td class="px-5 py-3.5"><span class="${statusColor} border text-[10px] px-2.5 py-1 rounded-md font-bold">${item.status || 'BAIK'}</span></td>
-            <td class="px-5 py-3.5 text-slate-300 font-medium">${item.catatan || item.jenis_pekerjaan || '-'}</td>
-            <td class="px-5 py-3.5 text-center space-x-2">
-              ${isScheduled ? `<button onclick="markDone(${item.id})" class="text-emerald-400 hover:underline font-bold text-xs">Selesai</button>` : ''}
-              <button onclick="editItem(${item.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
-              <button onclick="deleteItem(${item.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
+            <td class="px-3 py-3 text-center font-bold text-slate-400 sticky-col-1">${startIndex + index + 1}</td>
+            <td class="px-4 py-3 font-mono text-cyan-400 font-bold sticky-col-2">${unit.kode_unit}</td>
+            <td class="px-4 py-3 font-semibold text-white">${lokasiDisplay}</td>
+            <td class="px-4 py-3 text-slate-300">${merkKapDisplay}</td>
+            <td class="px-4 py-3 text-center">${badgeCondition}</td>
+            ${cycleCells}
+            <td class="px-4 py-3 text-center space-x-2 border-l border-slate-800">
+              <button onclick="editItem(${unit.baseRow.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
+              <button onclick="deleteUnit('${unit.kode_unit}')" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
             </td>
           </tr>
         `;
@@ -616,7 +664,7 @@
     }
 
     function renderPaginationControls(totalItems, totalPages, startIndex, endIndex) {
-      document.getElementById('pagination-info').innerText = `Menampilkan ${startIndex + 1} - ${endIndex} dari ${totalItems.toLocaleString('id-ID')} data`;
+      document.getElementById('pagination-info').innerText = `Menampilkan ${startIndex + 1} - ${endIndex} dari ${totalItems.toLocaleString('id-ID')} unit AC`;
       const controls = document.getElementById('pagination-controls');
       let html = '';
 
@@ -650,7 +698,7 @@
     }
 
     function changePage(page) {
-      const filtered = getFilteredData();
+      const filtered = getFilteredUnits();
       const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
       if (page >= 1 && page <= totalPages) {
         currentPage = page;
@@ -659,8 +707,8 @@
     }
 
     function updateKpis() {
-      const total = acData.length;
-      const uniqueUnits = new Set(acData.map(i => i.kode_unit)).size;
+      const totalSched = acData.length;
+      const uniqueCount = groupedUnits.length;
       const selesai = acData.filter(i => {
         const s = (i.status || 'BAIK').toUpperCase();
         return s.includes('BAIK') || s.includes('SELESAI');
@@ -669,13 +717,10 @@
         const s = (i.status || '').toUpperCase();
         return s.includes('TERJADWAL') || s.includes('PROSES');
       }).length;
-      const rusak = acData.filter(i => {
-        const s = (i.status || '').toUpperCase();
-        return s.includes('RUSAK') || s.includes('MATI') || s.includes('KENDALA');
-      }).length;
+      const rusak = groupedUnits.filter(u => u.schedules.some(s => (s.status || '').toUpperCase().includes('RUSAK'))).length;
 
-      animateCounter('kpi-total-ac', total);
-      document.getElementById('kpi-unique-ac').innerText = `${uniqueUnits.toLocaleString('id-ID')} Unit AC Unik`;
+      animateCounter('kpi-unique-ac', uniqueCount);
+      document.getElementById('kpi-total-sched').innerText = `${totalSched.toLocaleString('id-ID')} Total Slot Jadwal`;
       animateCounter('kpi-selesai-ac', selesai);
       animateCounter('kpi-proses-ac', proses);
       animateCounter('kpi-rusak-ac', rusak);
@@ -683,7 +728,10 @@
 
     function renderCharts() {
       const locCounts = {};
-      acData.forEach(i => { const key = i.kategori_gedung || i.gedung || i.lokasi || 'Lainnya'; locCounts[key] = (locCounts[key] || 0) + 1; });
+      groupedUnits.forEach(u => {
+        const key = u.kategori_gedung || u.gedung || 'Lainnya';
+        locCounts[key] = (locCounts[key] || 0) + 1;
+      });
       const labels = Object.keys(locCounts).slice(0, 6);
       const values = Object.values(locCounts).slice(0, 6);
 
@@ -693,7 +741,7 @@
         type: 'bar',
         data: {
           labels: labels.length ? labels : ['Belum Ada Data'],
-          datasets: [{ label: 'Total Jadwal / Unit', data: values.length ? values : [0], backgroundColor: '#06b6d4', borderRadius: 4, barPercentage: 0.55 }]
+          datasets: [{ label: 'Jumlah Unit AC', data: values.length ? values : [0], backgroundColor: '#06b6d4', borderRadius: 4, barPercentage: 0.55 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
@@ -704,26 +752,49 @@
 
       const selesai = acData.filter(i => ['BAIK', 'SELESAI', ''].includes((i.status || 'BAIK').toUpperCase())).length;
       const proses = acData.filter(i => ['TERJADWAL', 'PROSES'].includes((i.status || '').toUpperCase())).length;
-      const rusak = acData.filter(i => {
-        const s = (i.status || '').toUpperCase();
-        return s.includes('RUSAK') || s.includes('MATI');
-      }).length;
+      const rusak = acData.filter(i => (i.status || '').toUpperCase().includes('RUSAK')).length;
 
       const ctxPie = document.getElementById('acStatusPieChart').getContext('2d');
       if (statusPieChartInstance) statusPieChartInstance.destroy();
       statusPieChartInstance = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-          labels: ['Baik / Selesai', 'Terjadwal / Proses', 'Rusak'],
+          labels: ['Selesai / Baik', 'Terjadwal Cuci', 'Rusak'],
           datasets: [{ data: [selesai, proses, rusak], backgroundColor: ['#10b981', '#6366f1', '#ef4444'], borderWidth: 2, borderColor: '#0f172a' }]
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } } }
       });
     }
 
+    async function toggleScheduleStatus(id) {
+      const item = acData.find(i => i.id === id);
+      if (!item) return;
+
+      const currentStatus = (item.status || '').toUpperCase();
+      const nextStatus = (currentStatus.includes('BAIK') || currentStatus.includes('SELESAI')) ? 'Terjadwal' : 'BAIK';
+
+      try {
+        const res = await fetch(`/api/maintenance-ac/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...item, status: nextStatus })
+        });
+        if (res.ok) {
+          item.status = nextStatus;
+          groupedUnits = buildGroupedUnits(acData);
+          renderTable();
+          updateKpis();
+          renderCharts();
+          showToast(`${item.kode_unit} (${item.tgl_servis}) → ${nextStatus === 'BAIK' ? 'Selesai Cuci' : 'Terjadwal'}`, "success");
+        }
+      } catch (err) {
+        showToast("Gagal memperbarui status: " + err.message, "error");
+      }
+    }
+
     function openModal(editObj = null) {
       document.getElementById('editId').value = editObj ? editObj.id : '';
-      document.getElementById('modalTitle').innerText = editObj ? "Edit Data Unit & Servis AC" : "Input Data Unit & Servis AC";
+      document.getElementById('modalTitle').innerText = editObj ? "Edit Data Unit AC" : "Input Data Unit AC";
       document.getElementById('kategori_gedung').value = editObj ? (editObj.kategori_gedung || 'G. UMUM') : 'G. UMUM';
       document.getElementById('kode_unit').value = editObj ? (editObj.kode_unit || '') : '';
       document.getElementById('gedung').value = editObj ? (editObj.gedung || '') : '';
@@ -735,8 +806,6 @@
       document.getElementById('kapasitas').value = editObj ? (editObj.kapasitas || '') : '';
       document.getElementById('freon').value = editObj ? (editObj.freon || '') : '';
       document.getElementById('tgl_servis').value = editObj ? (editObj.tgl_servis || '') : new Date().toISOString().split('T')[0];
-      document.getElementById('jenis_pekerjaan').value = editObj ? (editObj.jenis_pekerjaan || '') : '';
-      document.getElementById('teknisi').value = editObj ? (editObj.teknisi || 'Tim K3 Sarpras') : 'Tim K3 Sarpras';
       document.getElementById('catatan').value = editObj ? (editObj.catatan || '') : '';
 
       const st = editObj ? (editObj.status || 'BAIK').toUpperCase() : 'BAIK';
@@ -758,7 +827,7 @@
     }
     function closeScheduleModal() { document.getElementById('scheduleModal').classList.add('hidden'); }
 
-    // KIRIM DATA PER CHUNK 500 BARIS AGAR TIDAK MELEBIHI LIMIT 4.5MB VERCEL
+    // KIRIM DATA PER CHUNK 500 BARIS AGAR LOLOS BATAS 4.5MB VERCEL
     async function sendBulkInChunks(items, initialAppend, progressBtn, defaultBtnLabel) {
       const CHUNK_SIZE = 500;
       const totalChunks = Math.ceil(items.length / CHUNK_SIZE);
@@ -792,31 +861,21 @@
 
     async function handleGenerateSchedule(e) {
       e.preventDefault();
-      if (!acData || acData.length === 0) {
+      if (!groupedUnits || groupedUnits.length === 0) {
         showToast("Belum ada data unit AC. Silakan import Excel terlebih dahulu.", "error");
         return;
       }
 
       const startDateStr = document.getElementById('schedStartDate').value;
       const intervalDays = parseInt(document.getElementById('schedInterval').value, 10);
-      const isAppend = document.getElementById('schedMode').value === 'append';
+      const totalCycles = parseInt(document.getElementById('schedCycles').value, 10);
       const btn = document.getElementById('btnSubmitSchedule');
 
-      // Ambil daftar unik unit AC berdasarkan kode_unit
-      const uniqueUnitsMap = new Map();
-      acData.forEach(item => {
-        const key = item.kode_unit || `${item.gedung}-${item.ruang}-${item.no_urut}`;
-        if (!uniqueUnitsMap.has(key)) {
-          uniqueUnitsMap.set(key, item);
-        }
-      });
-
-      const uniqueUnits = Array.from(uniqueUnitsMap.values());
       const generatedItems = [];
       const baseDate = new Date(startDateStr);
 
-      uniqueUnits.forEach(unit => {
-        for (let cycle = 1; cycle <= 20; cycle++) {
+      groupedUnits.forEach(unit => {
+        for (let cycle = 1; cycle <= totalCycles; cycle++) {
           const schedDate = new Date(baseDate);
           schedDate.setDate(baseDate.getDate() + (cycle - 1) * intervalDays);
           const isoDate = schedDate.toISOString().split('T')[0];
@@ -834,10 +893,10 @@
             freon: unit.freon || '',
             tgl_servis: isoDate,
             status: 'Terjadwal',
-            catatan: `Service & Cuci AC ke-${cycle} dari 20`,
+            catatan: `Cuci ke-${cycle}/${totalCycles}`,
             lokasi: unit.lokasi || `${unit.gedung || ''} ${unit.ruang ? '(' + unit.ruang + ')' : ''}`.trim(),
-            jenis_pekerjaan: `Service & Cuci AC (Siklus ${cycle}/20)`,
-            teknisi: unit.teknisi || 'Tim K3 Sarpras'
+            jenis_pekerjaan: `Service & Cuci AC (Siklus ${cycle}/${totalCycles})`,
+            teknisi: 'Tim K3 Sarpras'
           });
         }
       });
@@ -845,40 +904,15 @@
       btn.disabled = true;
 
       try {
-        await sendBulkInChunks(generatedItems, isAppend, btn, "Buat 20x Jadwal");
-        showToast(`Sukses! ${uniqueUnits.length} unit AC direkap menjadi ${generatedItems.length.toLocaleString('id-ID')} jadwal (20x cuci).`, "success");
+        await sendBulkInChunks(generatedItems, false, btn, "Buat Jadwal Per-AC");
+        showToast(`Berhasil membuat jadwal ${totalCycles}x cuci untuk masing-masing ${groupedUnits.length} unit AC!`, "success");
         closeScheduleModal();
         await loadAcData();
       } catch (err) {
         showToast("Error: " + err.message, "error");
       } finally {
         btn.disabled = false;
-        btn.innerText = "Buat 20x Jadwal";
-      }
-    }
-
-    async function markDone(id) {
-      const item = acData.find(i => i.id === id);
-      if (!item) return;
-
-      const updatedPayload = {
-        ...item,
-        status: 'BAIK',
-        catatan: (item.catatan || '').replace('Service & Cuci', 'Selesai Service & Cuci')
-      };
-
-      try {
-        const res = await fetch(`/api/maintenance-ac/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedPayload)
-        });
-        if (res.ok) {
-          showToast(`Unit ${item.kode_unit} ditandai Selesai / BAIK!`, "success");
-          await loadAcData();
-        }
-      } catch (err) {
-        showToast("Gagal memperbarui status: " + err.message, "error");
+        btn.innerText = "Buat Jadwal Per-AC";
       }
     }
 
@@ -994,7 +1028,7 @@
 
           btn.disabled = true;
           await sendBulkInChunks(parsedItems, false, btn, "Mulai Import");
-          showToast(`Berhasil meng-import ${parsedItems.length.toLocaleString('id-ID')} data AC ke Supabase!`, "success");
+          showToast(`Berhasil meng-import ${parsedItems.length.toLocaleString('id-ID')} unit AC!`, "success");
           closeImportModal();
           await loadAcData();
         } catch (err) {
@@ -1012,11 +1046,15 @@
       if (item) openModal(item);
     }
 
-    async function deleteItem(id) {
-      if (confirm("Hapus data pemeliharaan AC ini dari database?")) {
+    async function deleteUnit(kodeUnit) {
+      if (confirm(`Hapus seluruh jadwal unit AC ${kodeUnit} dari database?`)) {
         try {
-          const res = await fetch(`/api/maintenance-ac/${id}`, { method: 'DELETE' });
-          if (res.ok) { showToast("Data AC berhasil dihapus!", "success"); await loadAcData(); }
+          const rowsToDelete = acData.filter(i => i.kode_unit === kodeUnit);
+          for (const r of rowsToDelete) {
+            await fetch(`/api/maintenance-ac/${r.id}`, { method: 'DELETE' });
+          }
+          showToast(`Unit ${kodeUnit} berhasil dihapus!`, "success");
+          await loadAcData();
         } catch (err) { showToast("Error: " + err.message, "error"); }
       }
     }
@@ -1046,8 +1084,8 @@
         status: document.getElementById('statusSelect').value,
         catatan: document.getElementById('catatan').value,
         lokasi: `${gedung} ${lantai ? 'Lt.' + lantai : ''} ${ruang ? '(' + ruang + ')' : ''}`.trim(),
-        jenis_pekerjaan: document.getElementById('jenis_pekerjaan').value || `${merk_ac} ${type_ac} ${kapasitas}`.trim(),
-        teknisi: document.getElementById('teknisi').value
+        jenis_pekerjaan: `${merk_ac} ${type_ac} ${kapasitas}`.trim(),
+        teknisi: 'Tim K3 Sarpras'
       };
 
       const method = editId ? 'PUT' : 'POST';
@@ -1064,49 +1102,78 @@
     async function exportToPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('l', 'mm', 'a4');
-      const filteredData = getFilteredData();
+      const filteredUnits = getFilteredUnits();
 
-      if (!filteredData || filteredData.length === 0) {
-        showToast("Tidak ada data AC yang sesuai dengan pencarian untuk dicetak.", "error");
+      if (!filteredUnits || filteredUnits.length === 0) {
+        showToast("Tidak ada data unit AC untuk dicetak.", "error");
         return;
       }
 
       const filterGedung = currentFilter !== 'SEMUA' ? ` (Gedung: ${currentFilter})` : '';
-      const cycleInfo = cycleFilter !== 'ALL' ? ` | ${cycleFilter}` : '';
-      const searchInfo = searchQuery ? ` | Kata Kunci: "${searchQuery}"` : '';
 
-      doc.setFontSize(14); doc.setFont("helvetica", "bold");
-      doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
-      doc.setFontSize(10); doc.setFont("helvetica", "normal");
-      doc.text(`LAPORAN JADWAL & MAINTENANCE AC${filterGedung.toUpperCase()}`, 14, 21);
+      doc.setFontSize(13); doc.setFont("helvetica", "bold");
+      doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 14);
+      doc.setFontSize(9); doc.setFont("helvetica", "normal");
+      doc.text(`REKAP JADWAL SERVICE & CUCI PER-UNIT AC${filterGedung.toUpperCase()}`, 14, 19);
       doc.setFontSize(8);
-      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Total Data: ${filteredData.length} Jadwal${cycleInfo}${searchInfo}`, 14, 25);
-      doc.line(14, 27, 283, 27);
+      doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')} | Total Unit: ${filteredUnits.length} Unit AC`, 14, 23);
+      doc.line(14, 25, 283, 25);
 
-      const rowsAc = filteredData.map((item, i) => [
-        i + 1,
-        item.kode_unit || '-',
-        item.gedung || item.kategori_gedung || '-',
-        item.lantai || '-',
-        item.ruang || item.lokasi || '-',
-        `${item.merk_ac || '-'} ${item.type_ac || ''}`.trim(),
-        `${item.kapasitas || '-'} / ${item.freon || '-'}`,
-        item.tgl_servis || '-',
-        item.status || 'BAIK',
-        item.catatan || '-'
-      ]);
+      const headCols = ['No', 'Kode Unit', 'Gedung/Ruang', 'Merk/PK'];
+      for (let c = 1; c <= 10; c++) headCols.push(`C${c}`);
 
-      doc.autoTable({
-        head: [['No', 'Kode Unit', 'Gedung', 'Lt', 'Ruang', 'Merk & Tipe', 'Kapasitas/Freon', 'Tgl Jadwal', 'Status', 'Catatan / Siklus']],
-        body: rowsAc,
-        startY: 31,
-        headStyles: { fillColor: [6, 182, 212] },
-        styles: { fontSize: 7 }
+      const rowsPart1 = filteredUnits.map((u, i) => {
+        const row = [
+          i + 1,
+          u.kode_unit,
+          `${u.gedung || ''} ${u.ruang || ''}`.trim(),
+          `${u.merk_ac || ''} ${u.kapasitas || ''}`.trim()
+        ];
+        for (let c = 0; c < 10; c++) {
+          row.push(u.schedules[c] ? formatShortDate(u.schedules[c].tgl_servis) : '-');
+        }
+        return row;
       });
 
-      const fileSuffix = cycleFilter !== 'ALL' ? `_${cycleFilter.replace(/[^a-zA-Z0-9]/g, '_')}` : '';
-      doc.save(`Laporan_Jadwal_AC${fileSuffix}_${new Date().toISOString().split('T')[0]}.pdf`);
-      showToast("Laporan PDF berhasil diunduh!", "success");
+      doc.autoTable({
+        head: [headCols],
+        body: rowsPart1,
+        startY: 28,
+        headStyles: { fillColor: [6, 182, 212] },
+        styles: { fontSize: 6.5, cellPadding: 1.2 }
+      });
+
+      if (maxCycles > 10) {
+        doc.addPage();
+        doc.setFontSize(10); doc.setFont("helvetica", "bold");
+        doc.text("LANJUTAN JADWAL CUCI KE-11 S/D KE-20 PER-UNIT AC", 14, 14);
+
+        const headCols2 = ['No', 'Kode Unit', 'Gedung/Ruang'];
+        for (let c = 11; c <= 20; c++) headCols2.push(`C${c}`);
+
+        const rowsPart2 = filteredUnits.map((u, i) => {
+          const row = [
+            i + 1,
+            u.kode_unit,
+            `${u.gedung || ''} ${u.ruang || ''}`.trim()
+          ];
+          for (let c = 10; c < 20; c++) {
+            row.push(u.schedules[c] ? formatShortDate(u.schedules[c].tgl_servis) : '-');
+          }
+          return row;
+        });
+
+        doc.autoTable({
+          head: [headCols2],
+          body: rowsPart2,
+          startY: 18,
+          headStyles: { fillColor: [79, 70, 229] },
+          styles: { fontSize: 6.5, cellPadding: 1.2 }
+        });
+      }
+
+      doc.save(`Rekap_Jadwal_Cuci_Per_AC_${new Date().toISOString().split('T')[0]}.pdf`);
+      showToast("Laporan Matriks PDF berhasil diunduh!", "success");
     }
   </script>
 </body>
