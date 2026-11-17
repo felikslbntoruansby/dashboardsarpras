@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,21 +18,21 @@
     .radar-pulse { animation: radarPulse 3s infinite ease-in-out; }
   </style>
 </head>
-<body class="bg-slate-950 font-sans text-slate-100 p-4 md:p-6 min-h-screen antialiased">
+<body class="bg-slate-50 font-sans text-slate-800 p-4 md:p-6 min-h-screen antialiased">
 
   <!-- CINEMATIC PLANE LOADING OVERLAY -->
-  <div id="pageLoader" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
+  <div id="pageLoader" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
     <div class="relative flex flex-col items-center">
       <div class="relative">
-        <div class="absolute -inset-4 rounded-full bg-blue-500/20 blur-xl radar-pulse"></div>
-        <i class="fa-solid fa-plane-up text-5xl text-blue-400 animate-bounce"></i>
+        <div class="absolute -inset-4 rounded-full bg-blue-500/15 blur-xl radar-pulse"></div>
+        <i class="fa-solid fa-plane-up text-5xl text-blue-600 animate-bounce"></i>
       </div>
-      <h3 class="mt-6 text-sm font-bold tracking-widest text-slate-200 uppercase flex items-center gap-2">
-        <i class="fa-solid fa-circle-notch animate-spin text-blue-400"></i> Memuat Layanan Sarpras...
+      <h3 class="mt-6 text-sm font-bold tracking-widest text-slate-800 uppercase flex items-center gap-2">
+        <i class="fa-solid fa-circle-notch animate-spin text-blue-600"></i> Memuat Layanan Sarpras...
       </h3>
-      <p class="text-[11px] text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya</p>
-      <div class="w-48 bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden border border-slate-700">
-        <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full w-full animate-pulse"></div>
+      <p class="text-[11px] text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya</p>
+      <div class="w-48 bg-slate-200 h-1.5 rounded-full mt-4 overflow-hidden border border-slate-300">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full w-full animate-pulse"></div>
       </div>
     </div>
   </div>
@@ -40,122 +40,122 @@
   <div class="max-w-7xl mx-auto space-y-6">
 
     <!-- HEADER UTAMA -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-xl relative overflow-hidden">
-      <div class="absolute right-0 top-0 -mr-10 -mt-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+      <div class="absolute right-0 top-0 -mr-10 -mt-10 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
       <div class="flex items-center space-x-4">
-        <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 p-3.5 rounded-xl shadow-lg shadow-blue-500/20 flex items-center justify-center">
+        <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 p-3.5 rounded-xl shadow-md shadow-blue-500/20 flex items-center justify-center">
           <i class="fa-solid fa-building-user text-white text-2xl"></i>
         </div>
         <div>
-          <p class="text-[10px] font-bold uppercase tracking-widest text-blue-400 flex items-center gap-1.5">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-blue-600 flex items-center gap-1.5">
             <i class="fa-solid fa-plane text-[9px]"></i> BIDANG UMUM
           </p>
-          <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-white">
+          <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-slate-900">
             Dashboard Layanan Rumah Tangga
           </h1>
-          <p class="text-xs text-slate-400 mt-0.5">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase</p>
+          <p class="text-xs text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase</p>
         </div>
       </div>
 
       <!-- NAVIGASI MENU -->
       <div class="flex items-center space-x-2 w-full md:w-auto">
-        <a href="/" class="nav-link px-4 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-xl transition hover:border-indigo-400">
+        <a href="/" class="nav-link px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold rounded-xl transition">
           <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
         </a>
-        <a href="/rumah-tangga" class="nav-link px-4 py-2 bg-blue-600 text-white font-semibold text-xs rounded-xl shadow shadow-blue-600/30">
+        <a href="/rumah-tangga" class="nav-link px-4 py-2 bg-blue-600 text-white font-semibold text-xs rounded-xl shadow-sm">
           <i class="fa-solid fa-building-user mr-1"></i> Rumah Tangga
         </a>
-        <a href="/ac" class="nav-link px-4 py-2 bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-xs font-semibold rounded-xl transition hover:border-cyan-400">
+        <a href="/ac" class="nav-link px-4 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 text-xs font-semibold rounded-xl transition">
           <i class="fa-solid fa-snowflake mr-1"></i> Maintenance AC
         </a>
       </div>
     </div>
 
     <!-- WIDGET MOTIVASI HARIAN -->
-    <div class="bg-gradient-to-r from-blue-950/60 via-slate-900 to-indigo-950/60 p-4 rounded-2xl border border-blue-500/20 shadow-lg flex items-center gap-4 backdrop-blur-md hover:border-blue-500/40 transition">
-      <div class="bg-blue-500/20 text-blue-400 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-blue-500/30">
+    <div class="bg-gradient-to-r from-blue-50 via-white to-indigo-50 p-4 rounded-2xl border border-blue-200 shadow-sm flex items-center gap-4 hover:border-blue-300 transition">
+      <div class="bg-blue-100 text-blue-600 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-blue-200">
         <i class="fa-solid fa-quote-left text-xl"></i>
       </div>
       <div class="flex-1">
         <div class="flex items-center gap-2">
-          <span class="bg-blue-500/20 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-500/30">MOTIVASI HARIAN RUMAH TANGGA</span>
-          <span id="quoteDate" class="text-[10px] text-slate-400"></span>
+          <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-200">MOTIVASI HARIAN RUMAH TANGGA</span>
+          <span id="quoteDate" class="text-[10px] text-slate-500"></span>
         </div>
-        <p id="quoteText" class="text-xs md:text-sm font-medium text-slate-200 mt-1 italic">
+        <p id="quoteText" class="text-xs md:text-sm font-medium text-slate-700 mt-1 italic">
           "Pelayanan terbaik lahir dari koordinasi yang solid dan sikap ramah."
         </p>
-        <p id="quoteAuthor" class="text-[11px] font-bold text-blue-400 mt-0.5">— Tim Rumah Tangga Poltekbang</p>
+        <p id="quoteAuthor" class="text-[11px] font-bold text-blue-600 mt-0.5">— Tim Rumah Tangga Poltekbang</p>
       </div>
-      <button onclick="changeQuote()" title="Ganti Motivasi" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl text-xs transition border border-slate-700 active:scale-95">
-        <i class="fa-solid fa-rotate text-blue-400"></i>
+      <button onclick="changeQuote()" title="Ganti Motivasi" class="bg-white hover:bg-slate-100 text-slate-600 p-2.5 rounded-xl text-xs transition border border-slate-200 shadow-sm active:scale-95">
+        <i class="fa-solid fa-rotate text-blue-600"></i>
       </button>
     </div>
 
     <!-- SEKSI 1: KPI SCORECARDS (DAPAT DIKLIK UNTUK MELIHAT RINCIAN DATA) -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div onclick="openRtKpiModal('TOTAL')" role="button" tabindex="0" class="cursor-pointer group bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-blue-400 hover:bg-slate-900 transition duration-300 active:scale-[0.99]">
+      <div onclick="openRtKpiModal('TOTAL')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 hover:bg-blue-50/30 transition duration-300 active:scale-[0.99]">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-blue-300 transition">Total Layanan</p>
-          <i class="fa-solid fa-folder-open text-blue-400 text-xs"></i>
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-blue-600 transition">Total Layanan</p>
+          <i class="fa-solid fa-folder-open text-blue-600 text-xs"></i>
         </div>
-        <h3 class="text-3xl font-black text-blue-400 mt-2" id="kpi-total-rt">0</h3>
+        <h3 class="text-3xl font-black text-blue-600 mt-2" id="kpi-total-rt">0</h3>
         <div class="flex items-center justify-between mt-1">
           <p class="text-[11px] text-slate-500">Permohonan Terdaftar</p>
-          <span class="text-[10px] text-blue-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          <span class="text-[10px] text-blue-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
         </div>
       </div>
 
-      <div onclick="openRtKpiModal('DISETUJUI')" role="button" tabindex="0" class="cursor-pointer group bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-emerald-400 hover:bg-slate-900 transition duration-300 active:scale-[0.99]">
+      <div onclick="openRtKpiModal('DISETUJUI')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-400 hover:bg-emerald-50/30 transition duration-300 active:scale-[0.99]">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-emerald-300 transition">Permohonan Disetujui</p>
-          <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-600 transition">Permohonan Disetujui</p>
+          <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
         </div>
-        <h3 class="text-3xl font-black text-emerald-400 mt-2" id="kpi-disetujui-rt">0</h3>
+        <h3 class="text-3xl font-black text-emerald-600 mt-2" id="kpi-disetujui-rt">0</h3>
         <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-emerald-500/80">Status Disetujui / Aktif</p>
-          <span class="text-[10px] text-emerald-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          <p class="text-[11px] text-emerald-600">Status Disetujui / Aktif</p>
+          <span class="text-[10px] text-emerald-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
         </div>
       </div>
 
-      <div onclick="openRtKpiModal('PROSES')" role="button" tabindex="0" class="cursor-pointer group bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-amber-400 hover:bg-slate-900 transition duration-300 active:scale-[0.99]">
+      <div onclick="openRtKpiModal('PROSES')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-amber-400 hover:bg-amber-50/30 transition duration-300 active:scale-[0.99]">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-amber-300 transition">Sedang Diproses</p>
-          <i class="fa-solid fa-clock text-amber-400 text-xs"></i>
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-amber-600 transition">Sedang Diproses</p>
+          <i class="fa-solid fa-clock text-amber-500 text-xs"></i>
         </div>
-        <h3 class="text-3xl font-black text-amber-400 mt-2" id="kpi-proses-rt">0</h3>
+        <h3 class="text-3xl font-black text-amber-500 mt-2" id="kpi-proses-rt">0</h3>
         <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-amber-500/80">Menunggu Verifikasi</p>
-          <span class="text-[10px] text-amber-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          <p class="text-[11px] text-amber-600">Menunggu Verifikasi</p>
+          <span class="text-[10px] text-amber-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
         </div>
       </div>
 
-      <div onclick="openRtKpiModal('MAINTENANCE')" role="button" tabindex="0" class="cursor-pointer group bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-xl hover:border-rose-400 hover:bg-slate-900 transition duration-300 active:scale-[0.99]">
+      <div onclick="openRtKpiModal('MAINTENANCE')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-rose-400 hover:bg-rose-50/30 transition duration-300 active:scale-[0.99]">
         <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-rose-300 transition">Maintenance / Ditolak</p>
-          <i class="fa-solid fa-triangle-exclamation text-rose-400 text-xs"></i>
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-rose-600 transition">Maintenance / Ditolak</p>
+          <i class="fa-solid fa-triangle-exclamation text-rose-600 text-xs"></i>
         </div>
-        <h3 class="text-3xl font-black text-rose-400 mt-2" id="kpi-maintenance-rt">0</h3>
+        <h3 class="text-3xl font-black text-rose-600 mt-2" id="kpi-maintenance-rt">0</h3>
         <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-rose-500/80">Kendala / Perawatan</p>
-          <span class="text-[10px] text-rose-400 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          <p class="text-[11px] text-rose-600">Kendala / Perawatan</p>
+          <span class="text-[10px] text-rose-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
         </div>
       </div>
     </div>
 
     <!-- SEKSI 2: GRAFIK ANALYTICS -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="lg:col-span-2 bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
-        <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-column text-blue-400"></i> Analytics Komparasi Peminjaman Ruangan & Kendaraan
+      <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-column text-blue-600"></i> Analytics Komparasi Peminjaman Ruangan & Kendaraan
         </h2>
         <div style="position: relative; height: 230px; width: 100%;">
           <canvas id="rtComboChart"></canvas>
         </div>
       </div>
 
-      <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
-        <h2 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-emerald-400"></i> Rasio Persetujuan Layanan Rumah Tangga
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-emerald-600"></i> Rasio Persetujuan Layanan Rumah Tangga
         </h2>
         <div style="position: relative; height: 230px; width: 100%;">
           <canvas id="rtPieChart"></canvas>
@@ -164,28 +164,28 @@
     </div>
 
     <!-- SEKSI 3: TABEL PEMINJAMAN RUANGAN -->
-    <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
-      <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
-        <h2 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-door-open text-blue-400"></i> Daftar Peminjaman Ruangan & Aula
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+      <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-4">
+        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-door-open text-blue-600"></i> Daftar Peminjaman Ruangan & Aula
         </h2>
         <div class="flex flex-wrap items-center gap-2">
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="searchRuangan" oninput="renderRuanganTable()" placeholder="Cari peminjam / ruangan..." class="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="text" id="searchRuangan" oninput="renderRuanganTable()" placeholder="Cari peminjam / ruangan..." class="bg-white border border-slate-300 text-slate-800 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
-          <button onclick="exportRuanganPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+          <button onclick="exportRuanganPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
-          <button onclick="openRuanganModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow transition">
+          <button onclick="openRuanganModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
             + Pinjam Ruangan
           </button>
         </div>
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
-          <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800">
+        <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+          <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
             <tr>
               <th class="px-4 py-3.5 font-bold text-center">No</th>
               <th class="px-5 py-3.5 font-bold">Nama Peminjam</th>
@@ -197,36 +197,36 @@
               <th class="px-5 py-3.5 font-bold text-center">Aksi</th>
             </tr>
           </thead>
-          <tbody id="tbody-ruangan" class="divide-y divide-slate-800">
-            <tr><td colspan="8" class="text-center py-5 text-slate-500">Memuat data ruangan...</td></tr>
+          <tbody id="tbody-ruangan" class="divide-y divide-slate-200">
+            <tr><td colspan="8" class="text-center py-5 text-slate-400">Memuat data ruangan...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- SEKSI 4: TABEL PEMINJAMAN KENDARAAN DINAS -->
-    <div class="bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
-      <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
-        <h2 class="text-sm font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-car-side text-indigo-400"></i> Daftar Peminjaman Kendaraan Dinas
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+      <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-4">
+        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-car-side text-indigo-600"></i> Daftar Peminjaman Kendaraan Dinas
         </h2>
         <div class="flex flex-wrap items-center gap-2">
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="searchKendaraan" oninput="renderKendaraanTable()" placeholder="Cari driver / kendaraan..." class="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input type="text" id="searchKendaraan" oninput="renderKendaraanTable()" placeholder="Cari driver / kendaraan..." class="bg-white border border-slate-300 text-slate-800 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
-          <button onclick="exportKendaraanPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+          <button onclick="exportKendaraanPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
-          <button onclick="openKendaraanModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow transition">
+          <button onclick="openKendaraanModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
             + Pinjam Kendaraan
           </button>
         </div>
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
-          <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800">
+        <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+          <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
             <tr>
               <th class="px-4 py-3.5 font-bold text-center">No</th>
               <th class="px-5 py-3.5 font-bold">Nama Peminjam / Driver</th>
@@ -237,8 +237,8 @@
               <th class="px-5 py-3.5 font-bold text-center">Aksi</th>
             </tr>
           </thead>
-          <tbody id="tbody-kendaraan" class="divide-y divide-slate-800">
-            <tr><td colspan="7" class="text-center py-5 text-slate-500">Memuat data kendaraan...</td></tr>
+          <tbody id="tbody-kendaraan" class="divide-y divide-slate-200">
+            <tr><td colspan="7" class="text-center py-5 text-slate-400">Memuat data kendaraan...</td></tr>
           </tbody>
         </table>
       </div>
@@ -247,19 +247,19 @@
   </div>
 
   <!-- MODAL RINCIAN DATA DARI KLIK KARTU KPI RUMAH TANGGA -->
-  <div id="rtKpiModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
-    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-5xl text-slate-100 my-8 flex flex-col max-h-[90vh]">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
+  <div id="rtKpiModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
+    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-5xl text-slate-800 my-8 flex flex-col max-h-[90vh]">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 pb-4">
         <div>
-          <span id="rtKpiBadge" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">RINCIAN PERMOHONAN</span>
-          <h3 id="rtKpiTitle" class="text-lg font-extrabold text-white mt-1">Daftar Permohonan Layanan Rumah Tangga</h3>
-          <p id="rtKpiSubtitle" class="text-xs text-slate-400">Gabungan data peminjaman ruangan & kendaraan dinas sesuai kategori kartu KPI.</p>
+          <span id="rtKpiBadge" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">RINCIAN PERMOHONAN</span>
+          <h3 id="rtKpiTitle" class="text-lg font-extrabold text-slate-900 mt-1">Daftar Permohonan Layanan Rumah Tangga</h3>
+          <p id="rtKpiSubtitle" class="text-xs text-slate-500">Gabungan data peminjaman ruangan & kendaraan dinas sesuai kategori kartu KPI.</p>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="exportRtKpiPDF()" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5">
+          <button onclick="exportRtKpiPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold flex items-center gap-1.5">
             <i class="fa-solid fa-file-pdf"></i> Cetak PDF
           </button>
-          <button onclick="closeRtKpiModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-xl text-xs font-bold">
+          <button onclick="closeRtKpiModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold">
             <i class="fa-solid fa-xmark mr-1"></i> Tutup
           </button>
         </div>
@@ -269,9 +269,9 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="rtKpiSearch" oninput="renderRtKpiModalTable()" placeholder="Cari nama peminjam, ruangan, kendaraan, keperluan..." class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="rtKpiSearch" oninput="renderRtKpiModalTable()" placeholder="Cari nama peminjam, ruangan, kendaraan, keperluan..." class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        <select id="rtKpiCategoryFilter" onchange="renderRtKpiModalTable()" class="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <select id="rtKpiCategoryFilter" onchange="renderRtKpiModalTable()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="ALL">Semua Jenis Layanan (Ruangan & Kendaraan)</option>
           <option value="RUANGAN">Hanya Peminjaman Ruangan</option>
           <option value="KENDARAAN">Hanya Peminjaman Kendaraan</option>
@@ -279,9 +279,9 @@
       </div>
 
       <!-- TABEL ISI MODAL KPI -->
-      <div class="overflow-auto flex-1 border border-slate-800 rounded-xl">
-        <table class="w-full text-xs text-left text-slate-300 whitespace-nowrap">
-          <thead class="text-[11px] text-slate-400 uppercase bg-slate-950 border-b border-slate-800 sticky top-0">
+      <div class="overflow-auto flex-1 border border-slate-200 rounded-xl">
+        <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+          <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200 sticky top-0">
             <tr>
               <th class="px-4 py-3 font-bold text-center">No</th>
               <th class="px-4 py-3 font-bold">Jenis Layanan</th>
@@ -293,11 +293,11 @@
               <th class="px-4 py-3 font-bold text-center">Aksi Cepat</th>
             </tr>
           </thead>
-          <tbody id="rtKpiTbody" class="divide-y divide-slate-800"></tbody>
+          <tbody id="rtKpiTbody" class="divide-y divide-slate-200"></tbody>
         </table>
       </div>
 
-      <div class="pt-3 mt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+      <div class="pt-3 mt-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
         <span id="rtKpiFooterInfo">Total: 0 data</span>
         <span>Klik "Setujui" untuk langsung memverifikasi permohonan yang sedang diproses.</span>
       </div>
@@ -305,37 +305,37 @@
   </div>
 
   <!-- MODAL FORM PEMINJAMAN RUANGAN -->
-  <div id="ruanganModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
-    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100 my-8">
-      <h3 id="ruanganModalTitle" class="text-lg font-extrabold text-white mb-4">Form Peminjaman Ruangan</h3>
+  <div id="ruanganModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
+    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-800 my-8">
+      <h3 id="ruanganModalTitle" class="text-lg font-extrabold text-slate-900 mb-4">Form Peminjaman Ruangan</h3>
       <form onsubmit="handleRuanganSubmit(event)" class="space-y-3">
         <input type="hidden" id="editRuanganId">
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Nama Peminjam / Unit</label>
-          <input type="text" id="r_nama_peminjam" required placeholder="Contoh: Subbag Umum" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-xs font-bold mb-1 text-slate-700">Nama Peminjam / Unit</label>
+          <input type="text" id="r_nama_peminjam" required placeholder="Contoh: Subbag Umum" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Ruangan / Aula</label>
-          <input type="text" id="r_ruangan" required placeholder="Contoh: Aula Dirgantara" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-xs font-bold mb-1 text-slate-700">Ruangan / Aula</label>
+          <input type="text" id="r_ruangan" required placeholder="Contoh: Aula Dirgantara" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Mulai</label>
-            <input type="date" id="r_tgl_pinjam" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-xs font-bold mb-1 text-slate-700">Tanggal Mulai</label>
+            <input type="date" id="r_tgl_pinjam" required class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Selesai</label>
-            <input type="date" id="r_tgl_selesai" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-xs font-bold mb-1 text-slate-700">Tanggal Selesai</label>
+            <input type="date" id="r_tgl_selesai" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Jam Mulai - Selesai</label>
-            <input type="text" id="r_jam_mulai" placeholder="08.00 - 12.00" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-xs font-bold mb-1 text-slate-700">Jam Mulai - Selesai</label>
+            <input type="text" id="r_jam_mulai" placeholder="08.00 - 12.00" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
-            <select id="r_status" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-xs font-bold mb-1 text-slate-700">Status</label>
+            <select id="r_status" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
               <option value="Disetujui">Disetujui</option>
               <option value="Diproses">Diproses</option>
               <option value="Maintenance">Maintenance</option>
@@ -344,39 +344,39 @@
           </div>
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Keperluan</label>
-          <textarea id="r_keperluan" rows="2" required placeholder="Rapat koordinasi / Seminar..." class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+          <label class="block text-xs font-bold mb-1 text-slate-700">Keperluan</label>
+          <textarea id="r_keperluan" rows="2" required placeholder="Rapat koordinasi / Seminar..." class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
         </div>
-        <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
-          <button type="button" onclick="closeRuanganModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30">Simpan</button>
+        <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closeRuanganModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- MODAL FORM PEMINJAMAN KENDARAAN -->
-  <div id="kendaraanModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
-    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-100 my-8">
-      <h3 id="kendaraanModalTitle" class="text-lg font-extrabold text-white mb-4">Form Peminjaman Kendaraan</h3>
+  <div id="kendaraanModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
+    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-800 my-8">
+      <h3 id="kendaraanModalTitle" class="text-lg font-extrabold text-slate-900 mb-4">Form Peminjaman Kendaraan</h3>
       <form onsubmit="handleKendaraanSubmit(event)" class="space-y-3">
         <input type="hidden" id="editKendaraanId">
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Nama Peminjam / Driver</label>
-          <input type="text" id="k_nama_driver" required placeholder="Contoh: Bpk. Ahmad" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+          <label class="block text-xs font-bold mb-1 text-slate-700">Nama Peminjam / Driver</label>
+          <input type="text" id="k_nama_driver" required placeholder="Contoh: Bpk. Ahmad" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Kendaraan Dinas</label>
-          <input type="text" id="k_kendaraan" required placeholder="Contoh: Innova Zenix / Hiace" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+          <label class="block text-xs font-bold mb-1 text-slate-700">Kendaraan Dinas</label>
+          <input type="text" id="k_kendaraan" required placeholder="Contoh: Innova Zenix / Hiace" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Tanggal Pinjam</label>
-            <input type="date" id="k_tgl_pinjam" required class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+            <label class="block text-xs font-bold mb-1 text-slate-700">Tanggal Pinjam</label>
+            <input type="date" id="k_tgl_pinjam" required class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold mb-1 text-slate-300">Status</label>
-            <select id="k_status" class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+            <label class="block text-xs font-bold mb-1 text-slate-700">Status</label>
+            <select id="k_status" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
               <option value="Disetujui">Disetujui</option>
               <option value="Diproses">Diproses</option>
               <option value="Maintenance">Maintenance</option>
@@ -385,12 +385,12 @@
           </div>
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1 text-slate-300">Tujuan / Keperluan</label>
-          <textarea id="k_tujuan" rows="2" required placeholder="Dinas Luar Bandara Juanda..." class="w-full border border-slate-700 bg-slate-950 text-white p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+          <label class="block text-xs font-bold mb-1 text-slate-700">Tujuan / Keperluan</label>
+          <textarea id="k_tujuan" rows="2" required placeholder="Dinas Luar Bandara Juanda..." class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
         </div>
-        <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
-          <button type="button" onclick="closeKendaraanModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-600/30">Simpan</button>
+        <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closeKendaraanModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
         </div>
       </form>
     </div>
@@ -401,7 +401,7 @@
   <script>
     let ruanganData = [];
     let kendaraanData = [];
-    let activeRtKpiType = null; // 'TOTAL' | 'DISETUJUI' | 'PROSES' | 'MAINTENANCE'
+    let activeRtKpiType = null;
 
     let rtComboChartInstance = null;
     let rtPieChartInstance = null;
@@ -452,7 +452,7 @@
       const t = document.createElement('div');
       const bg = type === 'success' ? 'bg-emerald-600' : 'bg-rose-600';
       const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark';
-      t.className = `${bg} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold transition-all transform translate-y-5 opacity-0`;
+      t.className = `${bg} text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-xs font-bold transition-all transform translate-y-5 opacity-0`;
       t.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${msg}</span>`;
       c.appendChild(t);
       setTimeout(() => t.classList.remove('translate-y-5', 'opacity-0'), 50);
@@ -563,13 +563,13 @@
           datasets: [
             { type: 'bar', label: 'Permohonan Disetujui / Aktif', data: [rOk, kOk], backgroundColor: '#10b981', borderRadius: 6, barPercentage: 0.45 },
             { type: 'bar', label: 'Diproses / Maintenance', data: [rProc, kProc], backgroundColor: '#f59e0b', borderRadius: 6, barPercentage: 0.45 },
-            { type: 'line', label: 'Total Permohonan Masuk', data: [ruanganData.length, kendaraanData.length], borderColor: '#6366f1', backgroundColor: '#6366f1', tension: 0.3 }
+            { type: 'line', label: 'Total Permohonan Masuk', data: [ruanganData.length, kendaraanData.length], borderColor: '#4f46e5', backgroundColor: '#4f46e5', tension: 0.3 }
           ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } },
-          scales: { x: { ticks: { color: '#cbd5e1' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#cbd5e1' }, grid: { color: '#1e293b' } } }
+          plugins: { legend: { labels: { color: '#475569', font: { size: 11 } } } },
+          scales: { x: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } }, y: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } } }
         }
       });
 
@@ -584,15 +584,12 @@
         type: 'doughnut',
         data: {
           labels: ['Disetujui / Aktif', 'Diproses', 'Maintenance / Ditolak'],
-          datasets: [{ data: [disetujui, proses, maint], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#0f172a' }]
+          datasets: [{ data: [disetujui, proses, maint], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#ffffff' }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { size: 11 } } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#475569', font: { size: 11 } } } } }
       });
     }
 
-    // =========================================================================
-    // MODAL RINCIAN DATA SAAT KLIK KARTU KPI RUMAH TANGGA
-    // =========================================================================
     function openRtKpiModal(type) {
       activeRtKpiType = type;
       document.getElementById('rtKpiSearch').value = '';
@@ -603,22 +600,22 @@
       const sub = document.getElementById('rtKpiSubtitle');
 
       if (type === 'TOTAL') {
-        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30";
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200";
         badge.innerText = "TOTAL LAYANAN TERDAFTAR";
         title.innerText = "Seluruh Permohonan Layanan Rumah Tangga";
         sub.innerText = "Menampilkan semua permohonan peminjaman ruangan & kendaraan dinas yang tercatat.";
       } else if (type === 'DISETUJUI') {
-        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200";
         badge.innerText = "PERMOHONAN DISETUJUI";
         title.innerText = "Daftar Permohonan yang Telah Disetujui / Aktif";
         sub.innerText = "Permohonan peminjaman ruangan dan kendaraan yang telah disetujui.";
       } else if (type === 'PROSES') {
-        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200";
         badge.innerText = "SEDANG DIPROSES";
         title.innerText = "Permohonan Menunggu Verifikasi / Diproses";
         sub.innerText = "Klik tombol 'Setujui' pada kolom Aksi Cepat untuk langsung menyetujui permohonan.";
       } else if (type === 'MAINTENANCE') {
-        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30";
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200";
         badge.innerText = "MAINTENANCE / DITOLAK";
         title.innerText = "Daftar Fasilitas Maintenance atau Permohonan Ditolak";
         sub.innerText = "Menampilkan ruangan/kendaraan yang sedang dalam perawatan atau permohonan yang ditolak.";
@@ -654,31 +651,31 @@
       document.getElementById('rtKpiFooterInfo').innerText = `Menampilkan ${list.length} data permohonan`;
 
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500">Tidak ada data permohonan pada kategori ini.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada data permohonan pada kategori ini.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = list.map((item, i) => {
         const jenisBadge = item.jenis === 'RUANGAN'
-          ? `<span class="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-bold"><i class="fa-solid fa-door-open mr-1"></i>Ruangan</span>`
-          : `<span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded text-[10px] font-bold"><i class="fa-solid fa-car-side mr-1"></i>Kendaraan</span>`;
+          ? `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-[10px] font-bold"><i class="fa-solid fa-door-open mr-1"></i>Ruangan</span>`
+          : `<span class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded text-[10px] font-bold"><i class="fa-solid fa-car-side mr-1"></i>Kendaraan</span>`;
 
-        let stColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-        if (item.kategoriStatus === 'PROSES') stColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-        else if (item.kategoriStatus === 'MAINTENANCE') stColor = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+        let stColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        if (item.kategoriStatus === 'PROSES') stColor = 'bg-amber-50 text-amber-800 border-amber-200';
+        else if (item.kategoriStatus === 'MAINTENANCE') stColor = 'bg-rose-50 text-rose-700 border-rose-200';
 
         const approveBtn = item.kategoriStatus === 'PROSES'
-          ? `<button onclick="quickApproveService('${item.jenis}', ${item.rawId})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">Setujui</button>`
-          : `<span class="text-slate-500 text-[11px]">-</span>`;
+          ? `<button onclick="quickApproveService('${item.jenis}', ${item.rawId})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">Setujui</button>`
+          : `<span class="text-slate-400 text-[11px]">-</span>`;
 
         return `
-          <tr class="hover:bg-slate-800/50 transition">
-            <td class="px-4 py-3 text-center font-bold text-slate-400">${i + 1}</td>
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 text-center font-bold text-slate-500">${i + 1}</td>
             <td class="px-4 py-3">${jenisBadge}</td>
-            <td class="px-4 py-3 font-semibold text-white">${item.peminjam}</td>
-            <td class="px-4 py-3 text-cyan-300 font-bold">${item.fasilitas}</td>
-            <td class="px-4 py-3 font-mono text-amber-300">${item.tanggal}</td>
-            <td class="px-4 py-3 text-slate-300">${item.keperluan}</td>
+            <td class="px-4 py-3 font-semibold text-slate-900">${item.peminjam}</td>
+            <td class="px-4 py-3 text-blue-700 font-bold">${item.fasilitas}</td>
+            <td class="px-4 py-3 font-mono text-amber-700 font-semibold">${item.tanggal}</td>
+            <td class="px-4 py-3 text-slate-600">${item.keperluan}</td>
             <td class="px-4 py-3"><span class="${stColor} border text-[10px] px-2.5 py-0.5 rounded-md font-bold">${item.status}</span></td>
             <td class="px-4 py-3 text-center">${approveBtn}</td>
           </tr>
@@ -752,14 +749,11 @@
       showToast("Laporan PDF berhasil diunduh!", "success");
     }
 
-    // =========================================================================
-    // RENDER & CRUD TABEL RUANGAN
-    // =========================================================================
     function getStatusBadge(status) {
       const cat = classifyStatus(status);
-      if (cat === 'PROSES') return `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${status}</span>`;
-      if (cat === 'MAINTENANCE') return `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${status}</span>`;
-      return `<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] px-2.5 py-1 rounded-md font-bold">${status || 'Disetujui'}</span>`;
+      if (cat === 'PROSES') return `<span class="bg-amber-50 text-amber-800 border border-amber-200 text-[10px] px-2.5 py-1 rounded-md font-bold">${status}</span>`;
+      if (cat === 'MAINTENANCE') return `<span class="bg-rose-50 text-rose-700 border border-rose-200 text-[10px] px-2.5 py-1 rounded-md font-bold">${status}</span>`;
+      return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-2.5 py-1 rounded-md font-bold">${status || 'Disetujui'}</span>`;
     }
 
     function renderRuanganTable() {
@@ -768,22 +762,22 @@
       const filtered = ruanganData.filter(r => `${r.nama_peminjam} ${r.ruangan} ${r.keperluan} ${r.status}`.toLowerCase().includes(kw));
 
       if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-500">Belum ada data peminjaman ruangan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-400">Belum ada data peminjaman ruangan.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = filtered.map((r, i) => `
-        <tr class="hover:bg-slate-800/50 transition">
-          <td class="px-4 py-3.5 text-center font-bold text-slate-400">${i + 1}</td>
-          <td class="px-5 py-3.5 font-semibold text-white">${r.nama_peminjam || '-'}</td>
-          <td class="px-5 py-3.5 font-bold text-blue-400">${r.ruangan || '-'}</td>
-          <td class="px-5 py-3.5 font-mono text-amber-300">${r.tgl_pinjam || '-'}${r.tgl_selesai && r.tgl_selesai !== r.tgl_pinjam ? ' s/d ' + r.tgl_selesai : ''}</td>
-          <td class="px-5 py-3.5 text-slate-300">${r.jam_mulai || '-'}</td>
-          <td class="px-5 py-3.5 text-slate-300">${r.keperluan || '-'}</td>
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-4 py-3.5 text-center font-bold text-slate-500">${i + 1}</td>
+          <td class="px-5 py-3.5 font-semibold text-slate-900">${r.nama_peminjam || '-'}</td>
+          <td class="px-5 py-3.5 font-bold text-blue-600">${r.ruangan || '-'}</td>
+          <td class="px-5 py-3.5 font-mono text-amber-700 font-semibold">${r.tgl_pinjam || '-'}${r.tgl_selesai && r.tgl_selesai !== r.tgl_pinjam ? ' s/d ' + r.tgl_selesai : ''}</td>
+          <td class="px-5 py-3.5 text-slate-600">${r.jam_mulai || '-'}</td>
+          <td class="px-5 py-3.5 text-slate-600">${r.keperluan || '-'}</td>
           <td class="px-5 py-3.5">${getStatusBadge(r.status)}</td>
           <td class="px-5 py-3.5 text-center space-x-2">
-            <button onclick="openRuanganModal(${r.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
-            <button onclick="deleteRuangan(${r.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
+            <button onclick="openRuanganModal(${r.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
+            <button onclick="deleteRuangan(${r.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
           </td>
         </tr>
       `).join('');
@@ -839,30 +833,27 @@
       }
     }
 
-    // =========================================================================
-    // RENDER & CRUD TABEL KENDARAAN
-    // =========================================================================
     function renderKendaraanTable() {
       const tbody = document.getElementById('tbody-kendaraan');
       const kw = (document.getElementById('searchKendaraan').value || '').toLowerCase();
       const filtered = kendaraanData.filter(k => `${k.nama_driver} ${k.kendaraan} ${k.tujuan} ${k.status}`.toLowerCase().includes(kw));
 
       if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-slate-500">Belum ada data peminjaman kendaraan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-slate-400">Belum ada data peminjaman kendaraan.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = filtered.map((k, i) => `
-        <tr class="hover:bg-slate-800/50 transition">
-          <td class="px-4 py-3.5 text-center font-bold text-slate-400">${i + 1}</td>
-          <td class="px-5 py-3.5 font-semibold text-white">${k.nama_driver || '-'}</td>
-          <td class="px-5 py-3.5 font-bold text-indigo-400">${k.kendaraan || '-'}</td>
-          <td class="px-5 py-3.5 font-mono text-amber-300">${k.tgl_pinjam || '-'}</td>
-          <td class="px-5 py-3.5 text-slate-300">${k.tujuan || '-'}</td>
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-4 py-3.5 text-center font-bold text-slate-500">${i + 1}</td>
+          <td class="px-5 py-3.5 font-semibold text-slate-900">${k.nama_driver || '-'}</td>
+          <td class="px-5 py-3.5 font-bold text-indigo-600">${k.kendaraan || '-'}</td>
+          <td class="px-5 py-3.5 font-mono text-amber-700 font-semibold">${k.tgl_pinjam || '-'}</td>
+          <td class="px-5 py-3.5 text-slate-600">${k.tujuan || '-'}</td>
           <td class="px-5 py-3.5">${getStatusBadge(k.status)}</td>
           <td class="px-5 py-3.5 text-center space-x-2">
-            <button onclick="openKendaraanModal(${k.id})" class="text-blue-400 hover:underline font-bold text-xs">Edit</button>
-            <button onclick="deleteKendaraan(${k.id})" class="text-rose-400 hover:underline font-bold text-xs">Hapus</button>
+            <button onclick="openKendaraanModal(${k.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
+            <button onclick="deleteKendaraan(${k.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
           </td>
         </tr>
       `).join('');
