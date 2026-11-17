@@ -20,15 +20,23 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// Static Routing
+// =============================================================
+// STATIC ROUTING HALAMAN DASHBOARD
+// =============================================================
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/executive', (req, res) => res.sendFile(path.join(__dirname, 'executive.html')));
+app.get('/executive.html', (req, res) => res.sendFile(path.join(__dirname, 'executive.html')));
 app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
 app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
 app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
+app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 
+// =============================================================
 // API PREFERENSI FILTER BULAN (PERMANEN DI SUPABASE)
+// =============================================================
 app.get('/api/preferences/:key', async (req, res) => {
     try {
         const { key } = req.params;
@@ -61,7 +69,9 @@ app.post('/api/preferences/:key', async (req, res) => {
     }
 });
 
+// =============================================================
 // FUNGSI KONVERSI FORMAT TANGGAL ISO (YYYY-MM-DD)
+// =============================================================
 function formatToIsoDate(val) {
     if (!val) return new Date().toISOString().split('T')[0];
     const strVal = String(val).trim();
@@ -95,7 +105,6 @@ function formatToIsoDate(val) {
 // =============================================================
 // API MAINTENANCE AC (SESUAI SKEMA SUPABASE & JADWAL 20X)
 // =============================================================
-
 app.get('/api/maintenance-ac', async (req, res) => {
     try {
         let allData = [];
@@ -133,9 +142,12 @@ app.post('/api/maintenance-ac/bulk', async (req, res) => {
         }
 
         if (!append) {
-            const { error: deleteError } = await supabase.from('maintenance_k3_ac').delete().neq('id', 0);
+            const { error: deleteError } = await supabase
+                .from('maintenance_k3_ac')
+                .delete()
+                .not('id', 'is', null);
             if (deleteError) {
-                console.error("Gagal menghapus data lama:", deleteError);
+                console.error("Gagal menghapus data lama:", deleteError.message);
             }
         }
 
@@ -165,7 +177,7 @@ app.post('/api/maintenance-ac/bulk', async (req, res) => {
             const chunk = rowsToInsert.slice(i, i + BATCH_SIZE);
             const { error: insertErr } = await supabase.from('maintenance_k3_ac').insert(chunk);
             if (insertErr) {
-                console.error(`Error pada batch ${i}:`, insertErr);
+                console.error(`Error pada batch ${i}:`, insertErr.message);
                 throw insertErr;
             }
             insertedTotal += chunk.length;
@@ -176,7 +188,7 @@ app.post('/api/maintenance-ac/bulk', async (req, res) => {
             total: insertedTotal 
         });
     } catch (err) {
-        console.error("Error pada Bulk Insert AC:", err);
+        console.error("Error pada Bulk Insert AC:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
@@ -273,9 +285,8 @@ app.delete('/api/maintenance-ac/:id', async (req, res) => {
 });
 
 // =============================================================
-// API RUMAH TANGGA & INVENTORY
+// API RUMAH TANGGA (PEMINJAMAN RUANGAN & KENDARAAN)
 // =============================================================
-
 app.get('/api/peminjaman-ruangan', async (req, res) => {
     try {
         const { data, error } = await supabase.from('peminjaman_ruangan').select('*').order('id', { ascending: false });
@@ -362,6 +373,9 @@ app.delete('/api/peminjaman-kendaraan/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// =============================================================
+// API INVENTORY & TRANSAKSI LOG
+// =============================================================
 app.get('/api/inventory', async (req, res) => {
     try {
         const { data, error } = await supabase.from('inventory').select('*').order('id', { ascending: true });
@@ -466,6 +480,9 @@ app.delete('/api/logs/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// =============================================================
+// API BACKUP DATA TERPADU
+// =============================================================
 app.get('/api/backup', async (req, res) => {
     try {
         const { data: inv } = await supabase.from('inventory').select('*');
@@ -474,10 +491,16 @@ app.get('/api/backup', async (req, res) => {
         const { data: ac } = await supabase.from('maintenance_k3_ac').select('*');
         res.setHeader('Content-disposition', 'attachment; filename=backup_sarpras.json');
         res.setHeader('Content-type', 'application/json');
-        res.send(JSON.stringify({ inventory: inv || [], peminjaman_ruangan: rgn || [], peminjaman_kendaraan: kdr || [], maintenance_ac: ac || [] }, null, 2));
+        res.send(JSON.stringify({
+            inventory: inv || [],
+            peminjaman_ruangan: rgn || [],
+            peminjaman_kendaraan: kdr || [],
+            maintenance_ac: ac || []
+        }, null, 2));
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Fallback ke index.html jika rute tidak ditemukan
 app.use((req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 module.exports = app;

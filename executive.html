@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Executive Summary & Early Warning - Sarpras Poltekbang</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    @keyframes radarPulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.3; }
+      100% { transform: scale(0.9); opacity: 0.8; }
+    }
+    .radar-pulse { animation: radarPulse 3s infinite ease-in-out; }
+  </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 p-4 md:p-6 min-h-screen antialiased">
+
+  <!-- LOADING OVERLAY -->
+  <div id="pageLoader" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
+    <div class="relative flex flex-col items-center">
+      <div class="relative">
+        <div class="absolute -inset-4 rounded-full bg-amber-500/15 blur-xl radar-pulse"></div>
+        <i class="fa-solid fa-plane-up text-5xl text-slate-800 animate-bounce"></i>
+      </div>
+      <h3 class="mt-6 text-sm font-bold tracking-widest text-slate-800 uppercase flex items-center gap-2">
+        <i class="fa-solid fa-circle-notch animate-spin text-amber-600"></i> Memuat Ringkasan Eksekutif...
+      </h3>
+      <p class="text-[11px] text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya</p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto space-y-6">
+    
+    <!-- HEADER UTAMA -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+      <div class="flex items-center space-x-4">
+        <div class="bg-gradient-to-tr from-slate-800 to-slate-700 p-3.5 rounded-xl shadow-md flex items-center justify-center">
+          <i class="fa-solid fa-chart-line text-amber-400 text-2xl"></i>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-amber-600 flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-[10px]"></i> EXECUTIVE COMMAND CENTER
+          </p>
+          <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-slate-900">
+            Ringkasan Eksekutif & Sistem Peringatan Dini
+          </h1>
+          <p class="text-xs text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya • Pemantauan Terpadu Inventaris, Rumah Tangga & AC</p>
+        </div>
+      </div>
+      
+      <!-- NAVIGASI MODUL -->
+      <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+        <a href="/executive" class="nav-link px-3.5 py-2 bg-slate-900 text-white font-semibold text-xs rounded-xl shadow-sm">
+          <i class="fa-solid fa-gauge-high mr-1 text-amber-400"></i> Eksekutif
+        </a>
+        <a href="/" class="nav-link px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold rounded-xl transition">
+          <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
+        </a>
+        <a href="/rumah-tangga" class="nav-link px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold rounded-xl transition">
+          <i class="fa-solid fa-building-user mr-1"></i> Rumah Tangga
+        </a>
+        <a href="/ac" class="nav-link px-3.5 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 text-xs font-semibold rounded-xl transition">
+          <i class="fa-solid fa-snowflake mr-1"></i> Maintenance AC
+        </a>
+      </div>
+    </div>
+
+    <!-- BAR AKSI CEPAT & TANGGAL LAPORAN -->
+    <div class="bg-white px-5 py-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div class="flex items-center gap-2.5 text-xs">
+        <span class="flex h-2.5 w-2.5 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        </span>
+        <span class="font-bold text-slate-700">Status Sinkronisasi:</span>
+        <span id="lastSyncTime" class="text-slate-500 font-mono">Memuat data...</span>
+      </div>
+
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <button type="button" onclick="loadAllExecutiveData()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrows-rotate"></i> Segarkan Data
+        </button>
+        <button type="button" onclick="exportExecutivePDF()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-file-pdf"></i> Cetak Laporan Eksekutif (PDF)
+        </button>
+      </div>
+    </div>
+
+    <!-- BAGIAN 1: PANEL PERINGATAN DINI (EARLY WARNING SYSTEM) -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-bell text-rose-600"></i> Peringatan Dini & Prioritas Tindakan
+        </h2>
+        <span id="totalAlertsBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">0 Peringatan Aktif</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- ALERT 1: AC TERLAMBAT CUCI (OVERDUE) -->
+        <div onclick="openWarningModal('AC_OVERDUE')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-rose-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-bold uppercase text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">Cuci AC Terlambat</span>
+            <i class="fa-solid fa-clock-rotate-left text-rose-600 text-base"></i>
+          </div>
+          <h3 id="warn-ac-overdue" class="text-3xl font-black text-slate-900 mt-3">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Jadwal cuci melewati tanggal hari ini</p>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-rose-600 group-hover:underline">
+            <span>Periksa Daftar Unit</span>
+            <span>&rarr;</span>
+          </div>
+        </div>
+
+        <!-- ALERT 2: AC RUSAK / KENDALA -->
+        <div onclick="openWarningModal('AC_RUSAK')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-amber-500 border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">AC Perlu Perbaikan</span>
+            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-base"></i>
+          </div>
+          <h3 id="warn-ac-rusak" class="text-3xl font-black text-slate-900 mt-3">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Unit berstatus RUSAK / kendala teknis</p>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-amber-700 group-hover:underline">
+            <span>Lihat Unit Kendala</span>
+            <span>&rarr;</span>
+          </div>
+        </div>
+
+        <!-- ALERT 3: STOK INVENTARIS KRITIS -->
+        <div onclick="openWarningModal('INV_KRITIS')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-orange-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-bold uppercase text-orange-700 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200">Stok Barang Kritis</span>
+            <i class="fa-solid fa-box-open text-orange-600 text-base"></i>
+          </div>
+          <h3 id="warn-inv-kritis" class="text-3xl font-black text-slate-900 mt-3">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Item inventaris dengan sisa stok &le; 5</p>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-orange-600 group-hover:underline">
+            <span>Cek Barang Menipis</span>
+            <span>&rarr;</span>
+          </div>
+        </div>
+
+        <!-- ALERT 4: PEMINJAMAN MENUNGGU / BENTROK -->
+        <div onclick="openWarningModal('RT_PENDING')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-indigo-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-bold uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">Antrean Rumah Tangga</span>
+            <i class="fa-solid fa-calendar-exclamation fa-solid fa-hourglass-half text-indigo-600 text-base"></i>
+          </div>
+          <h3 id="warn-rt-pending" class="text-3xl font-black text-slate-900 mt-3">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Peminjaman ruang/kendaraan diproses</p>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-indigo-600 group-hover:underline">
+            <span>Tinjau Permohonan</span>
+            <span>&rarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 2: RINGKASAN KINERJA PER DIVISI (3 KARTU UTAMA) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- KARTU DIVISI 1: MAINTENANCE AC -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <div class="bg-cyan-100 text-cyan-700 p-2 rounded-lg">
+                <i class="fa-solid fa-snowflake"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-extrabold text-slate-900">Pemeliharaan Unit AC</h3>
+                <p class="text-[11px] text-slate-500">Kesiapan & Realisasi Cuci</p>
+              </div>
+            </div>
+            <a href="/ac" class="text-xs font-bold text-cyan-700 hover:underline">Buka &rarr;</a>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 my-4 text-center">
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500 block">Total Unit</span>
+              <strong id="sum-ac-units" class="text-lg font-black text-slate-900">0</strong>
+            </div>
+            <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
+              <span class="text-[10px] font-bold text-emerald-700 block">Selesai Cuci</span>
+              <strong id="sum-ac-done" class="text-lg font-black text-emerald-700">0</strong>
+            </div>
+            <div class="bg-indigo-50 p-2.5 rounded-xl border border-indigo-200">
+              <span class="text-[10px] font-bold text-indigo-700 block">Terjadwal</span>
+              <strong id="sum-ac-sched" class="text-lg font-black text-indigo-700">0</strong>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-600">Persentase Realisasi Cuci</span>
+              <span id="sum-ac-pct" class="text-cyan-700">0%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+              <div id="bar-ac-pct" class="bg-cyan-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex justify-between items-center">
+          <span>Jadwal Cuci 7 Hari Ke Depan:</span>
+          <strong id="sum-ac-upcoming7" class="text-slate-900 font-extrabold">0 Unit</strong>
+        </div>
+      </div>
+
+      <!-- KARTU DIVISI 2: INVENTARIS & LOGISTIK -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <div class="bg-indigo-100 text-indigo-700 p-2 rounded-lg">
+                <i class="fa-solid fa-boxes-stacked"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-extrabold text-slate-900">Inventaris & Gudang</h3>
+                <p class="text-[11px] text-slate-500">Ketersediaan Stok Sarpras</p>
+              </div>
+            </div>
+            <a href="/" class="text-xs font-bold text-indigo-700 hover:underline">Buka &rarr;</a>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 my-4 text-center">
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500 block">Jenis Barang</span>
+              <strong id="sum-inv-types" class="text-lg font-black text-slate-900">0</strong>
+            </div>
+            <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
+              <span class="text-[10px] font-bold text-emerald-700 block">Stok Aman</span>
+              <strong id="sum-inv-safe" class="text-lg font-black text-emerald-700">0</strong>
+            </div>
+            <div class="bg-rose-50 p-2.5 rounded-xl border border-rose-200">
+              <span class="text-[10px] font-bold text-rose-700 block">Stok Habis</span>
+              <strong id="sum-inv-empty" class="text-lg font-black text-rose-700">0</strong>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-600">Rasio Ketersediaan Stok Aman</span>
+              <span id="sum-inv-pct" class="text-indigo-700">0%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+              <div id="bar-inv-pct" class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex justify-between items-center">
+          <span>Total Fisik Barang Tersedia:</span>
+          <strong id="sum-inv-totalqty" class="text-slate-900 font-extrabold">0 Unit/Pcs</strong>
+        </div>
+      </div>
+
+      <!-- KARTU DIVISI 3: RUMAH TANGGA (RUANGAN & KENDARAAN) -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <div class="bg-blue-100 text-blue-700 p-2 rounded-lg">
+                <i class="fa-solid fa-building-user"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-extrabold text-slate-900">Layanan Rumah Tangga</h3>
+                <p class="text-[11px] text-slate-500">Peminjaman Ruangan & Kendaraan</p>
+              </div>
+            </div>
+            <a href="/rumah-tangga" class="text-xs font-bold text-blue-700 hover:underline">Buka &rarr;</a>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 my-4 text-center">
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500 block">Pinjam Ruang</span>
+              <strong id="sum-rt-ruang" class="text-lg font-black text-slate-900">0</strong>
+            </div>
+            <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-200">
+              <span class="text-[10px] font-bold text-blue-700 block">Kendaraan</span>
+              <strong id="sum-rt-kendaraan" class="text-lg font-black text-blue-700">0</strong>
+            </div>
+            <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+              <span class="text-[10px] font-bold text-amber-700 block">Bentrok Jadwal</span>
+              <strong id="sum-rt-conflict" class="text-lg font-black text-amber-700">0</strong>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-600">Tingkat Penyelesaian Layanan</span>
+              <span id="sum-rt-pct" class="text-blue-700">0%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+              <div id="bar-rt-pct" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex justify-between items-center">
+          <span>Agenda Penggunaan Hari Ini:</span>
+          <strong id="sum-rt-today" class="text-slate-900 font-extrabold">0 Agenda</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 3: VISUALISASI GRAFIK EKSEKUTIF -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-column text-cyan-600"></i> Kesiapan Unit AC per Gedung
+        </h3>
+        <div style="position: relative; height: 240px; width: 100%;">
+          <canvas id="execAcChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-indigo-600"></i> Komposisi Status Barang Inventaris
+        </h3>
+        <div style="position: relative; height: 240px; width: 100%;">
+          <canvas id="execInvChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 4: TABEL DAFTAR TINDAKAN PRIORITAS TERATAS -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div>
+          <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-rose-600"></i> Daftar Tindak Lanjut Mendesak (Top 15 Prioritas)
+          </h3>
+          <p class="text-[11px] text-slate-500">Gabungan jadwal AC terlambat, unit AC rusak, stok barang menipis, dan antrean peminjaman.</p>
+        </div>
+        <select id="priorityFilter" onchange="renderPriorityTable()" class="bg-white border border-slate-300 text-slate-800 text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-slate-500">
+          <option value="ALL">Semua Kategori Peringatan</option>
+          <option value="AC">Khusus Maintenance AC</option>
+          <option value="INV">Khusus Stok Inventaris</option>
+          <option value="RT">Khusus Rumah Tangga</option>
+        </select>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+          <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3 font-bold text-center">No</th>
+              <th class="px-4 py-3 font-bold">Tingkat Urgensi</th>
+              <th class="px-4 py-3 font-bold">Modul</th>
+              <th class="px-4 py-3 font-bold">Item / Kode / Ruangan</th>
+              <th class="px-4 py-3 font-bold">Keterangan Masalah</th>
+              <th class="px-4 py-3 font-bold text-center">Tautan Modul</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-priority" class="divide-y divide-slate-200">
+            <tr><td colspan="6" class="text-center py-6 text-slate-400">Menganalisis seluruh data sarpras...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL RINCIAN PERINGATAN DINI -->
+  <div id="warningModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
+    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-4xl text-slate-800 my-8 flex flex-col max-h-[88vh]">
+      <div class="flex justify-between items-start border-b border-slate-200 pb-4">
+        <div>
+          <span id="warnModalBadge" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">PERINGATAN DINI</span>
+          <h3 id="warnModalTitle" class="text-lg font-extrabold text-slate-900 mt-1">Rincian Peringatan</h3>
+          <p id="warnModalSubtitle" class="text-xs text-slate-500">Daftar item yang membutuhkan perhatian segera.</p>
+        </div>
+        <button type="button" onclick="closeWarningModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold">
+          <i class="fa-solid fa-xmark mr-1"></i> Tutup
+        </button>
+      </div>
+
+      <div class="overflow-auto flex-1 border border-slate-200 rounded-xl mt-4">
+        <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+          <thead id="warnModalThead" class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200 sticky top-0"></thead>
+          <tbody id="warnModalTbody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let rawAc = [];
+    let rawInv = [];
+    let rawRuang = [];
+    let rawKendaraan = [];
+
+    let listAcOverdue = [];
+    let listAcRusak = [];
+    let listInvKritis = [];
+    let listRtPending = [];
+    let listRtConflicts = [];
+    let unifiedPriorities = [];
+
+    let execAcChartInstance = null;
+    let execInvChartInstance = null;
+
+    function escHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initNavLoader();
+      loadAllExecutiveData();
+    });
+
+    function initNavLoader() {
+      document.querySelectorAll('a.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = link.getAttribute('href');
+          const loader = document.getElementById('pageLoader');
+          if (loader) {
+            loader.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => { window.location.href = target; }, 300);
+          } else {
+            window.location.href = target;
+          }
+        });
+      });
+    }
+
+    async function loadAllExecutiveData() {
+      try {
+        const [resAc, resInv, resRuang, resKendaraan] = await Promise.all([
+          fetch('/api/maintenance-ac').then(r => r.ok ? r.json() : []),
+          fetch('/api/inventory').then(r => r.ok ? r.json() : []),
+          fetch('/api/peminjaman-ruangan').then(r => r.ok ? r.json() : []),
+          fetch('/api/peminjaman-kendaraan').then(r => r.ok ? r.json() : [])
+        ]);
+
+        rawAc = Array.isArray(resAc) ? resAc : [];
+        rawInv = Array.isArray(resInv) ? resInv : [];
+        rawRuang = Array.isArray(resRuang) ? resRuang : [];
+        rawKendaraan = Array.isArray(resKendaraan) ? resKendaraan : [];
+
+        analyzeExecutiveMetrics();
+        renderPriorityTable();
+        renderExecutiveCharts();
+
+        const now = new Date();
+        document.getElementById('lastSyncTime').innerText = now.toLocaleDateString('id-ID', {
+          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) + ' WIB';
+      } catch (err) {
+        console.error("Gagal memuat ringkasan eksekutif:", err);
+      }
+    }
+
+    function analyzeExecutiveMetrics() {
+      const todayIso = new Date().toISOString().split('T')[0];
+      const next7Date = new Date();
+      next7Date.setDate(next7Date.getDate() + 7);
+      const next7Iso = next7Date.toISOString().split('T')[0];
+
+      // 1. ANALISIS AC
+      const unitSet = new Set();
+      let acDone = 0;
+      let acSched = 0;
+      let acUpcoming7 = 0;
+      listAcOverdue = [];
+      const rusakUnitsMap = new Map();
+
+      rawAc.forEach(item => {
+        const kode = item.kode_unit || `AC-${item.id}`;
+        unitSet.add(kode);
+        const st = (item.status || 'BAIK').toUpperCase();
+        const isDone = st.includes('BAIK') || st.includes('SELESAI');
+        const isRusak = st.includes('RUSAK');
+
+        if (isRusak) {
+          rusakUnitsMap.set(kode, item);
+        } else if (isDone) {
+          acDone++;
+        } else {
+          acSched++;
+          if (item.tgl_servis && item.tgl_servis < todayIso) {
+            listAcOverdue.push(item);
+          } else if (item.tgl_servis && item.tgl_servis >= todayIso && item.tgl_servis <= next7Iso) {
+            acUpcoming7++;
+          }
+        }
+      });
+
+      listAcRusak = Array.from(rusakUnitsMap.values());
+      const totalAcSlots = acDone + acSched;
+      const acPct = totalAcSlots > 0 ? Math.round((acDone / totalAcSlots) * 100) : 0;
+
+      document.getElementById('sum-ac-units').innerText = unitSet.size.toLocaleString('id-ID');
+      document.getElementById('sum-ac-done').innerText = acDone.toLocaleString('id-ID');
+      document.getElementById('sum-ac-sched').innerText = acSched.toLocaleString('id-ID');
+      document.getElementById('sum-ac-pct').innerText = `${acPct}%`;
+      document.getElementById('bar-ac-pct').style.width = `${acPct}%`;
+      document.getElementById('sum-ac-upcoming7').innerText = `${acUpcoming7.toLocaleString('id-ID')} Jadwal`;
+
+      // 2. ANALISIS INVENTARIS
+      let invSafe = 0;
+      let invEmpty = 0;
+      let invTotalQty = 0;
+      listInvKritis = [];
+
+      rawInv.forEach(item => {
+        const sisa = (Number(item.initial) || 0) + (Number(item.inQty) || 0) - (Number(item.outQty) || 0);
+        invTotalQty += Math.max(0, sisa);
+        if (sisa <= 0) {
+          invEmpty++;
+          listInvKritis.push({ ...item, sisa });
+        } else if (sisa <= 5) {
+          listInvKritis.push({ ...item, sisa });
+        } else {
+          invSafe++;
+        }
+      });
+
+      const invPct = rawInv.length > 0 ? Math.round((invSafe / rawInv.length) * 100) : 0;
+      document.getElementById('sum-inv-types').innerText = rawInv.length.toLocaleString('id-ID');
+      document.getElementById('sum-inv-safe').innerText = invSafe.toLocaleString('id-ID');
+      document.getElementById('sum-inv-empty').innerText = invEmpty.toLocaleString('id-ID');
+      document.getElementById('sum-inv-pct').innerText = `${invPct}%`;
+      document.getElementById('bar-inv-pct').style.width = `${invPct}%`;
+      document.getElementById('sum-inv-totalqty').innerText = `${invTotalQty.toLocaleString('id-ID')} Unit/Pcs`;
+
+      // 3. ANALISIS RUMAH TANGGA & DETEKSI BENTROK JADWAL
+      listRtPending = [];
+      let rtDone = 0;
+      let rtToday = 0;
+
+      rawRuang.forEach(r => {
+        const st = (r.status || '').toUpperCase();
+        if (st.includes('SELESAI') || st.includes('DISETUJUI')) rtDone++;
+        else listRtPending.push({ jenis: 'Ruangan', nama: r.ruangan, pemohon: r.nama_peminjam, tanggal: r.tgl_pinjam, status: r.status || 'Diproses' });
+        if (r.tgl_pinjam === todayIso) rtToday++;
+      });
+
+      rawKendaraan.forEach(k => {
+        const st = (k.status || '').toUpperCase();
+        if (st.includes('SELESAI') || st.includes('DISETUJUI')) rtDone++;
+        else listRtPending.push({ jenis: 'Kendaraan', nama: k.kendaraan, pemohon: k.nama_driver, tanggal: k.tgl_pinjam, status: k.status || 'Diproses' });
+        if (k.tgl_pinjam === todayIso) rtToday++;
+      });
+
+      // Deteksi bentrok ruangan pada tanggal yang sama
+      listRtConflicts = [];
+      const roomSlotMap = new Map();
+      rawRuang.forEach(r => {
+        if (!r.ruangan || !r.tgl_pinjam) return;
+        const key = `${r.ruangan.toLowerCase().trim()}|${r.tgl_pinjam}`;
+        if (roomSlotMap.has(key)) {
+          listRtConflicts.push({ ruang: r.ruangan, tanggal: r.tgl_pinjam, p1: roomSlotMap.get(key), p2: r.nama_peminjam });
+        } else {
+          roomSlotMap.set(key, r.nama_peminjam);
+        }
+      });
+
+      const totalRt = rawRuang.length + rawKendaraan.length;
+      const rtPct = totalRt > 0 ? Math.round((rtDone / totalRt) * 100) : 0;
+
+      document.getElementById('sum-rt-ruang').innerText = rawRuang.length.toLocaleString('id-ID');
+      document.getElementById('sum-rt-kendaraan').innerText = rawKendaraan.length.toLocaleString('id-ID');
+      document.getElementById('sum-rt-conflict').innerText = listRtConflicts.length.toLocaleString('id-ID');
+      document.getElementById('sum-rt-pct').innerText = `${rtPct}%`;
+      document.getElementById('bar-rt-pct').style.width = `${rtPct}%`;
+      document.getElementById('sum-rt-today').innerText = `${rtToday} Agenda`;
+
+      // UPDATE KARTU PERINGATAN DINI
+      document.getElementById('warn-ac-overdue').innerText = listAcOverdue.length.toLocaleString('id-ID');
+      document.getElementById('warn-ac-rusak').innerText = listAcRusak.length.toLocaleString('id-ID');
+      document.getElementById('warn-inv-kritis').innerText = listInvKritis.length.toLocaleString('id-ID');
+      document.getElementById('warn-rt-pending').innerText = (listRtPending.length + listRtConflicts.length).toLocaleString('id-ID');
+
+      const totalAlerts = listAcOverdue.length + listAcRusak.length + listInvKritis.length + listRtPending.length + listRtConflicts.length;
+      const badge = document.getElementById('totalAlertsBadge');
+      badge.innerText = `${totalAlerts.toLocaleString('id-ID')} Peringatan Aktif`;
+      badge.className = totalAlerts > 0
+        ? "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200"
+        : "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200";
+
+      // SUSUN DAFTAR PRIORITAS GABUNGAN
+      unifiedPriorities = [];
+
+      listAcRusak.forEach(u => {
+        unifiedPriorities.push({
+          cat: 'AC',
+          urgency: 'TINGGI',
+          modul: 'Maintenance AC',
+          item: `${u.kode_unit || '-'} (${u.ruang || u.gedung || '-'})`,
+          desc: `Status unit RUSAK / butuh perbaikan teknis (${u.catatan || 'Cek lapangan'})`,
+          link: '/ac'
+        });
+      });
+
+      listRtConflicts.forEach(c => {
+        unifiedPriorities.push({
+          cat: 'RT',
+          urgency: 'TINGGI',
+          modul: 'Rumah Tangga',
+          item: `${c.ruang} (${c.tanggal})`,
+          desc: `Potensi bentrok jadwal antara ${c.p1} dan ${c.p2}`,
+          link: '/rumah-tangga'
+        });
+      });
+
+      listInvKritis.sort((a, b) => a.sisa - b.sisa).forEach(inv => {
+        unifiedPriorities.push({
+          cat: 'INV',
+          urgency: inv.sisa <= 0 ? 'TINGGI' : 'SEDANG',
+          modul: 'Inventaris',
+          item: `${inv.code} — ${inv.name}`,
+          desc: inv.sisa <= 0 ? 'Stok HABIS (0 unit tersisa)' : `Stok menipis (Sisa ${inv.sisa} unit)`,
+          link: '/'
+        });
+      });
+
+      listAcOverdue.sort((a, b) => (a.tgl_servis || '').localeCompare(b.tgl_servis || '')).forEach(ac => {
+        unifiedPriorities.push({
+          cat: 'AC',
+          urgency: 'SEDANG',
+          modul: 'Maintenance AC',
+          item: `${ac.kode_unit || '-'} (${ac.ruang || ac.gedung || '-'})`,
+          desc: `Jadwal cuci terlewat sejak ${ac.tgl_servis} (${ac.catatan || 'Cuci rutin'})`,
+          link: '/ac'
+        });
+      });
+
+      listRtPending.forEach(rt => {
+        unifiedPriorities.push({
+          cat: 'RT',
+          urgency: 'NORMAL',
+          modul: 'Rumah Tangga',
+          item: `${rt.jenis}: ${rt.nama}`,
+          desc: `Permohonan oleh ${rt.pemohon} untuk tgl ${rt.tanggal} (${rt.status})`,
+          link: '/rumah-tangga'
+        });
+      });
+    }
+
+    function renderPriorityTable() {
+      const tbody = document.getElementById('tbody-priority');
+      const filter = document.getElementById('priorityFilter').value;
+      const filtered = unifiedPriorities.filter(p => filter === 'ALL' || p.cat === filter).slice(0, 15);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-emerald-700 font-semibold bg-emerald-50/40"><i class="fa-solid fa-circle-check mr-1.5"></i>Tidak ada peringatan mendesak pada kategori ini. Semua operasional berjalan baik.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((p, idx) => {
+        let urgBadge = '';
+        if (p.urgency === 'TINGGI') {
+          urgBadge = `<span class="bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded-md text-[10px] font-black">KRITIS / TINGGI</span>`;
+        } else if (p.urgency === 'SEDANG') {
+          urgBadge = `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-0.5 rounded-md text-[10px] font-bold">PERHATIAN</span>`;
+        } else {
+          urgBadge = `<span class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-0.5 rounded-md text-[10px] font-bold">ANTRIAN</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 text-center font-bold text-slate-500">${idx + 1}</td>
+            <td class="px-4 py-3">${urgBadge}</td>
+            <td class="px-4 py-3 font-bold text-slate-700">${escHtml(p.modul)}</td>
+            <td class="px-4 py-3 font-semibold text-slate-900">${escHtml(p.item)}</td>
+            <td class="px-4 py-3 text-slate-600">${escHtml(p.desc)}</td>
+            <td class="px-4 py-3 text-center">
+              <a href="${escHtml(p.link)}" class="inline-block bg-slate-900 hover:bg-slate-700 text-white px-3 py-1 rounded-lg text-[11px] font-bold transition">Tindak Lanjuti &rarr;</a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderExecutiveCharts() {
+      // Chart 1: Kesiapan AC per Gedung
+      const gedungStats = {};
+      rawAc.forEach(item => {
+        const g = item.kategori_gedung || item.gedung || 'Lainnya';
+        if (!gedungStats[g]) gedungStats[g] = { done: 0, pending: 0 };
+        const st = (item.status || 'BAIK').toUpperCase();
+        if (st.includes('BAIK') || st.includes('SELESAI')) gedungStats[g].done++;
+        else gedungStats[g].pending++;
+      });
+
+      const gLabels = Object.keys(gedungStats);
+      const gDone = gLabels.map(k => gedungStats[k].done);
+      const gPending = gLabels.map(k => gedungStats[k].pending);
+
+      const ctxAc = document.getElementById('execAcChart').getContext('2d');
+      if (execAcChartInstance) execAcChartInstance.destroy();
+      execAcChartInstance = new Chart(ctxAc, {
+        type: 'bar',
+        data: {
+          labels: gLabels.length ? gLabels : ['Belum Ada Data'],
+          datasets: [
+            { label: 'Selesai Cuci / Baik', data: gDone.length ? gDone : [0], backgroundColor: '#10b981', borderRadius: 4 },
+            { label: 'Terjadwal / Kendala', data: gPending.length ? gPending : [0], backgroundColor: '#6366f1', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+        }
+      });
+
+      // Chart 2: Komposisi Stok Inventaris
+      let safe = 0, low = 0, empty = 0;
+      rawInv.forEach(i => {
+        const sisa = (Number(i.initial) || 0) + (Number(i.inQty) || 0) - (Number(i.outQty) || 0);
+        if (sisa <= 0) empty++;
+        else if (sisa <= 5) low++;
+        else safe++;
+      });
+
+      const ctxInv = document.getElementById('execInvChart').getContext('2d');
+      if (execInvChartInstance) execInvChartInstance.destroy();
+      execInvChartInstance = new Chart(ctxInv, {
+        type: 'doughnut',
+        data: {
+          labels: ['Stok Aman (> 5)', 'Stok Menipis (1–5)', 'Stok Habis (0)'],
+          datasets: [{
+            data: [safe, low, empty],
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+
+    function openWarningModal(type) {
+      const title = document.getElementById('warnModalTitle');
+      const sub = document.getElementById('warnModalSubtitle');
+      const thead = document.getElementById('warnModalThead');
+      const tbody = document.getElementById('warnModalTbody');
+
+      if (type === 'AC_OVERDUE') {
+        title.innerText = `Jadwal Cuci AC Terlambat (${listAcOverdue.length} Jadwal)`;
+        sub.innerText = "Jadwal pemeliharaan AC yang sudah melewati tanggal rencana dan belum ditandai selesai.";
+        thead.innerHTML = `<tr><th class="px-4 py-3">No</th><th class="px-4 py-3">Tgl Jadwal</th><th class="px-4 py-3">Kode Unit</th><th class="px-4 py-3">Gedung / Ruang</th><th class="px-4 py-3">Siklus</th></tr>`;
+        tbody.innerHTML = listAcOverdue.length === 0
+          ? `<tr><td colspan="5" class="text-center py-6 text-slate-400">Tidak ada jadwal AC yang terlambat.</td></tr>`
+          : listAcOverdue.map((a, i) => `
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-2.5">${i + 1}</td>
+              <td class="px-4 py-2.5 font-mono font-bold text-rose-600">${escHtml(a.tgl_servis)}</td>
+              <td class="px-4 py-2.5 font-mono font-bold text-cyan-700">${escHtml(a.kode_unit)}</td>
+              <td class="px-4 py-2.5">${escHtml((a.gedung || '') + ' ' + (a.ruang || ''))}</td>
+              <td class="px-4 py-2.5">${escHtml(a.catatan || '-')}</td>
+            </tr>`).join('');
+      } else if (type === 'AC_RUSAK') {
+        title.innerText = `Unit AC Perlu Perbaikan (${listAcRusak.length} Unit)`;
+        sub.innerText = "Unit AC yang tercatat mengalami kerusakan atau kendala teknis.";
+        thead.innerHTML = `<tr><th class="px-4 py-3">No</th><th class="px-4 py-3">Kode Unit</th><th class="px-4 py-3">Gedung / Ruang</th><th class="px-4 py-3">Merk & PK</th><th class="px-4 py-3">Catatan</th></tr>`;
+        tbody.innerHTML = listAcRusak.length === 0
+          ? `<tr><td colspan="5" class="text-center py-6 text-slate-400">Tidak ada unit AC berstatus rusak.</td></tr>`
+          : listAcRusak.map((a, i) => `
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-2.5">${i + 1}</td>
+              <td class="px-4 py-2.5 font-mono font-bold text-rose-600">${escHtml(a.kode_unit)}</td>
+              <td class="px-4 py-2.5">${escHtml((a.gedung || '') + ' ' + (a.ruang || ''))}</td>
+              <td class="px-4 py-2.5">${escHtml((a.merk_ac || '-') + ' ' + (a.kapasitas || ''))}</td>
+              <td class="px-4 py-2.5 text-rose-700 font-semibold">${escHtml(a.catatan || 'Perlu pengecekan teknisi')}</td>
+            </tr>`).join('');
+      } else if (type === 'INV_KRITIS') {
+        title.innerText = `Stok Barang Inventaris Kritis (${listInvKritis.length} Item)`;
+        sub.innerText = "Barang inventaris dengan sisa stok 5 unit atau kurang.";
+        thead.innerHTML = `<tr><th class="px-4 py-3">No</th><th class="px-4 py-3">Kode Barang</th><th class="px-4 py-3">Nama Barang</th><th class="px-4 py-3 text-center">Sisa Stok</th><th class="px-4 py-3">Status</th></tr>`;
+        tbody.innerHTML = listInvKritis.length === 0
+          ? `<tr><td colspan="5" class="text-center py-6 text-slate-400">Seluruh stok barang berada pada batas aman.</td></tr>`
+          : listInvKritis.map((inv, i) => `
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-2.5">${i + 1}</td>
+              <td class="px-4 py-2.5 font-mono font-bold text-slate-700">${escHtml(inv.code)}</td>
+              <td class="px-4 py-2.5 font-semibold text-slate-900">${escHtml(inv.name)}</td>
+              <td class="px-4 py-2.5 text-center font-black ${inv.sisa <= 0 ? 'text-rose-600' : 'text-amber-600'}">${inv.sisa}</td>
+              <td class="px-4 py-2.5 font-bold ${inv.sisa <= 0 ? 'text-rose-600' : 'text-amber-600'}">${inv.sisa <= 0 ? 'HABIS' : 'MENIPIS'}</td>
+            </tr>`).join('');
+      } else if (type === 'RT_PENDING') {
+        title.innerText = `Antrean & Bentrok Layanan Rumah Tangga (${listRtPending.length + listRtConflicts.length})`;
+        sub.innerText = "Permohonan peminjaman ruangan/kendaraan yang masih berstatus Diproses.";
+        thead.innerHTML = `<tr><th class="px-4 py-3">No</th><th class="px-4 py-3">Jenis</th><th class="px-4 py-3">Fasilitas / Kendaraan</th><th class="px-4 py-3">Pemohon / Driver</th><th class="px-4 py-3">Tanggal</th></tr>`;
+        tbody.innerHTML = listRtPending.length === 0
+          ? `<tr><td colspan="5" class="text-center py-6 text-slate-400">Tidak ada permohonan yang menunggu proses.</td></tr>`
+          : listRtPending.map((rt, i) => `
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-2.5">${i + 1}</td>
+              <td class="px-4 py-2.5 font-bold text-indigo-700">${escHtml(rt.jenis)}</td>
+              <td class="px-4 py-2.5 font-semibold text-slate-900">${escHtml(rt.nama)}</td>
+              <td class="px-4 py-2.5">${escHtml(rt.pemohon)}</td>
+              <td class="px-4 py-2.5 font-mono">${escHtml(rt.tanggal)}</td>
+            </tr>`).join('');
+      }
+
+      document.getElementById('warningModal').classList.remove('hidden');
+    }
+
+    function closeWarningModal() {
+      document.getElementById('warningModal').classList.add('hidden');
+    }
+
+    function exportExecutivePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4');
+
+      doc.setFontSize(14); doc.setFont("helvetica", "bold");
+      doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 16);
+      doc.setFontSize(10); doc.setFont("helvetica", "normal");
+      doc.text("LAPORAN RINGKASAN EKSEKUTIF & PERINGATAN DINI SARPRAS", 14, 22);
+      doc.setFontSize(8);
+      doc.text(`Tanggal Laporan: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`, 14, 27);
+      doc.line(14, 29, 196, 29);
+
+      // Ringkasan Angka Utama
+      doc.autoTable({
+        head: [['Divisi Layanan', 'Indikator Utama', 'Capaian / Kondisi', 'Peringatan Aktif']],
+        body: [
+          ['Maintenance AC', `${document.getElementById('sum-ac-units').innerText} Unit AC Terdaftar`, `Realisasi Cuci: ${document.getElementById('sum-ac-pct').innerText}`, `${listAcOverdue.length} Terlambat, ${listAcRusak.length} Rusak`],
+          ['Inventaris & Gudang', `${document.getElementById('sum-inv-types').innerText} Jenis Barang`, `Stok Aman: ${document.getElementById('sum-inv-pct').innerText}`, `${listInvKritis.length} Item Stok Kritis/Habis`],
+          ['Rumah Tangga', `${rawRuang.length} Ruang, ${rawKendaraan.length} Kendaraan`, `Selesai Layanan: ${document.getElementById('sum-rt-pct').innerText}`, `${listRtPending.length} Diproses, ${listRtConflicts.length} Bentrok`]
+        ],
+        startY: 33,
+        headStyles: { fillColor: [15, 23, 42] },
+        styles: { fontSize: 8 }
+      });
+
+      // Tabel Daftar Prioritas
+      const prioRows = unifiedPriorities.slice(0, 25).map((p, i) => [
+        i + 1, p.urgency, p.modul, p.item, p.desc
+      ]);
+
+      doc.setFontSize(10); doc.setFont("helvetica", "bold");
+      doc.text("DAFTAR TINDAK LANJUT PRIORITAS", 14, doc.lastAutoTable.finalY + 10);
+
+      doc.autoTable({
+        head: [['No', 'Urgensi', 'Modul', 'Item / Kode', 'Keterangan']],
+        body: prioRows.length ? prioRows : [['-', 'AMAN', 'Semua Modul', '-', 'Tidak ada peringatan aktif']],
+        startY: doc.lastAutoTable.finalY + 13,
+        headStyles: { fillColor: [225, 29, 72] },
+        styles: { fontSize: 7.5 }
+      });
+
+      doc.save(`Executive_Summary_Sarpras_${new Date().toISOString().split('T')[0]}.pdf`);
+    }
+  </script>
+</body>
+</html>
