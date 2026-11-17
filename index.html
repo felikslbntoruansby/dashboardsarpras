@@ -123,108 +123,284 @@
             </div>
         </div>
 
-        <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-chart-column text-blue-600"></i> Analisis Stok Akhir vs Keluar (Top 15 Barang)
-                </h2>
-                <div style="position: relative; height: 32vh; width: 100%;">
-                    <canvas id="stockChart"></canvas>
+        <!-- MENU NAVIGASI TERSENDIRI (REKAP STOK | KELOLA STOK | HISTORI TERPISAH) -->
+        <div class="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-2">
+            <button type="button" onclick="switchInvMenu('MASTER')" id="navBtn-MASTER" class="flex-1 py-3 px-4 rounded-xl bg-blue-600 text-white font-bold text-xs md:text-sm shadow-sm transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-table-list"></i> 1. Rekap Master Stok
+            </button>
+            <button type="button" onclick="switchInvMenu('KELOLA')" id="navBtn-KELOLA" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 font-bold text-xs md:text-sm transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-right-left"></i> 2. Kelola Stok (Restok & Ambil)
+            </button>
+            <button type="button" onclick="switchInvMenu('HISTORI')" id="navBtn-HISTORI" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-700 font-bold text-xs md:text-sm transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left"></i> 3. Histori Masuk & Keluar Terpisah
+            </button>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- MENU 1: REKAP MASTER STOK & GRAFIK ANALYTICS                              -->
+        <!-- ========================================================================= -->
+        <div id="menuSection-MASTER" class="space-y-6">
+            <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-column text-blue-600"></i> Analisis Stok Akhir vs Keluar (Top 15 Barang)
+                    </h2>
+                    <div style="position: relative; height: 32vh; width: 100%;">
+                        <canvas id="stockChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-emerald-600"></i> Distribusi Status Kesehatan Stok
+                    </h2>
+                    <div style="position: relative; height: 32vh; width: 100%;">
+                        <canvas id="healthPieChart"></canvas>
+                    </div>
                 </div>
             </div>
 
+            <!-- SEKSI 3: FAST-MOVING ITEMS -->
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-chart-pie text-emerald-600"></i> Distribusi Status Kesehatan Stok
+                    <i class="fa-solid fa-fire text-amber-500"></i> Analytics Fast-Moving Items (Barang Paling Sering Diambil)
                 </h2>
-                <div style="position: relative; height: 32vh; width: 100%;">
-                    <canvas id="healthPieChart"></canvas>
+                <div style="position: relative; height: 26vh; width: 100%;">
+                    <canvas id="fastMovingChart"></canvas>
+                </div>
+            </div>
+
+            <!-- TABEL UTAMA MASTER INVENTARIS (BERSIH TANPA TOMBOL KELOLA STOK DI TABEL) -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-slate-50/70">
+                    <div class="w-full md:w-1/3">
+                        <input type="text" id="searchInput" onkeyup="filterData()" placeholder="🔍 Cari Kode atau Nama Barang..." class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="itemCount" class="text-xs md:text-sm font-semibold text-slate-500">Memuat data...</span>
+                        <button onclick="switchInvMenu('KELOLA')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition">
+                            <i class="fa-solid fa-right-left mr-1"></i> Input Restok / Ambil
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left border-collapse whitespace-nowrap">
+                        <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="py-4 px-5">Kode Barang</th>
+                                <th class="py-4 px-5">Nama Barang</th>
+                                <th class="py-4 px-5 text-center">Stok Awal</th>
+                                <th class="py-4 px-5 text-center">Masuk</th>
+                                <th class="py-4 px-5 text-center">Keluar</th>
+                                <th class="py-4 px-5 text-center">Stok Akhir</th>
+                                <th class="py-4 px-5 text-center">Aksi Master</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="text-slate-700 text-xs md:text-sm divide-y divide-slate-200">
+                            <tr><td colspan="7" class="text-center py-6 text-slate-400">Memuat data inventaris...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-between items-center p-4 border-t border-slate-200 bg-slate-50 text-xs md:text-sm">
+                    <button id="prevBtn" onclick="changePage(-1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Previous</button>
+                    <span id="pageIndicator" class="font-semibold text-slate-600">Halaman 1</span>
+                    <button id="nextBtn" onclick="changePage(1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Next</button>
                 </div>
             </div>
         </div>
 
-        <!-- SEKSI 3: FAST-MOVING ITEMS -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-fire text-amber-500"></i> Analytics Fast-Moving Items (Barang Paling Sering Diambil)
-            </h2>
-            <div style="position: relative; height: 26vh; width: 100%;">
-                <canvas id="fastMovingChart"></canvas>
-            </div>
-        </div>
-
-        <!-- TABEL UTAMA MASTER INVENTARIS -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-slate-50/70">
-                <div class="w-full md:w-1/3">
-                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="🔍 Cari Kode atau Nama Barang..." class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div id="itemCount" class="text-xs md:text-sm font-semibold text-slate-500">
-                    Memuat data...
+        <!-- ========================================================================= -->
+        <!-- MENU 2: MENU TERSENDIRI KELOLA STOK (FORM RESTOK & AMBIL BARANG)          -->
+        <!-- ========================================================================= -->
+        <div id="menuSection-KELOLA" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-blue-50 via-white to-emerald-50 p-4 rounded-2xl border border-blue-200 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 text-white p-3 rounded-xl">
+                        <i class="fa-solid fa-arrows-rotate text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-extrabold text-slate-900">Menu Kelola Stok Barang (Terhubung Otomatis)</h2>
+                        <p class="text-xs text-slate-600">Setiap transaksi <strong>Restok (+ Masuk)</strong> atau <strong>Pengambilan (- Keluar)</strong> akan langsung memperbarui kolom Stok Akhir di Rekap Master serta masuk ke masing-masing Histori terpisah.</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-left border-collapse whitespace-nowrap">
-                    <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
-                        <tr>
-                            <th class="py-4 px-5">Kode Barang</th>
-                            <th class="py-4 px-5">Nama Barang</th>
-                            <th class="py-4 px-5 text-center">Stok Awal</th>
-                            <th class="py-4 px-5 text-center">Masuk</th>
-                            <th class="py-4 px-5 text-center">Keluar</th>
-                            <th class="py-4 px-5 text-center">Stok Akhir</th>
-                            <th class="py-4 px-5 text-center">Kelola Stok</th>
-                            <th class="py-4 px-5 text-center">Aksi Master</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody" class="text-slate-700 text-xs md:text-sm divide-y divide-slate-200">
-                        <tr><td colspan="8" class="text-center py-6 text-slate-400">Memuat data inventaris...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- FORM 1: RESTOK / PENAMBAHAN STOK (IN) -->
+                <div class="bg-white rounded-2xl border-2 border-emerald-200 shadow-sm overflow-hidden">
+                    <div class="bg-emerald-600 text-white p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-plus text-xl"></i>
+                            <div>
+                                <h3 class="font-extrabold text-base">Form Penambahan Stok (+ Restok)</h3>
+                                <p class="text-[11px] text-emerald-100">Menambah kolom "Masuk" & "Stok Akhir" + tercatat di Histori Restok</p>
+                            </div>
+                        </div>
+                    </div>
+                    <form id="formRestokDedicated" onsubmit="submitDedicatedTransaction(event, 'IN')" class="p-5 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Cari & Pilih Barang</label>
+                            <input type="text" id="searchSelectIn" oninput="populateStockSelects()" placeholder="Ketik kode/nama barang untuk memfilter daftar..." class="w-full border border-slate-200 bg-slate-50 text-slate-700 p-2 rounded-xl text-xs mb-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <select id="selectItemIn" onchange="updateSelectedStockBadge('IN')" required class="w-full border border-slate-300 bg-white text-slate-900 font-semibold p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"></select>
+                            <p id="badgeStockIn" class="text-[11px] font-bold text-emerald-700 mt-1.5">Sisa Stok Saat Ini: -</p>
+                        </div>
 
-            <div class="flex justify-between items-center p-4 border-t border-slate-200 bg-slate-50 text-xs md:text-sm">
-                <button id="prevBtn" onclick="changePage(-1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Previous</button>
-                <span id="pageIndicator" class="font-semibold text-slate-600">Halaman 1</span>
-                <button id="nextBtn" onclick="changePage(1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Next</button>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Restok (Masuk)</label>
+                                <input type="number" id="qtyIn" min="1" value="1" required class="w-full border border-slate-300 bg-white text-slate-900 font-bold p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Petugas Penerima / Sumber</label>
+                                <input type="text" id="picIn" required placeholder="Contoh: Gudang Sarpras / Toko" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Pembelian / Restok</label>
+                            <textarea id="notesIn" rows="2" placeholder="Contoh: Pengadaan rutin bulan ini / Nota #123" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                        </div>
+
+                        <button type="submit" id="btnSubmitIn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-sm text-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i> Simpan Penambahan Stok (+ Masuk)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- FORM 2: PENGAMBILAN / BARANG KELUAR (OUT) -->
+                <div class="bg-white rounded-2xl border-2 border-amber-200 shadow-sm overflow-hidden">
+                    <div class="bg-amber-500 text-white p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-minus text-xl"></i>
+                            <div>
+                                <h3 class="font-extrabold text-base">Form Pengambilan Barang (- Keluar)</h3>
+                                <p class="text-[11px] text-amber-50">Menambah kolom "Keluar" & mengurangi "Stok Akhir" + tercatat di Histori Keluar</p>
+                            </div>
+                        </div>
+                    </div>
+                    <form id="formAmbilDedicated" onsubmit="submitDedicatedTransaction(event, 'OUT')" class="p-5 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Cari & Pilih Barang yang Diambil</label>
+                            <input type="text" id="searchSelectOut" oninput="populateStockSelects()" placeholder="Ketik kode/nama barang untuk memfilter daftar..." class="w-full border border-slate-200 bg-slate-50 text-slate-700 p-2 rounded-xl text-xs mb-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <select id="selectItemOut" onchange="updateSelectedStockBadge('OUT')" required class="w-full border border-slate-300 bg-white text-slate-900 font-semibold p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"></select>
+                            <p id="badgeStockOut" class="text-[11px] font-bold text-amber-700 mt-1.5">Sisa Stok Tersedia: -</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Diambil (Keluar)</label>
+                                <input type="number" id="qtyOut" min="1" value="1" required class="w-full border border-slate-300 bg-white text-slate-900 font-bold p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pengambil / Teknisi</label>
+                                <input type="text" id="picOut" required placeholder="Contoh: Budi (Teknisi Gedung)" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Keperluan / Lokasi Pemasangan</label>
+                            <textarea id="notesOut" rows="2" placeholder="Contoh: Perbaikan kran toilet Gedung Umum Lt.2" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+                        </div>
+
+                        <button type="submit" id="btnSubmitOut" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-sm text-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-minus-circle"></i> Simpan Pengambilan Barang (- Keluar)
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <!-- TABEL HISTORI TRANSAKSI DENGAN FILTER BULAN & TAHUN -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6 space-y-4">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-purple-600"></i> Histori Transaksi (Penambahan & Pengambilan)
-                </h2>
+        <!-- ========================================================================= -->
+        <!-- MENU 3: HISTORI TERPISAH (HISTORI RESTOK/MASUK VS HISTORI KELUAR/AMBIL)   -->
+        <!-- ========================================================================= -->
+        <div id="menuSection-HISTORI" class="hidden space-y-6">
+            <!-- FILTER PERIODE BULAN BERSAMA -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-purple-600"></i> Buku Histori Transaksi Terpisah
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Riwayat transaksi <strong>Restok (Masuk)</strong> dan <strong>Pengambilan (Keluar)</strong> dipisahkan secara otomatis agar mudah diaudit.</p>
+                </div>
                 
                 <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap">
                     <input type="month" id="logMonthFilter" onchange="filterLogsByMonth(true)" class="bg-white border border-slate-300 text-purple-700 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
                     <button onclick="resetLogMonthFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-2 rounded-xl border border-slate-300">Semua Bulan</button>
-                    <button onclick="exportLogsToPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded-xl shadow-sm text-xs md:text-sm flex items-center gap-2 transition">
-                        <i class="fa-solid fa-file-pdf"></i> Cetak PDF Histori Terfilter
-                    </button>
                 </div>
             </div>
 
-            <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl">
-                <table class="min-w-full text-left border-collapse whitespace-nowrap text-xs md:text-sm">
-                    <thead class="bg-slate-100 text-slate-600 sticky top-0 border-b border-slate-200">
-                        <tr>
-                            <th class="py-3 px-4">Waktu & Tanggal</th>
-                            <th class="py-3 px-4">Kode & Barang</th>
-                            <th class="py-3 px-4 text-center">Jenis</th>
-                            <th class="py-3 px-4 text-center">Jumlah</th>
-                            <th class="py-3 px-4">Petugas / Pengambil</th>
-                            <th class="py-3 px-4">Catatan / Keperluan</th>
-                            <th class="py-3 px-4 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="logTableBody" class="divide-y divide-slate-200 text-slate-700">
-                        <tr><td colspan="7" class="text-center py-4 text-slate-400">Memuat histori...</td></tr>
-                    </tbody>
-                </table>
+            <!-- GRID 2 KOLOM: KIRI HISTORI RESTOK (IN), KANAN HISTORI PENGAMBILAN (OUT) -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                
+                <!-- TABEL HISTORI 1: PENAMBAHAN STOK / RESTOK (IN) -->
+                <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm overflow-hidden flex flex-col">
+                    <div class="p-4 bg-emerald-50 border-b border-emerald-200 flex flex-wrap justify-between items-center gap-2">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-emerald-900 flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-down-wide-short text-emerald-600"></i> Histori Restok / Barang Masuk (+ IN)
+                            </h3>
+                            <p class="text-[11px] text-emerald-700" id="countLogIn">0 transaksi masuk</p>
+                        </div>
+                        <button onclick="exportLogsByTypePDF('IN')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-3 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition">
+                            <i class="fa-solid fa-file-pdf"></i> Cetak PDF Masuk
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto max-h-[460px]">
+                        <table class="min-w-full text-left border-collapse whitespace-nowrap text-xs">
+                            <thead class="bg-slate-100 text-slate-600 sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3">Tanggal</th>
+                                    <th class="py-3 px-3">Barang</th>
+                                    <th class="py-3 px-3 text-center">Masuk</th>
+                                    <th class="py-3 px-3">Penerima</th>
+                                    <th class="py-3 px-3">Catatan</th>
+                                    <th class="py-3 px-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logTableBodyIn" class="divide-y divide-slate-200 text-slate-700">
+                                <tr><td colspan="6" class="text-center py-5 text-slate-400">Memuat histori barang masuk...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TABEL HISTORI 2: PENGAMBILAN / BARANG KELUAR (OUT) -->
+                <div class="bg-white rounded-2xl border border-rose-200 shadow-sm overflow-hidden flex flex-col">
+                    <div class="p-4 bg-rose-50 border-b border-rose-200 flex flex-wrap justify-between items-center gap-2">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-rose-900 flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-rose-600"></i> Histori Pengambilan / Barang Keluar (- OUT)
+                            </h3>
+                            <p class="text-[11px] text-rose-700" id="countLogOut">0 transaksi keluar</p>
+                        </div>
+                        <button onclick="exportLogsByTypePDF('OUT')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-1.5 px-3 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition">
+                            <i class="fa-solid fa-file-pdf"></i> Cetak PDF Keluar
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto max-h-[460px]">
+                        <table class="min-w-full text-left border-collapse whitespace-nowrap text-xs">
+                            <thead class="bg-slate-100 text-slate-600 sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3">Tanggal</th>
+                                    <th class="py-3 px-3">Barang</th>
+                                    <th class="py-3 px-3 text-center">Keluar</th>
+                                    <th class="py-3 px-3">Pengambil</th>
+                                    <th class="py-3 px-3">Keperluan</th>
+                                    <th class="py-3 px-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logTableBodyOut" class="divide-y divide-slate-200 text-slate-700">
+                                <tr><td colspan="6" class="text-center py-5 text-slate-400">Memuat histori barang keluar...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -252,7 +428,6 @@
                 </div>
             </div>
 
-            <!-- PENCARIAN DALAM MODAL KPI -->
             <div class="my-3">
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -260,7 +435,6 @@
                 </div>
             </div>
 
-            <!-- TABEL ISI MODAL KPI -->
             <div class="overflow-auto flex-1 border border-slate-200 rounded-xl">
                 <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
                     <thead id="invKpiThead" class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200 sticky top-0"></thead>
@@ -270,7 +444,7 @@
 
             <div class="pt-3 mt-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
                 <span id="invKpiFooterInfo">Total: 0 data</span>
-                <span>Gunakan tombol "+ Restok" atau "- Ambil" untuk langsung memperbarui stok.</span>
+                <span>Klik "Kelola di Menu Stok" untuk menambah atau mengambil stok.</span>
             </div>
         </div>
     </div>
@@ -315,37 +489,7 @@
         </div>
     </div>
 
-    <!-- Modal Form Transaksi -->
-    <div id="transModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-[60] p-4">
-        <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-800">
-            <h2 id="transModalTitle" class="text-xl font-bold mb-4 text-slate-900">Transaksi Barang</h2>
-            <form id="transForm" class="space-y-3">
-                <input type="hidden" id="transItemId">
-                <input type="hidden" id="transType">
-                
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-700">Nama Barang</label>
-                    <input type="text" id="transItemName" disabled class="w-full border border-slate-200 bg-slate-100 p-2.5 rounded-xl text-sm font-bold text-slate-600">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-700">Jumlah Barang</label>
-                    <input type="number" id="transQty" min="1" value="1" required class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-700">Nama Petugas / Pengambil Barang</label>
-                    <input type="text" id="transPic" placeholder="Contoh: Budi (Bagian IT)" required class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-700">Catatan / Keperluan</label>
-                    <textarea id="transNotes" placeholder="Contoh: Perbaikan AC Ruang 102" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                </div>
-                <div class="flex justify-end gap-2 pt-3">
-                    <button type="button" onclick="closeTransModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 px-4 rounded-xl text-xs font-bold">Batal</button>
-                    <button type="submit" id="transSubmitBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-xl text-xs font-bold shadow-sm">Simpan Transaksi</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
     <script>
         let inventory = [];
@@ -366,6 +510,140 @@
             await loadSavedLogMonthFilter();
             loadInventory();
         });
+
+        function showToast(msg, type = 'success') {
+            const c = document.getElementById('toastContainer');
+            if (!c) return;
+            const t = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-600' : 'bg-rose-600';
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark';
+            t.className = `${bg} text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-xs font-bold transition-all transform translate-y-5 opacity-0`;
+            t.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${msg}</span>`;
+            c.appendChild(t);
+            setTimeout(() => t.classList.remove('translate-y-5', 'opacity-0'), 50);
+            setTimeout(() => {
+                t.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => t.remove(), 300);
+            }, 3500);
+        }
+
+        // SWITCH MENU TERSENDIRI: MASTER | KELOLA | HISTORI
+        function switchInvMenu(menuName, preselectItemId = null, preselectType = null) {
+            const sections = ['MASTER', 'KELOLA', 'HISTORI'];
+            sections.forEach(s => {
+                const secEl = document.getElementById(`menuSection-${s}`);
+                const btnEl = document.getElementById(`navBtn-${s}`);
+                if (s === menuName) {
+                    secEl.classList.remove('hidden');
+                    if (s === 'MASTER') btnEl.className = "flex-1 py-3 px-4 rounded-xl bg-blue-600 text-white font-bold text-xs md:text-sm shadow-sm transition flex items-center justify-center gap-2";
+                    if (s === 'KELOLA') btnEl.className = "flex-1 py-3 px-4 rounded-xl bg-emerald-600 text-white font-bold text-xs md:text-sm shadow-sm transition flex items-center justify-center gap-2";
+                    if (s === 'HISTORI') btnEl.className = "flex-1 py-3 px-4 rounded-xl bg-purple-600 text-white font-bold text-xs md:text-sm shadow-sm transition flex items-center justify-center gap-2";
+                } else {
+                    secEl.classList.add('hidden');
+                    btnEl.className = "flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs md:text-sm transition flex items-center justify-center gap-2";
+                }
+            });
+
+            if (menuName === 'MASTER') {
+                renderChart();
+                renderHealthPieChart();
+                renderFastMovingChart();
+            } else if (menuName === 'KELOLA') {
+                populateStockSelects(preselectItemId, preselectType);
+            }
+        }
+
+        function jumpToKelola(itemId, type) {
+            closeInvKpiModal();
+            switchInvMenu('KELOLA', itemId, type);
+        }
+
+        function populateStockSelects(preselectItemId = null, preselectType = null) {
+            const kwIn = (document.getElementById('searchSelectIn')?.value || '').toLowerCase();
+            const kwOut = (document.getElementById('searchSelectOut')?.value || '').toLowerCase();
+
+            const selIn = document.getElementById('selectItemIn');
+            const selOut = document.getElementById('selectItemOut');
+            if (!selIn || !selOut) return;
+
+            const prevIn = preselectType === 'IN' && preselectItemId ? String(preselectItemId) : selIn.value;
+            const prevOut = preselectType === 'OUT' && preselectItemId ? String(preselectItemId) : selOut.value;
+
+            const listIn = inventory.filter(i => `${i.code} ${i.name}`.toLowerCase().includes(kwIn));
+            const listOut = inventory.filter(i => `${i.code} ${i.name}`.toLowerCase().includes(kwOut));
+
+            selIn.innerHTML = listIn.map(i => `<option value="${i.id}">${i.code} - ${i.name} (Sisa: ${calculateFinalStock(i)})</option>`).join('');
+            selOut.innerHTML = listOut.map(i => `<option value="${i.id}">${i.code} - ${i.name} (Sisa: ${calculateFinalStock(i)})</option>`).join('');
+
+            if (prevIn && listIn.some(i => String(i.id) === prevIn)) selIn.value = prevIn;
+            if (prevOut && listOut.some(i => String(i.id) === prevOut)) selOut.value = prevOut;
+
+            updateSelectedStockBadge('IN');
+            updateSelectedStockBadge('OUT');
+        }
+
+        function updateSelectedStockBadge(type) {
+            const selectEl = document.getElementById(type === 'IN' ? 'selectItemIn' : 'selectItemOut');
+            const badgeEl = document.getElementById(type === 'IN' ? 'badgeStockIn' : 'badgeStockOut');
+            if (!selectEl || !badgeEl) return;
+
+            const item = inventory.find(i => String(i.id) === String(selectEl.value));
+            if (!item) {
+                badgeEl.innerText = "Sisa Stok: -";
+                return;
+            }
+            const sisa = calculateFinalStock(item);
+            if (type === 'IN') {
+                badgeEl.innerText = `Sisa Stok Saat Ini: ${sisa} unit (Masuk sebelumnya: +${item.inQty || 0})`;
+            } else {
+                badgeEl.innerText = sisa <= 0
+                    ? `PERINGATAN: Stok barang ini HABIS (0 unit)!`
+                    : `Sisa Stok Tersedia: ${sisa} unit (Keluar sebelumnya: -${item.outQty || 0})`;
+                badgeEl.className = sisa <= 0 ? "text-[11px] font-bold text-rose-600 mt-1.5" : "text-[11px] font-bold text-amber-700 mt-1.5";
+            }
+        }
+
+        async function submitDedicatedTransaction(e, type) {
+            e.preventDefault();
+            const isIN = type === 'IN';
+            const itemId = document.getElementById(isIN ? 'selectItemIn' : 'selectItemOut').value;
+            const quantity = document.getElementById(isIN ? 'qtyIn' : 'qtyOut').value;
+            const picName = document.getElementById(isIN ? 'picIn' : 'picOut').value;
+            const notes = document.getElementById(isIN ? 'notesIn' : 'notesOut').value;
+            const btn = document.getElementById(isIN ? 'btnSubmitIn' : 'btnSubmitOut');
+
+            if (!itemId) {
+                showToast("Silakan pilih barang terlebih dahulu!", "error");
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/inventory/transaction', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inventoryId: itemId, type, quantity, picName, notes })
+                });
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || "Gagal memproses transaksi");
+
+                document.getElementById(isIN ? 'qtyIn' : 'qtyOut').value = 1;
+                document.getElementById(isIN ? 'picIn' : 'picOut').value = '';
+                document.getElementById(isIN ? 'notesIn' : 'notesOut').value = '';
+
+                showToast(
+                    isIN
+                        ? `Berhasil menambah +${quantity} unit! Stok & Histori Masuk diperbarui.`
+                        : `Berhasil mengambil -${quantity} unit! Stok & Histori Keluar diperbarui.`,
+                    "success"
+                );
+                await loadInventory();
+            } catch (err) {
+                showToast(err.message, "error");
+            } finally {
+                btn.disabled = false;
+            }
+        }
 
         async function loadSavedLogMonthFilter() {
             try {
@@ -411,8 +689,9 @@
         function animateCounter(id, targetVal) {
             const el = document.getElementById(id);
             if (!el) return;
+            if (targetVal === 0) { el.innerText = '0'; return; }
             let start = 0;
-            const duration = 800;
+            const duration = 600;
             const stepTime = Math.max(Math.floor(duration / (targetVal || 1)), 20);
             const timer = setInterval(() => {
                 start += Math.ceil(targetVal / (duration / stepTime));
@@ -425,24 +704,24 @@
             }, stepTime);
         }
 
-        function loadInventory() {
-            fetch('/api/inventory')
-                .then(res => res.json())
-                .then(data => {
-                    inventory = Array.isArray(data) ? data : [];
-                    filteredInventory = [...inventory];
-                    updateKpis();
-                    checkStockAlerts();
-                    renderData();
-                    loadLogs();
-                    renderHealthPieChart();
-                    renderFastMovingChart();
-                    if (activeInvKpiType) renderInvKpiModalTable();
-                })
-                .catch(err => {
-                    console.error("Gagal memuat data:", err);
-                    document.getElementById("tableBody").innerHTML = `<tr><td colspan="8" class="text-center py-6 text-rose-600 font-semibold">Gagal memuat data dari API backend.</td></tr>`;
-                });
+        async function loadInventory() {
+            try {
+                const res = await fetch('/api/inventory');
+                const data = await res.json();
+                inventory = Array.isArray(data) ? data : [];
+                filteredInventory = [...inventory];
+                updateKpis();
+                checkStockAlerts();
+                renderData();
+                populateStockSelects();
+                await loadLogs();
+                renderHealthPieChart();
+                renderFastMovingChart();
+                if (activeInvKpiType) renderInvKpiModalTable();
+            } catch (err) {
+                console.error("Gagal memuat data:", err);
+                document.getElementById("tableBody").innerHTML = `<tr><td colspan="7" class="text-center py-6 text-rose-600 font-semibold">Gagal memuat data dari API backend.</td></tr>`;
+            }
         }
 
         function calculateFinalStock(item) {
@@ -508,7 +787,7 @@
                 badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200";
                 badge.innerText = "BARANG KRITIS (< 5 UNIT)";
                 title.innerText = `Daftar Barang Perlu Restok Segera (${kritisItems.length} Jenis)`;
-                sub.innerText = "Barang dengan sisa stok kurang dari 5 unit atau habis. Klik '+ Restok' untuk menambah stok.";
+                sub.innerText = "Barang dengan sisa stok kurang dari 5 unit atau habis.";
             }
 
             renderInvKpiModalTable();
@@ -601,7 +880,7 @@
                     <th class="px-4 py-3 font-bold text-center">Masuk</th>
                     <th class="px-4 py-3 font-bold text-center">Keluar</th>
                     <th class="px-4 py-3 font-bold text-center">Stok Akhir</th>
-                    <th class="px-4 py-3 font-bold text-center">Aksi Cepat</th>
+                    <th class="px-4 py-3 font-bold text-center">Aksi</th>
                 </tr>
             `;
 
@@ -616,7 +895,6 @@
             tbody.innerHTML = rows.map((item, i) => {
                 const finalStock = calculateFinalStock(item);
                 const textClass = finalStock <= 0 ? "text-rose-600 font-black" : (finalStock < 5 ? "text-amber-600 font-black" : "text-emerald-600 font-black");
-                const safeName = (item.name || '').replace(/'/g, "\\'");
 
                 return `
                     <tr class="hover:bg-slate-50 transition">
@@ -627,9 +905,8 @@
                         <td class="px-4 py-3 text-center text-emerald-600 font-semibold">+${item.inQty || 0}</td>
                         <td class="px-4 py-3 text-center text-rose-600 font-semibold">-${item.outQty || 0}</td>
                         <td class="px-4 py-3 text-center ${textClass}">${finalStock}</td>
-                        <td class="px-4 py-3 text-center space-x-1">
-                            <button onclick="openTransModal(${item.id}, '${safeName}', 'IN')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] px-2.5 py-1 rounded-lg font-bold">+ Restok</button>
-                            <button onclick="openTransModal(${item.id}, '${safeName}', 'OUT')" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] px-2.5 py-1 rounded-lg font-bold">- Ambil</button>
+                        <td class="px-4 py-3 text-center">
+                            <button onclick="jumpToKelola(${item.id}, 'IN')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] px-2.5 py-1 rounded-lg font-bold">Kelola di Menu Stok &rarr;</button>
                         </td>
                     </tr>
                 `;
@@ -640,10 +917,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape');
             const rows = getInvKpiFilteredRows();
-            if (!rows.length) {
-                alert("Tidak ada data untuk dicetak.");
-                return;
-            }
+            if (!rows.length) { showToast("Tidak ada data untuk dicetak.", "error"); return; }
 
             const titleText = document.getElementById('invKpiTitle').innerText;
             doc.setFontSize(14); doc.setFont("helvetica", "bold");
@@ -681,7 +955,9 @@
         }
 
         function renderChart() {
-            const ctx = document.getElementById('stockChart').getContext('2d');
+            const canvas = document.getElementById('stockChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             const chartItems = filteredInventory.slice(0, 15);
             const labels = chartItems.map(item => item.name);
             const stockData = chartItems.map(item => calculateFinalStock(item));
@@ -694,37 +970,21 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        {
-                            type: 'line',
-                            label: 'Terpakai (Out)',
-                            data: outData,
-                            borderColor: '#f59e0b',
-                            borderWidth: 2,
-                            fill: false,
-                            tension: 0.3
-                        },
-                        {
-                            type: 'bar',
-                            label: 'Stok Akhir',
-                            data: stockData,
-                            backgroundColor: stockData.map(s => s <= 0 ? '#ef4444' : (s < 10 ? '#f59e0b' : '#10b981')),
-                            borderRadius: 4
-                        }
+                        { type: 'line', label: 'Terpakai (Out)', data: outData, borderColor: '#f59e0b', borderWidth: 2, fill: false, tension: 0.3 },
+                        { type: 'bar', label: 'Stok Akhir', data: stockData, backgroundColor: stockData.map(s => s <= 0 ? '#ef4444' : (s < 10 ? '#f59e0b' : '#10b981')), borderRadius: 4 }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { labels: { color: '#475569' } } },
-                    scales: {
-                        x: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } },
-                        y: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } }
-                    }
+                    scales: { x: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } }, y: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } } }
                 }
             });
         }
 
         function renderHealthPieChart() {
+            const canvas = document.getElementById('healthPieChart');
+            if (!canvas) return;
             let aman = 0, warning = 0, kritis = 0;
             inventory.forEach(item => {
                 const s = calculateFinalStock(item);
@@ -733,68 +993,53 @@
                 else aman++;
             });
 
-            const ctx = document.getElementById('healthPieChart').getContext('2d');
+            const ctx = canvas.getContext('2d');
             if (healthPieChartInstance) healthPieChartInstance.destroy();
 
             healthPieChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Aman (>15)', 'Perlu Perhatian (5-15)', 'Kritis (<5)'],
-                    datasets: [{
-                        data: [aman, warning, kritis],
-                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
+                    datasets: [{ data: [aman, warning, kritis], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#ffffff' }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#475569' } } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#475569' } } } }
             });
         }
 
         function renderFastMovingChart() {
+            const canvas = document.getElementById('fastMovingChart');
+            if (!canvas) return;
             const sortedByOut = [...inventory].sort((a, b) => (b.outQty || 0) - (a.outQty || 0)).slice(0, 7);
             const labels = sortedByOut.map(i => i.name);
             const dataValues = sortedByOut.map(i => i.outQty || 0);
 
-            const ctx = document.getElementById('fastMovingChart').getContext('2d');
+            const ctx = canvas.getContext('2d');
             if (fastMovingChartInstance) fastMovingChartInstance.destroy();
 
             fastMovingChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Total Terpakai (Unit)',
-                        data: dataValues,
-                        backgroundColor: 'rgba(79, 70, 229, 0.85)',
-                        borderRadius: 6
-                    }]
+                    datasets: [{ label: 'Total Terpakai (Unit)', data: dataValues, backgroundColor: 'rgba(79, 70, 229, 0.85)', borderRadius: 6 }]
                 },
                 options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { labels: { color: '#475569' } } },
-                    scales: {
-                        x: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } },
-                        y: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } }
-                    }
+                    scales: { x: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } }, y: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } } }
                 }
             });
         }
 
-        function loadLogs() {
-            fetch('/api/logs')
-                .then(res => res.json())
-                .then(logs => {
-                    allLogsData = Array.isArray(logs) ? logs : [];
-                    filterLogsByMonth(false);
-                    if (activeInvKpiType === 'OUT') renderInvKpiModalTable();
-                });
+        async function loadLogs() {
+            try {
+                const res = await fetch('/api/logs');
+                const logs = await res.json();
+                allLogsData = Array.isArray(logs) ? logs : [];
+                filterLogsByMonth(false);
+                if (activeInvKpiType === 'OUT') renderInvKpiModalTable();
+            } catch (err) {
+                console.error("Gagal memuat logs:", err);
+            }
         }
 
         async function filterLogsByMonth(shouldSave = true) {
@@ -804,7 +1049,7 @@
             } else {
                 filteredLogsData = [...allLogsData];
             }
-            renderLogTable();
+            renderSeparatedLogTables();
             if (shouldSave) {
                 await saveLogMonthFilterToServer(selectedLogMonth);
             }
@@ -814,74 +1059,116 @@
             document.getElementById('logMonthFilter').value = '';
             selectedLogMonth = '';
             filteredLogsData = [...allLogsData];
-            renderLogTable();
+            renderSeparatedLogTables();
             await saveLogMonthFilterToServer('');
         }
 
-        function renderLogTable() {
-            const tbody = document.getElementById('logTableBody');
-            if (!filteredLogsData || filteredLogsData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-slate-400">Tidak ada riwayat transaksi pada periode ini.</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = filteredLogsData.map(log => {
-                const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
-                const isIN = log.type === 'IN';
-                const badge = isIN ? `<span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-md font-bold border border-emerald-200">PENAMBAHAN</span>` 
-                                   : `<span class="bg-rose-50 text-rose-700 text-xs px-2.5 py-1 rounded-md font-bold border border-rose-200">PENGAMBILAN</span>`;
-                
-                const itemCode = log.inventory ? log.inventory.code : '-';
-                const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
+        // MERENDER 2 TABEL HISTORI TERPISAH: RESTOK (IN) & PENGAMBILAN (OUT)
+        function renderSeparatedLogTables() {
+            const tbodyIn = document.getElementById('logTableBodyIn');
+            const tbodyOut = document.getElementById('logTableBodyOut');
 
-                return `
-                    <tr class="hover:bg-slate-50 transition duration-150">
-                        <td class="py-3 px-4 font-mono text-xs text-slate-600">${date}</td>
-                        <td class="py-3 px-4 font-semibold text-slate-800">${itemCode} - ${itemName}</td>
-                        <td class="py-3 px-4 text-center">${badge}</td>
-                        <td class="py-3 px-4 text-center font-bold ${isIN ? 'text-emerald-600' : 'text-rose-600'}">${isIN ? '+' : '-'}${log.quantity}</td>
-                        <td class="py-3 px-4 font-medium text-blue-700">${log.pic_name || '-'}</td>
-                        <td class="py-3 px-4 text-slate-500 text-xs">${log.notes || '-'}</td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="deleteLog(${log.id})" class="text-rose-600 hover:text-rose-800 hover:underline text-xs font-semibold">Hapus</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            const logsIn = filteredLogsData.filter(l => l.type === 'IN');
+            const logsOut = filteredLogsData.filter(l => l.type === 'OUT');
+
+            document.getElementById('countLogIn').innerText = `${logsIn.length} riwayat penambahan stok`;
+            document.getElementById('countLogOut').innerText = `${logsOut.length} riwayat pengambilan barang`;
+
+            if (logsIn.length === 0) {
+                tbodyIn.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-400">Belum ada histori penambahan stok pada periode ini.</td></tr>`;
+            } else {
+                tbodyIn.innerHTML = logsIn.map(log => {
+                    const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                    const itemCode = log.inventory ? log.inventory.code : '-';
+                    const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
+                    return `
+                        <tr class="hover:bg-emerald-50/40 transition">
+                            <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">${date}</td>
+                            <td class="py-2.5 px-3 font-semibold text-slate-800">${itemCode} - ${itemName}</td>
+                            <td class="py-2.5 px-3 text-center font-black text-emerald-600">+${log.quantity}</td>
+                            <td class="py-2.5 px-3 font-medium text-emerald-800">${log.pic_name || '-'}</td>
+                            <td class="py-2.5 px-3 text-slate-500">${log.notes || '-'}</td>
+                            <td class="py-2.5 px-3 text-center">
+                                <button onclick="deleteLog(${log.id})" class="text-rose-600 hover:underline font-semibold">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            if (logsOut.length === 0) {
+                tbodyOut.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-400">Belum ada histori pengambilan barang pada periode ini.</td></tr>`;
+            } else {
+                tbodyOut.innerHTML = logsOut.map(log => {
+                    const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                    const itemCode = log.inventory ? log.inventory.code : '-';
+                    const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
+                    return `
+                        <tr class="hover:bg-rose-50/40 transition">
+                            <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">${date}</td>
+                            <td class="py-2.5 px-3 font-semibold text-slate-800">${itemCode} - ${itemName}</td>
+                            <td class="py-2.5 px-3 text-center font-black text-rose-600">-${log.quantity}</td>
+                            <td class="py-2.5 px-3 font-medium text-blue-700">${log.pic_name || '-'}</td>
+                            <td class="py-2.5 px-3 text-slate-500">${log.notes || '-'}</td>
+                            <td class="py-2.5 px-3 text-center">
+                                <button onclick="deleteLog(${log.id})" class="text-rose-600 hover:underline font-semibold">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
         }
 
         function deleteLog(logId) {
             if(confirm("Apakah Anda yakin ingin menghapus catatan transaksi ini dari database?")) {
                 fetch(`/api/logs/${logId}`, { method: 'DELETE' })
                     .then(res => res.json())
-                    .then(() => loadInventory())
-                    .catch(err => alert("Gagal menghapus log: " + err.message));
+                    .then(() => {
+                        showToast("Riwayat berhasil dihapus!", "success");
+                        loadInventory();
+                    })
+                    .catch(err => showToast("Gagal menghapus log: " + err.message, "error"));
             }
         }
 
-        function exportLogsToPDF() {
+        function exportLogsByTypePDF(type) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape');
+            const isIN = type === 'IN';
+            const logs = filteredLogsData.filter(l => l.type === type);
+
+            if (!logs.length) {
+                showToast(`Tidak ada data histori ${isIN ? 'barang masuk' : 'barang keluar'} untuk dicetak.`, "error");
+                return;
+            }
+
             let periodeText = selectedLogMonth ? `PERIODE: ${selectedLogMonth}` : 'SEMUA PERIODE';
+            const judul = isIN
+                ? `LAPORAN HISTORI RESTOK / BARANG MASUK (${periodeText})`
+                : `LAPORAN HISTORI PENGAMBILAN / BARANG KELUAR (${periodeText})`;
 
             doc.setFontSize(14); doc.setFont("helvetica", "bold");
             doc.text("POLITEKNIK PENERBANGAN SURABAYA", 14, 15);
             doc.setFontSize(10); doc.setFont("helvetica", "normal");
-            doc.text(`LAPORAN HISTORI TRANSAKSI INVENTARIS BARANG (${periodeText})`, 14, 22);
+            doc.text(judul, 14, 22);
             doc.line(14, 25, 283, 25);
 
-            const tableRows = filteredLogsData.map((log, index) => {
+            const tableRows = logs.map((log, index) => {
                 const date = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
                 const itemCode = log.inventory ? log.inventory.code : '-';
                 const itemName = log.inventory ? log.inventory.name : `ID ${log.inventory_id}`;
-                return [index + 1, date, `${itemCode} - ${itemName}`, log.type === 'IN' ? 'PENAMBAHAN' : 'PENGAMBILAN', log.quantity, log.pic_name || '-', log.notes || '-'];
+                return [index + 1, date, `${itemCode} - ${itemName}`, isIN ? `+${log.quantity}` : `-${log.quantity}`, log.pic_name || '-', log.notes || '-'];
             });
 
             doc.autoTable({
-                head: [['No', 'Waktu & Tanggal', 'Barang', 'Jenis Transaksi', 'Jumlah', 'Petugas/Pengambil', 'Catatan']],
-                body: tableRows, startY: 28, theme: 'grid', headStyles: { fillColor: [30, 58, 138], halign: 'center' }
+                head: [['No', 'Waktu & Tanggal', 'Barang', isIN ? 'Jumlah Masuk' : 'Jumlah Keluar', isIN ? 'Penerima' : 'Pengambil', 'Catatan / Keperluan']],
+                body: tableRows,
+                startY: 28,
+                theme: 'grid',
+                headStyles: { fillColor: isIN ? [5, 150, 105] : [225, 29, 72], halign: 'center' }
             });
 
-            doc.save(`Laporan_Histori_${selectedLogMonth || 'Semua'}.pdf`);
+            doc.save(`Histori_${isIN ? 'Barang_Masuk' : 'Barang_Keluar'}_${selectedLogMonth || 'Semua'}.pdf`);
         }
 
         function exportExecutiveSummaryPDF() {
@@ -939,7 +1226,7 @@
             document.getElementById("itemCount").innerText = `Menampilkan ${filteredInventory.length} total data`;
 
             if (pageData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400 font-semibold">Data barang tidak ditemukan.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-400 font-semibold">Data barang tidak ditemukan.</td></tr>`;
                 updatePaginationControls();
                 return;
             }
@@ -949,7 +1236,6 @@
                 let rowClass = finalStock <= 0 ? "bg-rose-50/70 hover:bg-rose-50" : "hover:bg-slate-50";
                 let textClass = finalStock <= 0 ? "text-rose-600 font-bold" : (finalStock < 10 ? "text-amber-600 font-bold" : "text-emerald-600 font-bold");
                 let statusText = finalStock <= 0 ? " (HABIS)" : "";
-                const safeName = (item.name || '').replace(/'/g, "\\'");
 
                 tableBody.innerHTML += `
                     <tr class="border-b border-slate-200 ${rowClass} transition duration-150">
@@ -959,10 +1245,6 @@
                         <td class="py-3 px-5 text-center text-emerald-600 font-semibold">+${item.inQty || 0}</td>
                         <td class="py-3 px-5 text-center text-rose-600 font-semibold">-${item.outQty || 0}</td>
                         <td class="py-3 px-5 text-center ${textClass}">${finalStock}</td>
-                        <td class="py-3 px-5 text-center space-x-1">
-                            <button onclick="openTransModal(${item.id}, '${safeName}', 'IN')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1 rounded-lg font-bold shadow-sm">+ Restok</button>
-                            <button onclick="openTransModal(${item.id}, '${safeName}', 'OUT')" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-2.5 py-1 rounded-lg font-bold shadow-sm">- Ambil</button>
-                        </td>
                         <td class="py-3 px-5 text-center">
                             <button onclick="editItem(${item.id})" class="text-blue-600 hover:underline text-xs mr-2 font-semibold">Edit</button>
                             <button onclick="deleteItem(${item.id})" class="text-rose-600 hover:underline text-xs font-semibold">Hapus</button>
@@ -989,52 +1271,6 @@
                 renderTable();
             }
         }
-
-        function openTransModal(id, name, type) {
-            document.getElementById("transItemId").value = id;
-            document.getElementById("transType").value = type;
-            document.getElementById("transItemName").value = name;
-            document.getElementById("transQty").value = 1;
-            document.getElementById("transPic").value = "";
-            document.getElementById("transNotes").value = "";
-            
-            const btn = document.getElementById("transSubmitBtn");
-            if (type === 'IN') {
-                document.getElementById("transModalTitle").innerText = "Penambahan Stok Barang";
-                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-xl text-xs font-bold shadow-sm";
-                btn.innerText = "Simpan Penambahan";
-            } else {
-                document.getElementById("transModalTitle").innerText = "Pengambilan Barang";
-                btn.className = "bg-amber-500 hover:bg-amber-600 text-white py-2 px-4 rounded-xl text-xs font-bold shadow-sm";
-                btn.innerText = "Simpan Pengambilan";
-            }
-            document.getElementById("transModal").classList.remove("hidden");
-        }
-
-        function closeTransModal() { document.getElementById("transModal").classList.add("hidden"); }
-
-        document.getElementById("transForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-            const payload = {
-                inventoryId: document.getElementById("transItemId").value,
-                type: document.getElementById("transType").value,
-                quantity: document.getElementById("transQty").value,
-                picName: document.getElementById("transPic").value,
-                notes: document.getElementById("transNotes").value
-            };
-
-            fetch('/api/inventory/transaction', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(res => {
-                if(!res.ok) return res.json().then(err => { throw new Error(err.error) });
-                return res.json();
-            })
-            .then(() => { closeTransModal(); loadInventory(); })
-            .catch(err => alert("Gagal transaksi: " + err.message));
-        });
 
         function exportToExcel() {
             const excelData = inventory.map(item => ({
@@ -1079,7 +1315,11 @@
                 body: JSON.stringify(payload) 
             })
             .then(res => res.json())
-            .then(() => { closeModal(); loadInventory(); })
+            .then(() => {
+                closeModal();
+                showToast(id ? "Data master barang diperbarui!" : "Master barang baru ditambahkan!", "success");
+                loadInventory();
+            })
             .catch(err => console.error("Gagal menyimpan:", err)); 
         });
 
@@ -1101,7 +1341,10 @@
             if(confirm("Apakah Anda yakin ingin menghapus barang ini dari database?")) { 
                 fetch(`/api/inventory/${id}`, { method: 'DELETE' })
                     .then(res => res.json())
-                    .then(() => loadInventory())
+                    .then(() => {
+                        showToast("Barang dihapus dari database!", "success");
+                        loadInventory();
+                    })
                     .catch(err => console.error("Gagal menghapus:", err));
             }
         }
