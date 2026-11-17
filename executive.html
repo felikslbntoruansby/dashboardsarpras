@@ -34,7 +34,146 @@
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto space-y-6">
+  <!-- ========================================================================= -->
+  <!-- OVERLAY DASHBOARD LAYAR MONITORING TV (KIOSK MODE FULLSCREEN)             -->
+  <!-- ========================================================================= -->
+  <div id="kioskOverlay" class="fixed inset-0 z-[90] hidden bg-slate-950 text-slate-100 flex flex-col p-4 md:p-6 overflow-y-auto">
+    
+    <!-- TOP BAR KIOSK TV -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-900/90 border border-slate-800 px-6 py-4 rounded-2xl shadow-xl shrink-0">
+      <div class="flex items-center gap-4">
+        <div class="bg-gradient-to-tr from-amber-500 to-orange-600 p-3.5 rounded-xl shadow-lg shadow-amber-500/20">
+          <i class="fa-solid fa-tv text-slate-950 text-2xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="flex h-2.5 w-2.5 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span class="text-[11px] font-extrabold uppercase tracking-widest text-amber-400">LIVE MONITORING BOARD • KIOSK MODE</span>
+          </div>
+          <h1 class="text-xl md:text-2xl font-black tracking-wide text-white mt-0.5">
+            Pusat Pemantauan Operasional Sarpras Poltekbang Surabaya
+          </h1>
+        </div>
+      </div>
+
+      <!-- JAM DIGITAL, COUNTDOWN AUTO-REFRESH & KELUAR KIOSK -->
+      <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+        <div class="bg-slate-800/90 border border-slate-700 px-4 py-2 rounded-xl text-right">
+          <div id="kioskLiveClock" class="text-xl md:text-2xl font-black font-mono text-white tracking-wider">00:00:00</div>
+          <div id="kioskLiveDate" class="text-[11px] text-slate-400 font-semibold">Memuat tanggal...</div>
+        </div>
+
+        <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2.5 rounded-xl flex items-center gap-2.5">
+          <i class="fa-solid fa-arrows-rotate text-cyan-400 animate-spin" style="animation-duration: 6s;"></i>
+          <div>
+            <p class="text-[10px] uppercase font-bold text-slate-400">Auto-Refresh</p>
+            <p id="kioskCountdownLabel" class="text-xs font-black font-mono text-cyan-300">60 detik</p>
+          </div>
+        </div>
+
+        <button type="button" onclick="exitKioskMode()" class="px-4 py-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold rounded-xl shadow-lg transition flex items-center gap-2">
+          <i class="fa-solid fa-compress"></i> Keluar Mode TV
+        </button>
+      </div>
+    </div>
+
+    <!-- BARIS RINGKASAN KPI BESAR UNTUK TV -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 my-4 shrink-0">
+      <div class="bg-slate-900 border border-slate-800 border-l-4 border-l-blue-500 p-4 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Agenda Ruang & Kendaraan</p>
+          <h2 id="kiosk-kpi-rt" class="text-3xl md:text-4xl font-black text-white mt-1">0</h2>
+          <p class="text-[11px] text-blue-400 font-semibold mt-0.5">Jadwal Aktif Hari Ini</p>
+        </div>
+        <i class="fa-solid fa-calendar-check text-3xl text-blue-500/40"></i>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 border-l-4 border-l-cyan-500 p-4 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Antrean Cuci AC</p>
+          <h2 id="kiosk-kpi-ac" class="text-3xl md:text-4xl font-black text-white mt-1">0</h2>
+          <p class="text-[11px] text-cyan-400 font-semibold mt-0.5">Hari Ini & Terlewat</p>
+        </div>
+        <i class="fa-solid fa-snowflake text-3xl text-cyan-500/40"></i>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 border-l-4 border-l-rose-500 p-4 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Unit AC Kendala / Rusak</p>
+          <h2 id="kiosk-kpi-ac-rusak" class="text-3xl md:text-4xl font-black text-white mt-1">0</h2>
+          <p class="text-[11px] text-rose-400 font-semibold mt-0.5">Perlu Penanganan Teknisi</p>
+        </div>
+        <i class="fa-solid fa-triangle-exclamation text-3xl text-rose-500/40"></i>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 border-l-4 border-l-amber-500 p-4 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Stok Barang Kritis</p>
+          <h2 id="kiosk-kpi-inv" class="text-3xl md:text-4xl font-black text-white mt-1">0</h2>
+          <p class="text-[11px] text-amber-400 font-semibold mt-0.5">Sisa Stok &le; 5 Unit</p>
+        </div>
+        <i class="fa-solid fa-boxes-stacked text-3xl text-amber-500/40"></i>
+      </div>
+    </div>
+
+    <!-- 3 PANEL OPERASIONAL UTAMA LAYAR TV -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-[380px]">
+      
+      <!-- PANEL 1: PEMINJAMAN RUANGAN & KENDARAAN HARI INI -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl flex flex-col overflow-hidden">
+        <div class="px-5 py-3.5 bg-blue-950/60 border-b border-slate-800 flex items-center justify-between">
+          <h3 class="text-sm font-extrabold text-blue-300 flex items-center gap-2">
+            <i class="fa-solid fa-building-user"></i> Peminjaman Ruang & Kendaraan Hari Ini
+          </h3>
+          <span id="kiosk-badge-rt" class="text-xs font-black bg-blue-600 text-white px-2.5 py-0.5 rounded-full">0</span>
+        </div>
+        <div id="kiosk-list-rt" class="p-4 space-y-2.5 overflow-y-auto flex-1">
+          <p class="text-xs text-slate-500 text-center py-8">Memuat jadwal hari ini...</p>
+        </div>
+      </div>
+
+      <!-- PANEL 2: JADWAL CUCI AC HARI INI & TERLEWAT -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl flex flex-col overflow-hidden">
+        <div class="px-5 py-3.5 bg-cyan-950/60 border-b border-slate-800 flex items-center justify-between">
+          <h3 class="text-sm font-extrabold text-cyan-300 flex items-center gap-2">
+            <i class="fa-solid fa-snowflake"></i> Jadwal Cuci AC (Hari Ini & Overdue)
+          </h3>
+          <span id="kiosk-badge-ac" class="text-xs font-black bg-cyan-600 text-white px-2.5 py-0.5 rounded-full">0</span>
+        </div>
+        <div id="kiosk-list-ac" class="p-4 space-y-2.5 overflow-y-auto flex-1">
+          <p class="text-xs text-slate-500 text-center py-8">Memuat jadwal cuci AC...</p>
+        </div>
+      </div>
+
+      <!-- PANEL 3: PERINGATAN STOK BARANG KRITIS -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl flex flex-col overflow-hidden">
+        <div class="px-5 py-3.5 bg-amber-950/60 border-b border-slate-800 flex items-center justify-between">
+          <h3 class="text-sm font-extrabold text-amber-300 flex items-center gap-2">
+            <i class="fa-solid fa-box-open"></i> Peringatan Stok Kritis (&le; 5 Unit)
+          </h3>
+          <span id="kiosk-badge-inv" class="text-xs font-black bg-amber-600 text-white px-2.5 py-0.5 rounded-full">0</span>
+        </div>
+        <div id="kiosk-list-inv" class="p-4 space-y-2.5 overflow-y-auto flex-1">
+          <p class="text-xs text-slate-500 text-center py-8">Memuat status stok gudang...</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RUNNING FOOTER STATUS -->
+    <div class="mt-4 bg-slate-900/80 border border-slate-800 px-5 py-2.5 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-slate-400 shrink-0">
+      <span class="font-semibold text-slate-300"><i class="fa-solid fa-circle-info text-amber-400 mr-1.5"></i>Tampilan Monitor TV Bidang Umum & Sarpras Politeknik Penerbangan Surabaya</span>
+      <span id="kioskLastSyncText" class="font-mono text-slate-400">Sinkronisasi terakhir: -</span>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- TAMPILAN UTAMA EXECUTIVE COMMAND CENTER (MODE STANDAR)                    -->
+  <!-- ========================================================================= -->
+  <div id="normalExecutiveView" class="max-w-7xl mx-auto space-y-6">
     
     <!-- HEADER UTAMA -->
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
@@ -81,12 +220,15 @@
         <span id="lastSyncTime" class="text-slate-500 font-mono">Memuat data...</span>
       </div>
 
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+        <button type="button" onclick="enterKioskMode(true)" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700 text-xs font-extrabold rounded-xl shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-tv"></i> Mode Monitor TV (Kiosk)
+        </button>
         <button type="button" onclick="loadAllExecutiveData()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-          <i class="fa-solid fa-arrows-rotate"></i> Segarkan Data
+          <i class="fa-solid fa-arrows-rotate"></i> Segarkan
         </button>
         <button type="button" onclick="exportExecutivePDF()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
-          <i class="fa-solid fa-file-pdf"></i> Cetak Laporan Eksekutif (PDF)
+          <i class="fa-solid fa-file-pdf"></i> Cetak PDF
         </button>
       </div>
     </div>
@@ -101,7 +243,6 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- ALERT 1: AC TERLAMBAT CUCI (OVERDUE) -->
         <div onclick="openWarningModal('AC_OVERDUE')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-rose-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
           <div class="flex justify-between items-start">
             <span class="text-[11px] font-bold uppercase text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">Cuci AC Terlambat</span>
@@ -115,7 +256,6 @@
           </div>
         </div>
 
-        <!-- ALERT 2: AC RUSAK / KENDALA -->
         <div onclick="openWarningModal('AC_RUSAK')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-amber-500 border border-slate-200 shadow-sm hover:shadow-md transition group">
           <div class="flex justify-between items-start">
             <span class="text-[11px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">AC Perlu Perbaikan</span>
@@ -129,7 +269,6 @@
           </div>
         </div>
 
-        <!-- ALERT 3: STOK INVENTARIS KRITIS -->
         <div onclick="openWarningModal('INV_KRITIS')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-orange-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
           <div class="flex justify-between items-start">
             <span class="text-[11px] font-bold uppercase text-orange-700 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200">Stok Barang Kritis</span>
@@ -143,11 +282,10 @@
           </div>
         </div>
 
-        <!-- ALERT 4: PEMINJAMAN MENUNGGU / BENTROK -->
         <div onclick="openWarningModal('RT_PENDING')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-indigo-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
           <div class="flex justify-between items-start">
             <span class="text-[11px] font-bold uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">Antrean Rumah Tangga</span>
-            <i class="fa-solid fa-calendar-exclamation fa-solid fa-hourglass-half text-indigo-600 text-base"></i>
+            <i class="fa-solid fa-hourglass-half text-indigo-600 text-base"></i>
           </div>
           <h3 id="warn-rt-pending" class="text-3xl font-black text-slate-900 mt-3">0</h3>
           <p class="text-xs text-slate-500 mt-1">Peminjaman ruang/kendaraan diproses</p>
@@ -161,8 +299,6 @@
 
     <!-- BAGIAN 2: RINGKASAN KINERJA PER DIVISI (3 KARTU UTAMA) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- KARTU DIVISI 1: MAINTENANCE AC -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -210,7 +346,6 @@
         </div>
       </div>
 
-      <!-- KARTU DIVISI 2: INVENTARIS & LOGISTIK -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -258,7 +393,6 @@
         </div>
       </div>
 
-      <!-- KARTU DIVISI 3: RUMAH TANGGA (RUANGAN & KENDARAAN) -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
         <div>
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -396,14 +530,21 @@
     let rawKendaraan = [];
 
     let listAcOverdue = [];
+    let listAcTodayAndOverdue = [];
     let listAcRusak = [];
     let listInvKritis = [];
     let listRtPending = [];
     let listRtConflicts = [];
+    let listRtTodayItems = [];
     let unifiedPriorities = [];
 
     let execAcChartInstance = null;
     let execInvChartInstance = null;
+
+    // STATE MODE MONITOR TV (KIOSK)
+    let isKioskActive = false;
+    let kioskCountdown = 60;
+    let kioskIntervalTimer = null;
 
     function escHtml(str) {
       if (str === null || str === undefined) return '';
@@ -415,9 +556,23 @@
         .replace(/'/g, '&#39;');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function getLocalTodayIso() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
       initNavLoader();
-      loadAllExecutiveData();
+      await loadAllExecutiveData();
+
+      // Cek apakah dibuka langsung dengan parameter ?kiosk=1
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('kiosk') === '1') {
+        enterKioskMode(false);
+      }
     });
 
     function initNavLoader() {
@@ -434,6 +589,141 @@
           }
         });
       });
+    }
+
+    // =========================================================================
+    // KONTROL MODE MONITOR TV (KIOSK FULLSCREEN + AUTO-REFRESH 60 DETIK)
+    // =========================================================================
+    function enterKioskMode(requestBrowserFullscreen = true) {
+      isKioskActive = true;
+      kioskCountdown = 60;
+      document.getElementById('kioskOverlay').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      renderKioskDashboard();
+
+      if (requestBrowserFullscreen && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+
+      if (kioskIntervalTimer) clearInterval(kioskIntervalTimer);
+      updateKioskClock();
+      kioskIntervalTimer = setInterval(async () => {
+        updateKioskClock();
+        kioskCountdown--;
+        const cdEl = document.getElementById('kioskCountdownLabel');
+        if (cdEl) cdEl.innerText = `${kioskCountdown} detik`;
+
+        if (kioskCountdown <= 0) {
+          kioskCountdown = 60;
+          await loadAllExecutiveData();
+        }
+      }, 1000);
+    }
+
+    function exitKioskMode() {
+      isKioskActive = false;
+      if (kioskIntervalTimer) clearInterval(kioskIntervalTimer);
+      document.getElementById('kioskOverlay').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function updateKioskClock() {
+      const now = new Date();
+      const clockEl = document.getElementById('kioskLiveClock');
+      const dateEl = document.getElementById('kioskLiveDate');
+      if (clockEl) {
+        clockEl.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ':');
+      }
+      if (dateEl) {
+        dateEl.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      }
+    }
+
+    function renderKioskDashboard() {
+      // Update KPI Besar Kiosk
+      document.getElementById('kiosk-kpi-rt').innerText = listRtTodayItems.length.toLocaleString('id-ID');
+      document.getElementById('kiosk-kpi-ac').innerText = listAcTodayAndOverdue.length.toLocaleString('id-ID');
+      document.getElementById('kiosk-kpi-ac-rusak').innerText = listAcRusak.length.toLocaleString('id-ID');
+      document.getElementById('kiosk-kpi-inv').innerText = listInvKritis.length.toLocaleString('id-ID');
+
+      document.getElementById('kiosk-badge-rt').innerText = listRtTodayItems.length;
+      document.getElementById('kiosk-badge-ac').innerText = listAcTodayAndOverdue.length;
+      document.getElementById('kiosk-badge-inv').innerText = listInvKritis.length;
+
+      // Panel 1: Agenda Ruangan & Kendaraan Hari Ini
+      const rtContainer = document.getElementById('kiosk-list-rt');
+      if (listRtTodayItems.length === 0) {
+        rtContainer.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-slate-500 py-10"><i class="fa-solid fa-calendar-xmark text-3xl mb-2 opacity-40"></i><p class="text-xs font-semibold">Tidak ada jadwal ruangan / kendaraan hari ini</p></div>`;
+      } else {
+        rtContainer.innerHTML = listRtTodayItems.map(item => {
+          const isRuang = item.jenis === 'RUANGAN';
+          const badgeColor = isRuang ? 'bg-blue-600/20 text-blue-300 border-blue-500/40' : 'bg-indigo-600/20 text-indigo-300 border-indigo-500/40';
+          const icon = isRuang ? 'fa-door-open' : 'fa-car-side';
+          return `
+            <div class="bg-slate-800/80 border border-slate-700/80 p-3.5 rounded-xl space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded border ${badgeColor}">
+                  <i class="fa-solid ${icon} mr-1"></i>${escHtml(item.jenis)}
+                </span>
+                <span class="text-[11px] font-mono font-bold text-amber-300">${escHtml(item.waktu)}</span>
+              </div>
+              <p class="text-sm font-extrabold text-white">${escHtml(item.fasilitas)}</p>
+              <p class="text-xs text-slate-300"><span class="text-slate-400">Peminjam:</span> <strong>${escHtml(item.peminjam)}</strong></p>
+              <p class="text-[11px] text-slate-400 truncate">${escHtml(item.keperluan)}</p>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Panel 2: Jadwal Cuci AC Hari Ini & Terlewat (Overdue)
+      const acContainer = document.getElementById('kiosk-list-ac');
+      if (listAcTodayAndOverdue.length === 0) {
+        acContainer.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-emerald-400/80 py-10"><i class="fa-solid fa-circle-check text-3xl mb-2"></i><p class="text-xs font-semibold">Semua jadwal cuci AC hingga hari ini sudah selesai!</p></div>`;
+      } else {
+        acContainer.innerHTML = listAcTodayAndOverdue.map(ac => {
+          const isOverdue = ac.isOverdue;
+          const statusTag = isOverdue
+            ? `<span class="text-[10px] font-extrabold bg-rose-600/30 text-rose-300 border border-rose-500/40 px-2 py-0.5 rounded">TERLEWAT (${escHtml(ac.tgl_servis)})</span>`
+            : `<span class="text-[10px] font-extrabold bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded">JADWAL HARI INI</span>`;
+          return `
+            <div class="bg-slate-800/80 border ${isOverdue ? 'border-rose-500/40' : 'border-slate-700/80'} p-3.5 rounded-xl space-y-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-mono text-xs font-black text-cyan-300">${escHtml(ac.kode_unit || '-')}</span>
+                ${statusTag}
+              </div>
+              <p class="text-sm font-extrabold text-white">${escHtml((ac.gedung || '') + ' • ' + (ac.ruang || '-'))}</p>
+              <p class="text-[11px] text-slate-400">${escHtml(ac.catatan || 'Cuci Rutin')} ${ac.merk_ac ? '• ' + escHtml(ac.merk_ac) : ''}</p>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Panel 3: Peringatan Stok Barang Kritis
+      const invContainer = document.getElementById('kiosk-list-inv');
+      if (listInvKritis.length === 0) {
+        invContainer.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-emerald-400/80 py-10"><i class="fa-solid fa-boxes-stacked text-3xl mb-2"></i><p class="text-xs font-semibold">Seluruh stok barang inventaris dalam batas aman</p></div>`;
+      } else {
+        invContainer.innerHTML = listInvKritis.map(inv => {
+          const isHabis = inv.sisa <= 0;
+          return `
+            <div class="bg-slate-800/80 border ${isHabis ? 'border-rose-500/50' : 'border-amber-500/30'} p-3.5 rounded-xl flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <span class="font-mono text-[11px] font-bold text-slate-400">${escHtml(inv.code || '-')}</span>
+                <p class="text-sm font-extrabold text-white truncate">${escHtml(inv.name || '-')}</p>
+                <p class="text-[11px] ${isHabis ? 'text-rose-400 font-bold' : 'text-amber-400'}">${isHabis ? 'STOK HABIS — SEGERA RESTOK' : 'Stok Menipis di Gudang'}</p>
+              </div>
+              <div class="shrink-0 text-center px-3 py-1.5 rounded-xl ${isHabis ? 'bg-rose-600 text-white' : 'bg-amber-500 text-slate-950'}">
+                <span class="block text-[9px] font-extrabold uppercase">Sisa</span>
+                <strong class="text-lg font-black leading-none">${inv.sisa}</strong>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
     async function loadAllExecutiveData() {
@@ -453,18 +743,22 @@
         analyzeExecutiveMetrics();
         renderPriorityTable();
         renderExecutiveCharts();
+        if (isKioskActive) renderKioskDashboard();
 
         const now = new Date();
-        document.getElementById('lastSyncTime').innerText = now.toLocaleDateString('id-ID', {
-          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        const syncText = now.toLocaleDateString('id-ID', {
+          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
         }) + ' WIB';
+        document.getElementById('lastSyncTime').innerText = syncText;
+        const kioskSyncEl = document.getElementById('kioskLastSyncText');
+        if (kioskSyncEl) kioskSyncEl.innerText = `Sinkronisasi terakhir: ${syncText}`;
       } catch (err) {
         console.error("Gagal memuat ringkasan eksekutif:", err);
       }
     }
 
     function analyzeExecutiveMetrics() {
-      const todayIso = new Date().toISOString().split('T')[0];
+      const todayIso = getLocalTodayIso();
       const next7Date = new Date();
       next7Date.setDate(next7Date.getDate() + 7);
       const next7Iso = next7Date.toISOString().split('T')[0];
@@ -475,6 +769,7 @@
       let acSched = 0;
       let acUpcoming7 = 0;
       listAcOverdue = [];
+      listAcTodayAndOverdue = [];
       const rusakUnitsMap = new Map();
 
       rawAc.forEach(item => {
@@ -492,12 +787,17 @@
           acSched++;
           if (item.tgl_servis && item.tgl_servis < todayIso) {
             listAcOverdue.push(item);
-          } else if (item.tgl_servis && item.tgl_servis >= todayIso && item.tgl_servis <= next7Iso) {
+            listAcTodayAndOverdue.push({ ...item, isOverdue: true });
+          } else if (item.tgl_servis === todayIso) {
+            listAcTodayAndOverdue.push({ ...item, isOverdue: false });
+            acUpcoming7++;
+          } else if (item.tgl_servis && item.tgl_servis > todayIso && item.tgl_servis <= next7Iso) {
             acUpcoming7++;
           }
         }
       });
 
+      listAcTodayAndOverdue.sort((a, b) => (a.tgl_servis || '').localeCompare(b.tgl_servis || ''));
       listAcRusak = Array.from(rusakUnitsMap.values());
       const totalAcSlots = acDone + acSched;
       const acPct = totalAcSlots > 0 ? Math.round((acDone / totalAcSlots) * 100) : 0;
@@ -527,6 +827,7 @@
           invSafe++;
         }
       });
+      listInvKritis.sort((a, b) => a.sisa - b.sisa);
 
       const invPct = rawInv.length > 0 ? Math.round((invSafe / rawInv.length) * 100) : 0;
       document.getElementById('sum-inv-types').innerText = rawInv.length.toLocaleString('id-ID');
@@ -536,23 +837,43 @@
       document.getElementById('bar-inv-pct').style.width = `${invPct}%`;
       document.getElementById('sum-inv-totalqty').innerText = `${invTotalQty.toLocaleString('id-ID')} Unit/Pcs`;
 
-      // 3. ANALISIS RUMAH TANGGA & DETEKSI BENTROK JADWAL
+      // 3. ANALISIS RUMAH TANGGA & AGENDA HARI INI (TERMASUK MULTI-HARI)
       listRtPending = [];
+      listRtTodayItems = [];
       let rtDone = 0;
-      let rtToday = 0;
 
       rawRuang.forEach(r => {
         const st = (r.status || '').toUpperCase();
         if (st.includes('SELESAI') || st.includes('DISETUJUI')) rtDone++;
         else listRtPending.push({ jenis: 'Ruangan', nama: r.ruangan, pemohon: r.nama_peminjam, tanggal: r.tgl_pinjam, status: r.status || 'Diproses' });
-        if (r.tgl_pinjam === todayIso) rtToday++;
+
+        const s = r.tgl_pinjam;
+        const e = r.tgl_selesai && r.tgl_selesai >= s ? r.tgl_selesai : s;
+        if (s && todayIso >= s && todayIso <= e && !st.includes('TOLAK')) {
+          listRtTodayItems.push({
+            jenis: 'RUANGAN',
+            fasilitas: r.ruangan || '-',
+            peminjam: r.nama_peminjam || '-',
+            waktu: r.jam_mulai || (e !== s ? `${s} s/d ${e}` : 'Seharian'),
+            keperluan: r.keperluan || '-'
+          });
+        }
       });
 
       rawKendaraan.forEach(k => {
         const st = (k.status || '').toUpperCase();
         if (st.includes('SELESAI') || st.includes('DISETUJUI')) rtDone++;
         else listRtPending.push({ jenis: 'Kendaraan', nama: k.kendaraan, pemohon: k.nama_driver, tanggal: k.tgl_pinjam, status: k.status || 'Diproses' });
-        if (k.tgl_pinjam === todayIso) rtToday++;
+
+        if (k.tgl_pinjam === todayIso && !st.includes('TOLAK')) {
+          listRtTodayItems.push({
+            jenis: 'KENDARAAN',
+            fasilitas: k.kendaraan || '-',
+            peminjam: k.nama_driver || '-',
+            waktu: k.tgl_pinjam,
+            keperluan: k.tujuan || '-'
+          });
+        }
       });
 
       // Deteksi bentrok ruangan pada tanggal yang sama
@@ -576,7 +897,7 @@
       document.getElementById('sum-rt-conflict').innerText = listRtConflicts.length.toLocaleString('id-ID');
       document.getElementById('sum-rt-pct').innerText = `${rtPct}%`;
       document.getElementById('bar-rt-pct').style.width = `${rtPct}%`;
-      document.getElementById('sum-rt-today').innerText = `${rtToday} Agenda`;
+      document.getElementById('sum-rt-today').innerText = `${listRtTodayItems.length} Agenda`;
 
       // UPDATE KARTU PERINGATAN DINI
       document.getElementById('warn-ac-overdue').innerText = listAcOverdue.length.toLocaleString('id-ID');
@@ -616,7 +937,7 @@
         });
       });
 
-      listInvKritis.sort((a, b) => a.sisa - b.sisa).forEach(inv => {
+      listInvKritis.forEach(inv => {
         unifiedPriorities.push({
           cat: 'INV',
           urgency: inv.sisa <= 0 ? 'TINGGI' : 'SEDANG',
@@ -686,7 +1007,6 @@
     }
 
     function renderExecutiveCharts() {
-      // Chart 1: Kesiapan AC per Gedung
       const gedungStats = {};
       rawAc.forEach(item => {
         const g = item.kategori_gedung || item.gedung || 'Lainnya';
@@ -717,7 +1037,6 @@
         }
       });
 
-      // Chart 2: Komposisi Stok Inventaris
       let safe = 0, low = 0, empty = 0;
       rawInv.forEach(i => {
         const sisa = (Number(i.initial) || 0) + (Number(i.inQty) || 0) - (Number(i.outQty) || 0);
@@ -829,7 +1148,6 @@
       doc.text(`Tanggal Laporan: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`, 14, 27);
       doc.line(14, 29, 196, 29);
 
-      // Ringkasan Angka Utama
       doc.autoTable({
         head: [['Divisi Layanan', 'Indikator Utama', 'Capaian / Kondisi', 'Peringatan Aktif']],
         body: [
@@ -842,7 +1160,6 @@
         styles: { fontSize: 8 }
       });
 
-      // Tabel Daftar Prioritas
       const prioRows = unifiedPriorities.slice(0, 25).map((p, i) => [
         i + 1, p.urgency, p.modul, p.item, p.desc
       ]);
