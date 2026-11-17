@@ -21,7 +21,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname)));
 
 // =============================================================
-// STATIC ROUTING HALAMAN DASHBOARD
+// STATIC ROUTING HALAMAN DASHBOARD & QR SCAN
 // =============================================================
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
@@ -31,6 +31,8 @@ app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumaht
 app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
 app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
 app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
+app.get('/unit-ac', (req, res) => res.sendFile(path.join(__dirname, 'unit-ac.html')));
+app.get('/unit-ac.html', (req, res) => res.sendFile(path.join(__dirname, 'unit-ac.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 

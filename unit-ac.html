@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kartu Kendali Unit AC - Scan QR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen p-4 antialiased">
+
+  <div class="max-w-md mx-auto space-y-4">
+    <!-- HEADER -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="bg-cyan-600 text-white p-2.5 rounded-xl">
+          <i class="fa-solid fa-qrcode text-lg"></i>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-wider text-cyan-600">KARTU KENDALI DIGITAL</p>
+          <h1 class="text-sm font-extrabold text-slate-900">Poltekbang Surabaya</h1>
+        </div>
+      </div>
+      <a href="/ac" class="text-xs font-bold text-slate-500 hover:text-cyan-700 bg-slate-100 px-3 py-1.5 rounded-lg">
+        Dashboard &rarr;
+      </a>
+    </div>
+
+    <!-- KARTU IDENTITAS UNIT AC -->
+    <div id="unitCard" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div class="text-center py-6 text-slate-400 text-xs">
+        <i class="fa-solid fa-circle-notch animate-spin text-cyan-600 text-xl mb-2 block"></i>
+        Memuat data unit AC...
+      </div>
+    </div>
+
+    <!-- FORM LAPOR KENDALA / CATATAN TEKNISI -->
+    <div id="reportBox" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+      <h3 class="text-xs font-extrabold uppercase tracking-wider text-rose-600 flex items-center gap-1.5">
+        <i class="fa-solid fa-triangle-exclamation"></i> Lapor Kendala / Kerusakan Unit
+      </h3>
+      <textarea id="issueNote" rows="2" placeholder="Contoh: AC tidak dingin, freon bocor, modul error..." class="w-full border border-slate-300 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-500 outline-none"></textarea>
+      <div class="flex gap-2">
+        <button type="button" onclick="reportUnitStatus('RUSAK')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2.5 rounded-xl transition">
+          Tandai Unit RUSAK
+        </button>
+        <button type="button" onclick="reportUnitStatus('BAIK')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 rounded-xl transition">
+          Unit Normal (BAIK)
+        </button>
+      </div>
+    </div>
+
+    <!-- DAFTAR 20 JADWAL CUCI UNIT INI -->
+    <div id="scheduleBox" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xs font-extrabold uppercase tracking-wider text-indigo-700">
+          Jadwal Service & Cuci (1–20)
+        </h3>
+        <span id="progressBadge" class="text-[11px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 px-2 py-0.5 rounded-md">0/20</span>
+      </div>
+      <p class="text-[11px] text-slate-500">Tekan kotak tanggal di bawah untuk menandai pekerjaan cuci selesai atau batal.</p>
+      <div id="scheduleList" class="grid grid-cols-2 gap-2"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg hidden"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const kodeUnit = (params.get('kode') || '').trim();
+    let unitRows = [];
+
+    function escHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.innerText = msg;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 3000);
+    }
+
+    async function loadUnitDetail() {
+      const card = document.getElementById('unitCard');
+      if (!kodeUnit) {
+        card.innerHTML = `<div class="text-center py-6 text-rose-600 text-xs font-bold">Kode unit AC tidak ditemukan pada URL QR Code.</div>`;
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/maintenance-ac');
+        const allData = await res.json();
+        unitRows = allData
+          .filter(r => (r.kode_unit || '').toLowerCase() === kodeUnit.toLowerCase())
+          .sort((a, b) => a.id - b.id);
+
+        if (unitRows.length === 0) {
+          card.innerHTML = `<div class="text-center py-6 text-rose-600 text-xs font-bold">Data unit "${escHtml(kodeUnit)}" tidak terdaftar di database.</div>`;
+          return;
+        }
+
+        const base = unitRows[0];
+        const isRusak = unitRows.some(r => (r.status || '').toUpperCase().includes('RUSAK'));
+        const doneCount = unitRows.filter(r => ['BAIK', 'SELESAI'].includes((r.status || '').toUpperCase())).length;
+
+        card.innerHTML = `
+          <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+            <div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200">${escHtml(base.kategori_gedung || 'G. UMUM')}</span>
+              <h2 class="text-2xl font-black text-slate-900 mt-1 font-mono">${escHtml(base.kode_unit)}</h2>
+              <p class="text-xs font-semibold text-slate-600">${escHtml(base.gedung || '-')} ${base.lantai ? '• Lt. ' + escHtml(base.lantai) : ''} • ${escHtml(base.ruang || '-')}</p>
+            </div>
+            <span class="text-[10px] font-black px-2.5 py-1 rounded-lg ${isRusak ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}">
+              ${isRusak ? 'RUSAK' : 'OPERASIONAL'}
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div><span class="text-[10px] text-slate-400 block">Merk / Tipe</span><strong>${escHtml(base.merk_ac || '-')} ${escHtml(base.type_ac || '')}</strong></div>
+            <div><span class="text-[10px] text-slate-400 block">Kapasitas / Freon</span><strong>${escHtml(base.kapasitas || '-')} / ${escHtml(base.freon || '-')}</strong></div>
+          </div>
+        `;
+
+        document.getElementById('reportBox').classList.remove('hidden');
+        document.getElementById('scheduleBox').classList.remove('hidden');
+        document.getElementById('progressBadge').innerText = `${doneCount}/${unitRows.length} Selesai`;
+
+        const listEl = document.getElementById('scheduleList');
+        listEl.innerHTML = unitRows.map((row, idx) => {
+          const st = (row.status || '').toUpperCase();
+          const isDone = st.includes('BAIK') || st.includes('SELESAI');
+          const style = isDone
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+            : 'bg-slate-50 border-indigo-200 text-slate-800';
+          return `
+            <button type="button" onclick="toggleRow(${row.id})" class="${style} border p-2.5 rounded-xl text-left transition active:scale-95">
+              <div class="flex justify-between items-center text-[10px] font-bold">
+                <span class="text-slate-500">Cuci ${idx + 1}</span>
+                <span class="${isDone ? 'text-emerald-700' : 'text-indigo-700'}">${isDone ? 'SELESAI' : 'JADWAL'}</span>
+              </div>
+              <div class="text-xs font-mono font-bold mt-1">${escHtml(row.tgl_servis || '-')}</div>
+            </button>
+          `;
+        }).join('');
+      } catch (err) {
+        card.innerHTML = `<div class="text-center py-6 text-rose-600 text-xs">Gagal memuat data: ${escHtml(err.message)}</div>`;
+      }
+    }
+
+    async function toggleRow(id) {
+      const row = unitRows.find(r => r.id === id);
+      if (!row) return;
+      const st = (row.status || '').toUpperCase();
+      const nextStatus = (st.includes('BAIK') || st.includes('SELESAI')) ? 'Terjadwal' : 'BAIK';
+
+      const res = await fetch(`/api/maintenance-ac/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...row, status: nextStatus })
+      });
+      if (res.ok) {
+        showToast(`Status diperbarui: ${nextStatus === 'BAIK' ? 'Selesai Dicuci' : 'Terjadwal'}`);
+        loadUnitDetail();
+      }
+    }
+
+    async function reportUnitStatus(newStatus) {
+      if (unitRows.length === 0) return;
+      const note = document.getElementById('issueNote').value.trim();
+      const targetRow = unitRows[0];
+      const updatedNote = note ? `${note} (${new Date().toLocaleDateString('id-ID')})` : targetRow.catatan;
+
+      const res = await fetch(`/api/maintenance-ac/${targetRow.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...targetRow, status: newStatus, catatan: updatedNote })
+      });
+      if (res.ok) {
+        showToast(newStatus === 'RUSAK' ? 'Unit ditandai RUSAK!' : 'Status unit dikembalikan ke BAIK');
+        loadUnitDetail();
+      }
+    }
+
+    loadUnitDetail();
+  </script>
+</body>
+</html>
