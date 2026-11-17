@@ -142,6 +142,92 @@
       </div>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- SEKSI BARU: KALENDER INTERAKTIF PEMINJAMAN RUANGAN & KENDARAAN            -->
+    <!-- ========================================================================= -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+      <div class="p-4 md:p-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-blue-50/40 to-indigo-50/40 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="bg-blue-600 text-white text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full">ANTI-BENTROK AKTIF</span>
+            <span class="text-[11px] text-slate-500 font-medium">Klik tanggal kosong untuk booking cepat • Klik jadwal untuk detail</span>
+          </div>
+          <h2 class="text-base md:text-lg font-extrabold text-slate-900 mt-1 flex items-center gap-2">
+            <i class="fa-solid fa-calendar-days text-blue-600"></i> Kalender Interaktif Peminjaman Ruangan & Kendaraan
+          </h2>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          <!-- FILTER JENIS KALENDER -->
+          <select id="calFilterType" onchange="renderInteractiveCalendar()" class="bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="ALL">Semua Jadwal (Ruangan & Kendaraan)</option>
+            <option value="RUANGAN">Hanya Peminjaman Ruangan</option>
+            <option value="KENDARAAN">Hanya Peminjaman Kendaraan</option>
+          </select>
+
+          <!-- SWITCH BULANAN / MINGGUAN -->
+          <div class="inline-flex rounded-xl bg-slate-200/80 p-1">
+            <button type="button" id="calModeMonthBtn" onclick="setCalendarViewMode('MONTH')" class="px-3 py-1.5 rounded-lg bg-white text-blue-700 font-bold text-xs shadow-sm transition">
+              Bulanan
+            </button>
+            <button type="button" id="calModeWeekBtn" onclick="setCalendarViewMode('WEEK')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-xs transition">
+              Mingguan
+            </button>
+          </div>
+
+          <!-- NAVIGASI PERIODE -->
+          <div class="inline-flex items-center gap-1 bg-white border border-slate-300 rounded-xl p-1">
+            <button type="button" onclick="navigateCalendar(-1)" class="px-2.5 py-1 hover:bg-slate-100 rounded-lg text-slate-700 text-xs font-bold" title="Sebelumnya">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span id="calPeriodLabel" class="px-2.5 text-xs font-extrabold text-slate-800 min-w-[130px] text-center">November 2026</span>
+            <button type="button" onclick="navigateCalendar(1)" class="px-2.5 py-1 hover:bg-slate-100 rounded-lg text-slate-700 text-xs font-bold" title="Berikutnya">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <button type="button" onclick="goToCalendarToday()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition">
+            Hari Ini
+          </button>
+        </div>
+      </div>
+
+      <!-- LEGENDA WARNA -->
+      <div class="px-5 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-[11px]">
+        <div class="flex flex-wrap items-center gap-4">
+          <span class="flex items-center gap-1.5 font-semibold text-slate-600">
+            <span class="w-2.5 h-2.5 rounded-sm bg-blue-600 inline-block"></span> Ruangan (Disetujui)
+          </span>
+          <span class="flex items-center gap-1.5 font-semibold text-slate-600">
+            <span class="w-2.5 h-2.5 rounded-sm bg-indigo-600 inline-block"></span> Kendaraan (Disetujui)
+          </span>
+          <span class="flex items-center gap-1.5 font-semibold text-slate-600">
+            <span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span> Sedang Diproses
+          </span>
+          <span class="flex items-center gap-1.5 font-semibold text-slate-600">
+            <span class="w-2.5 h-2.5 rounded-sm bg-rose-600 inline-block"></span> Maintenance / Ditolak
+          </span>
+        </div>
+        <span id="calSummaryBadge" class="font-bold text-blue-700">0 jadwal tampil</span>
+      </div>
+
+      <!-- GRID KALENDER BULANAN / MINGGUAN -->
+      <div class="p-3 md:p-4 overflow-x-auto">
+        <div class="min-w-[760px]">
+          <div id="calDayHeaders" class="grid grid-cols-7 gap-1.5 mb-1.5">
+            <div class="text-center text-[11px] font-extrabold uppercase text-rose-600 py-1.5 bg-rose-50/70 rounded-lg">Minggu</div>
+            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Senin</div>
+            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Selasa</div>
+            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Rabu</div>
+            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Kamis</div>
+            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Jumat</div>
+            <div class="text-center text-[11px] font-extrabold uppercase text-blue-600 py-1.5 bg-blue-50/70 rounded-lg">Sabtu</div>
+          </div>
+          <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- SEKSI 2: GRAFIK ANALYTICS -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -246,6 +332,64 @@
 
   </div>
 
+  <!-- MODAL PILIH BOOKING CEPAT DARI KLIK TANGGAL KALENDER -->
+  <div id="calQuickBookModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
+    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-sm text-slate-800">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">BOOKING CEPAT</span>
+          <h3 id="calQuickDateTitle" class="text-base font-extrabold text-slate-900 mt-1">Tanggal: -</h3>
+        </div>
+        <button onclick="closeCalQuickBookModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="text-xs text-slate-500 mb-4">Pilih jenis layanan yang ingin dijadwalkan pada tanggal ini:</p>
+      <div class="space-y-2.5">
+        <button onclick="quickBookFromCalendar('RUANGAN')" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-between transition">
+          <span><i class="fa-solid fa-door-open mr-2"></i> Pinjam Ruangan / Aula</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button onclick="quickBookFromCalendar('KENDARAAN')" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-between transition">
+          <span><i class="fa-solid fa-car-side mr-2"></i> Pinjam Kendaraan Dinas</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL JADWAL SAAT EVENT DI KALENDER DIKLIK -->
+  <div id="calEventDetailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
+    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-800">
+      <div class="flex justify-between items-start border-b border-slate-200 pb-3">
+        <div>
+          <span id="calEvBadge" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">RUANGAN</span>
+          <h3 id="calEvTitle" class="text-lg font-extrabold text-slate-900 mt-1">Nama Fasilitas</h3>
+        </div>
+        <button onclick="closeCalEventDetailModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="py-4 space-y-2.5 text-xs">
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-semibold">Peminjam / Driver:</span>
+          <span id="calEvPeminjam" class="font-bold text-slate-900">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-semibold">Tanggal & Waktu:</span>
+          <span id="calEvTanggal" class="font-mono font-bold text-amber-700">-</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-500 font-semibold">Status:</span>
+          <span id="calEvStatus">-</span>
+        </div>
+        <div class="pt-2 border-t border-slate-100">
+          <span class="text-slate-500 font-semibold block mb-1">Keperluan / Tujuan:</span>
+          <p id="calEvKeperluan" class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-slate-700">-</p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-200" id="calEvActions"></div>
+    </div>
+  </div>
+
   <!-- MODAL RINCIAN DATA DARI KLIK KARTU KPI RUMAH TANGGA -->
   <div id="rtKpiModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
     <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-5xl text-slate-800 my-8 flex flex-col max-h-[90vh]">
@@ -265,7 +409,6 @@
         </div>
       </div>
 
-      <!-- FILTER PENCARIAN & JENIS LAYANAN DI DALAM MODAL KPI -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -278,7 +421,6 @@
         </select>
       </div>
 
-      <!-- TABEL ISI MODAL KPI -->
       <div class="overflow-auto flex-1 border border-slate-200 rounded-xl">
         <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
           <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200 sticky top-0">
@@ -304,10 +446,17 @@
     </div>
   </div>
 
-  <!-- MODAL FORM PEMINJAMAN RUANGAN -->
+  <!-- MODAL FORM PEMINJAMAN RUANGAN (DENGAN PERINGATAN ANTI-BENTROK) -->
   <div id="ruanganModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
     <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-800 my-8">
-      <h3 id="ruanganModalTitle" class="text-lg font-extrabold text-slate-900 mb-4">Form Peminjaman Ruangan</h3>
+      <h3 id="ruanganModalTitle" class="text-lg font-extrabold text-slate-900 mb-3">Form Peminjaman Ruangan</h3>
+
+      <!-- KOTAK PERINGATAN JADWAL BENTROK RUANGAN -->
+      <div id="ruanganConflictBox" class="hidden mb-3 bg-rose-50 border-l-4 border-rose-600 p-3 rounded-r-xl text-rose-800 text-xs">
+        <p class="font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-ban"></i> Jadwal Ruangan Bentrok!</p>
+        <p id="ruanganConflictMsg" class="mt-1 leading-relaxed"></p>
+      </div>
+
       <form onsubmit="handleRuanganSubmit(event)" class="space-y-3">
         <input type="hidden" id="editRuanganId">
         <div>
@@ -316,26 +465,27 @@
         </div>
         <div>
           <label class="block text-xs font-bold mb-1 text-slate-700">Ruangan / Aula</label>
-          <input type="text" id="r_ruangan" required placeholder="Contoh: Aula Dirgantara" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+          <input type="text" id="r_ruangan" list="daftarRuanganSaran" oninput="previewRuanganConflict()" required placeholder="Contoh: AULA GSG" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+          <datalist id="daftarRuanganSaran"></datalist>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold mb-1 text-slate-700">Tanggal Mulai</label>
-            <input type="date" id="r_tgl_pinjam" required class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="date" id="r_tgl_pinjam" onchange="previewRuanganConflict()" required class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
           <div>
             <label class="block text-xs font-bold mb-1 text-slate-700">Tanggal Selesai</label>
-            <input type="date" id="r_tgl_selesai" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="date" id="r_tgl_selesai" onchange="previewRuanganConflict()" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold mb-1 text-slate-700">Jam Mulai - Selesai</label>
-            <input type="text" id="r_jam_mulai" placeholder="08.00 - 12.00" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="text" id="r_jam_mulai" oninput="previewRuanganConflict()" placeholder="08:00 - 12:00" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
           <div>
             <label class="block text-xs font-bold mb-1 text-slate-700">Status</label>
-            <select id="r_status" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+            <select id="r_status" onchange="previewRuanganConflict()" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none">
               <option value="Disetujui">Disetujui</option>
               <option value="Diproses">Diproses</option>
               <option value="Maintenance">Maintenance</option>
@@ -349,16 +499,23 @@
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
           <button type="button" onclick="closeRuanganModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
+          <button type="submit" id="btnSubmitRuangan" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL FORM PEMINJAMAN KENDARAAN -->
+  <!-- MODAL FORM PEMINJAMAN KENDARAAN (DENGAN PERINGATAN ANTI-BENTROK) -->
   <div id="kendaraanModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4 overflow-y-auto">
     <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-2xl w-full max-w-md text-slate-800 my-8">
-      <h3 id="kendaraanModalTitle" class="text-lg font-extrabold text-slate-900 mb-4">Form Peminjaman Kendaraan</h3>
+      <h3 id="kendaraanModalTitle" class="text-lg font-extrabold text-slate-900 mb-3">Form Peminjaman Kendaraan</h3>
+
+      <!-- KOTAK PERINGATAN JADWAL BENTROK KENDARAAN -->
+      <div id="kendaraanConflictBox" class="hidden mb-3 bg-rose-50 border-l-4 border-rose-600 p-3 rounded-r-xl text-rose-800 text-xs">
+        <p class="font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-ban"></i> Jadwal Kendaraan Bentrok!</p>
+        <p id="kendaraanConflictMsg" class="mt-1 leading-relaxed"></p>
+      </div>
+
       <form onsubmit="handleKendaraanSubmit(event)" class="space-y-3">
         <input type="hidden" id="editKendaraanId">
         <div>
@@ -367,16 +524,17 @@
         </div>
         <div>
           <label class="block text-xs font-bold mb-1 text-slate-700">Kendaraan Dinas</label>
-          <input type="text" id="k_kendaraan" required placeholder="Contoh: Innova Zenix / Hiace" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+          <input type="text" id="k_kendaraan" list="daftarKendaraanSaran" oninput="previewKendaraanConflict()" required placeholder="Contoh: Innova Zenix / Hiace" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+          <datalist id="daftarKendaraanSaran"></datalist>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold mb-1 text-slate-700">Tanggal Pinjam</label>
-            <input type="date" id="k_tgl_pinjam" required class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+            <input type="date" id="k_tgl_pinjam" onchange="previewKendaraanConflict()" required class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
           <div>
             <label class="block text-xs font-bold mb-1 text-slate-700">Status</label>
-            <select id="k_status" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+            <select id="k_status" onchange="previewKendaraanConflict()" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
               <option value="Disetujui">Disetujui</option>
               <option value="Diproses">Diproses</option>
               <option value="Maintenance">Maintenance</option>
@@ -390,7 +548,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
           <button type="button" onclick="closeKendaraanModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
+          <button type="submit" id="btnSubmitKendaraan" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
         </div>
       </form>
     </div>
@@ -402,6 +560,11 @@
     let ruanganData = [];
     let kendaraanData = [];
     let activeRtKpiType = null;
+
+    // STATE KALENDER INTERAKTIF
+    let calendarViewMode = 'MONTH'; // 'MONTH' | 'WEEK'
+    let calendarCursorDate = new Date();
+    let selectedQuickDateStr = '';
 
     let rtComboChartInstance = null;
     let rtPieChartInstance = null;
@@ -459,7 +622,7 @@
       setTimeout(() => {
         t.classList.add('opacity-0', 'translate-y-2');
         setTimeout(() => t.remove(), 300);
-      }, 4000);
+      }, 4200);
     }
 
     function animateCounter(id, targetVal) {
@@ -491,7 +654,9 @@
         ruanganData = await resR.json();
         kendaraanData = await resK.json();
 
+        populateDatalists();
         updateKpis();
+        renderInteractiveCalendar();
         renderCharts();
         renderRuanganTable();
         renderKendaraanTable();
@@ -501,6 +666,383 @@
       }
     }
 
+    function populateDatalists() {
+      const uniqueRooms = [...new Set(ruanganData.map(r => (r.ruangan || '').trim()).filter(Boolean))];
+      const uniqueCars = [...new Set(kendaraanData.map(k => (k.kendaraan || '').trim()).filter(Boolean))];
+      const dlR = document.getElementById('daftarRuanganSaran');
+      const dlK = document.getElementById('daftarKendaraanSaran');
+      if (dlR) dlR.innerHTML = uniqueRooms.map(name => `<option value="${name}">`).join('');
+      if (dlK) dlK.innerHTML = uniqueCars.map(name => `<option value="${name}">`).join('');
+    }
+
+    // =========================================================================
+    // LOGIKA DETEKSI ANTI-BENTROK (RUANGAN & KENDARAAN)
+    // =========================================================================
+    function normalizeText(str) {
+      return String(str || '').trim().toUpperCase().replace(/\s+/g, ' ');
+    }
+
+    function parseTimeRangeMinutes(timeStr) {
+      if (!timeStr) return [0, 24 * 60]; // Jika jam kosong, dianggap seharian penuh
+      const matches = String(timeStr).match(/(\d{1,2})[:.](\d{2})/g);
+      if (!matches || matches.length === 0) return [0, 24 * 60];
+
+      const toMins = (t) => {
+        const parts = t.split(/[:.]/);
+        return (parseInt(parts[0], 10) * 60) + parseInt(parts[1], 10);
+      };
+
+      const start = toMins(matches[0]);
+      // Jika hanya jam mulai ditulis (misal "07:00:00"), anggap durasi default 4 jam (240 menit) agar tetap terlindungi dari bentrok
+      const end = matches.length >= 2 ? toMins(matches[1]) : Math.min(start + 240, 24 * 60);
+      return [start, Math.max(end, start + 30)];
+    }
+
+    function findRuanganConflict(ruanganName, startDate, endDate, jamStr, statusStr, excludeId = null) {
+      if ((statusStr || '').toUpperCase().includes('TOLAK')) return null;
+
+      const targetRoom = normalizeText(ruanganName);
+      if (!targetRoom || !startDate) return null;
+
+      const s1 = startDate;
+      const e1 = endDate && endDate >= startDate ? endDate : startDate;
+      const [tStart1, tEnd1] = parseTimeRangeMinutes(jamStr);
+
+      for (const existing of ruanganData) {
+        if (excludeId && String(existing.id) === String(excludeId)) continue;
+        if ((existing.status || '').toUpperCase().includes('TOLAK')) continue;
+
+        if (normalizeText(existing.ruangan) !== targetRoom) continue;
+
+        const s2 = existing.tgl_pinjam;
+        const e2 = existing.tgl_selesai && existing.tgl_selesai >= s2 ? existing.tgl_selesai : s2;
+        if (!s2) continue;
+
+        // Cek irisan rentang tanggal
+        const dateOverlap = (s1 <= e2) && (e1 >= s2);
+        if (!dateOverlap) continue;
+
+        // Cek irisan jam
+        const [tStart2, tEnd2] = parseTimeRangeMinutes(existing.jam_mulai);
+        const timeOverlap = (tStart1 < tEnd2) && (tEnd1 > tStart2);
+        if (timeOverlap) {
+          return existing;
+        }
+      }
+      return null;
+    }
+
+    function findKendaraanConflict(kendaraanName, tglPinjam, statusStr, excludeId = null) {
+      if ((statusStr || '').toUpperCase().includes('TOLAK')) return null;
+
+      const targetCar = normalizeText(kendaraanName);
+      if (!targetCar || !tglPinjam) return null;
+
+      for (const existing of kendaraanData) {
+        if (excludeId && String(existing.id) === String(excludeId)) continue;
+        if ((existing.status || '').toUpperCase().includes('TOLAK')) continue;
+
+        if (normalizeText(existing.kendaraan) === targetCar && existing.tgl_pinjam === tglPinjam) {
+          return existing;
+        }
+      }
+      return null;
+    }
+
+    function previewRuanganConflict() {
+      const id = document.getElementById('editRuanganId').value;
+      const ruangan = document.getElementById('r_ruangan').value;
+      const tglMulai = document.getElementById('r_tgl_pinjam').value;
+      const tglSelesai = document.getElementById('r_tgl_selesai').value;
+      const jam = document.getElementById('r_jam_mulai').value;
+      const status = document.getElementById('r_status').value;
+
+      const conflict = findRuanganConflict(ruangan, tglMulai, tglSelesai, jam, status, id);
+      const box = document.getElementById('ruanganConflictBox');
+      const msg = document.getElementById('ruanganConflictMsg');
+
+      if (conflict) {
+        const range = `${conflict.tgl_pinjam}${conflict.tgl_selesai && conflict.tgl_selesai !== conflict.tgl_pinjam ? ' s/d ' + conflict.tgl_selesai : ''}`;
+        msg.innerHTML = `<strong>${conflict.ruangan}</strong> sudah dibooking oleh <strong>${conflict.nama_peminjam}</strong> pada <strong>${range}</strong> (${conflict.jam_mulai || 'Seharian'}) untuk "${conflict.keperluan || '-'}".`;
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    function previewKendaraanConflict() {
+      const id = document.getElementById('editKendaraanId').value;
+      const kendaraan = document.getElementById('k_kendaraan').value;
+      const tglPinjam = document.getElementById('k_tgl_pinjam').value;
+      const status = document.getElementById('k_status').value;
+
+      const conflict = findKendaraanConflict(kendaraan, tglPinjam, status, id);
+      const box = document.getElementById('kendaraanConflictBox');
+      const msg = document.getElementById('kendaraanConflictMsg');
+
+      if (conflict) {
+        msg.innerHTML = `<strong>${conflict.kendaraan}</strong> sudah digunakan oleh <strong>${conflict.nama_driver}</strong> pada tanggal <strong>${conflict.tgl_pinjam}</strong> tujuan "${conflict.tujuan || '-'}".`;
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    // =========================================================================
+    // RENDER KALENDER INTERAKTIF BULANAN & MINGGUAN
+    // =========================================================================
+    function formatDateYMD(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function setCalendarViewMode(mode) {
+      calendarViewMode = mode;
+      const mBtn = document.getElementById('calModeMonthBtn');
+      const wBtn = document.getElementById('calModeWeekBtn');
+      if (mode === 'MONTH') {
+        mBtn.className = "px-3 py-1.5 rounded-lg bg-white text-blue-700 font-bold text-xs shadow-sm transition";
+        wBtn.className = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-xs transition";
+      } else {
+        wBtn.className = "px-3 py-1.5 rounded-lg bg-white text-blue-700 font-bold text-xs shadow-sm transition";
+        mBtn.className = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-xs transition";
+      }
+      renderInteractiveCalendar();
+    }
+
+    function navigateCalendar(step) {
+      if (calendarViewMode === 'MONTH') {
+        calendarCursorDate = new Date(calendarCursorDate.getFullYear(), calendarCursorDate.getMonth() + step, 1);
+      } else {
+        calendarCursorDate = new Date(calendarCursorDate.getFullYear(), calendarCursorDate.getMonth(), calendarCursorDate.getDate() + (step * 7));
+      }
+      renderInteractiveCalendar();
+    }
+
+    function goToCalendarToday() {
+      calendarCursorDate = new Date();
+      renderInteractiveCalendar();
+    }
+
+    function getEventsForDate(ymdStr, filterType) {
+      const events = [];
+
+      if (filterType === 'ALL' || filterType === 'RUANGAN') {
+        ruanganData.forEach(r => {
+          const s = r.tgl_pinjam;
+          const e = r.tgl_selesai && r.tgl_selesai >= s ? r.tgl_selesai : s;
+          if (s && ymdStr >= s && ymdStr <= e) {
+            events.push({
+              id: r.id,
+              jenis: 'RUANGAN',
+              title: r.ruangan || 'Ruangan',
+              peminjam: r.nama_peminjam || '-',
+              jam: r.jam_mulai || '',
+              tanggalFull: `${s}${e !== s ? ' s/d ' + e : ''}${r.jam_mulai ? ' (' + r.jam_mulai + ')' : ''}`,
+              keperluan: r.keperluan || '-',
+              status: r.status || 'Disetujui',
+              catStatus: classifyStatus(r.status)
+            });
+          }
+        });
+      }
+
+      if (filterType === 'ALL' || filterType === 'KENDARAAN') {
+        kendaraanData.forEach(k => {
+          if (k.tgl_pinjam === ymdStr) {
+            events.push({
+              id: k.id,
+              jenis: 'KENDARAAN',
+              title: k.kendaraan || 'Kendaraan',
+              peminjam: k.nama_driver || '-',
+              jam: '',
+              tanggalFull: k.tgl_pinjam,
+              keperluan: k.tujuan || '-',
+              status: k.status || 'Disetujui',
+              catStatus: classifyStatus(k.status)
+            });
+          }
+        });
+      }
+
+      return events;
+    }
+
+    function renderInteractiveCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      const periodLabel = document.getElementById('calPeriodLabel');
+      const filterType = document.getElementById('calFilterType').value;
+      const todayYmd = formatDateYMD(new Date());
+
+      let daysList = [];
+
+      if (calendarViewMode === 'MONTH') {
+        const year = calendarCursorDate.getFullYear();
+        const month = calendarCursorDate.getMonth();
+        periodLabel.innerText = calendarCursorDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+
+        const firstDayOfMonth = new Date(year, month, 1);
+        const startWeekday = firstDayOfMonth.getDay(); // 0 = Minggu
+        const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let i = startWeekday - 1; i >= 0; i--) {
+          daysList.push({ date: new Date(year, month, -i), isCurrentMonth: false });
+        }
+        for (let d = 1; d <= totalDaysInMonth; d++) {
+          daysList.push({ date: new Date(year, month, d), isCurrentMonth: true });
+        }
+        while (daysList.length % 7 !== 0) {
+          const nextIdx = daysList.length - (startWeekday + totalDaysInMonth) + 1;
+          daysList.push({ date: new Date(year, month + 1, nextIdx), isCurrentMonth: false });
+        }
+      } else {
+        // MODE MINGGUAN (MINGGU - SABTU)
+        const curr = new Date(calendarCursorDate);
+        const sunday = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay());
+        const saturday = new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate() + 6);
+
+        periodLabel.innerText = `${sunday.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} - ${saturday.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate() + i);
+          daysList.push({ date: d, isCurrentMonth: true });
+        }
+      }
+
+      let totalEventsShown = 0;
+      const minHeightClass = calendarViewMode === 'WEEK' ? 'min-h-[240px]' : 'min-h-[115px]';
+
+      grid.innerHTML = daysList.map(cell => {
+        const ymd = formatDateYMD(cell.date);
+        const isToday = ymd === todayYmd;
+        const dayEvents = getEventsForDate(ymd, filterType);
+        totalEventsShown += dayEvents.length;
+
+        const cellBg = isToday
+          ? 'bg-blue-50/70 border-blue-500 ring-1 ring-blue-400'
+          : (cell.isCurrentMonth ? 'bg-white border-slate-200 hover:border-blue-300' : 'bg-slate-50/70 border-slate-100 opacity-60');
+
+        const dayNumBadge = isToday
+          ? `<span class="bg-blue-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-xs font-black">${cell.date.getDate()}</span>`
+          : `<span class="text-xs font-extrabold ${cell.date.getDay() === 0 ? 'text-rose-600' : 'text-slate-700'}">${cell.date.getDate()}</span>`;
+
+        const eventsHtml = dayEvents.map(ev => {
+          let pillClass = ev.jenis === 'RUANGAN'
+            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+            : 'bg-indigo-600 hover:bg-indigo-700 text-white';
+
+          if (ev.catStatus === 'PROSES') pillClass = 'bg-amber-500 hover:bg-amber-600 text-white';
+          if (ev.catStatus === 'MAINTENANCE') pillClass = 'bg-rose-600 hover:bg-rose-700 text-white';
+
+          const icon = ev.jenis === 'RUANGAN' ? 'fa-door-open' : 'fa-car-side';
+          const timePrefix = ev.jam ? `${ev.jam.slice(0, 5)} ` : '';
+
+          return `
+            <button type="button" onclick="event.stopPropagation(); openCalEventDetail('${ev.jenis}', ${ev.id})"
+              class="w-full text-left px-2 py-1 rounded-md text-[10px] font-bold leading-tight truncate transition shadow-xs flex items-center gap-1 ${pillClass}"
+              title="${ev.title} - ${ev.peminjam} (${ev.status})">
+              <i class="fa-solid ${icon} text-[9px] shrink-0"></i>
+              <span class="truncate">${timePrefix}${ev.title}</span>
+            </button>
+          `;
+        }).join('');
+
+        return `
+          <div onclick="openCalQuickBook('${ymd}')" role="button" class="${minHeightClass} border rounded-xl p-2 flex flex-col justify-between transition cursor-pointer group ${cellBg}">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                ${dayNumBadge}
+                <span class="opacity-0 group-hover:opacity-100 text-[10px] bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 px-1.5 py-0.5 rounded font-bold transition" title="Tambah jadwal di tanggal ini">+</span>
+              </div>
+              <div class="space-y-1">
+                ${eventsHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('calSummaryBadge').innerText = `${totalEventsShown} jadwal tampil pada tampilan ini`;
+    }
+
+    function openCalQuickBook(ymdStr) {
+      selectedQuickDateStr = ymdStr;
+      document.getElementById('calQuickDateTitle').innerText = `Tanggal: ${ymdStr}`;
+      document.getElementById('calQuickBookModal').classList.remove('hidden');
+    }
+
+    function closeCalQuickBookModal() {
+      document.getElementById('calQuickBookModal').classList.add('hidden');
+    }
+
+    function quickBookFromCalendar(jenis) {
+      closeCalQuickBookModal();
+      if (jenis === 'RUANGAN') {
+        openRuanganModal(null, selectedQuickDateStr);
+      } else {
+        openKendaraanModal(null, selectedQuickDateStr);
+      }
+    }
+
+    function openCalEventDetail(jenis, id) {
+      const badge = document.getElementById('calEvBadge');
+      const title = document.getElementById('calEvTitle');
+      const peminjam = document.getElementById('calEvPeminjam');
+      const tanggal = document.getElementById('calEvTanggal');
+      const status = document.getElementById('calEvStatus');
+      const keperluan = document.getElementById('calEvKeperluan');
+      const actions = document.getElementById('calEvActions');
+
+      if (jenis === 'RUANGAN') {
+        const r = ruanganData.find(item => item.id === id);
+        if (!r) return;
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200";
+        badge.innerText = "PEMINJAMAN RUANGAN";
+        title.innerText = r.ruangan || '-';
+        peminjam.innerText = r.nama_peminjam || '-';
+        tanggal.innerText = `${r.tgl_pinjam || '-'}${r.tgl_selesai && r.tgl_selesai !== r.tgl_pinjam ? ' s/d ' + r.tgl_selesai : ''}${r.jam_mulai ? ' (' + r.jam_mulai + ')' : ''}`;
+        status.innerHTML = getStatusBadge(r.status);
+        keperluan.innerText = r.keperluan || '-';
+
+        const approveBtn = classifyStatus(r.status) === 'PROSES'
+          ? `<button onclick="closeCalEventDetailModal(); quickApproveService('RUANGAN', ${r.id})" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs">Setujui</button>`
+          : '';
+        actions.innerHTML = `
+          ${approveBtn}
+          <button onclick="closeCalEventDetailModal(); openRuanganModal(${r.id})" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs">Edit Jadwal</button>
+        `;
+      } else {
+        const k = kendaraanData.find(item => item.id === id);
+        if (!k) return;
+        badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200";
+        badge.innerText = "PEMINJAMAN KENDARAAN";
+        title.innerText = k.kendaraan || '-';
+        peminjam.innerText = k.nama_driver || '-';
+        tanggal.innerText = k.tgl_pinjam || '-';
+        status.innerHTML = getStatusBadge(k.status);
+        keperluan.innerText = k.tujuan || '-';
+
+        const approveBtn = classifyStatus(k.status) === 'PROSES'
+          ? `<button onclick="closeCalEventDetailModal(); quickApproveService('KENDARAAN', ${k.id})" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs">Setujui</button>`
+          : '';
+        actions.innerHTML = `
+          ${approveBtn}
+          <button onclick="closeCalEventDetailModal(); openKendaraanModal(${k.id})" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs">Edit Jadwal</button>
+        `;
+      }
+
+      document.getElementById('calEventDetailModal').classList.remove('hidden');
+    }
+
+    function closeCalEventDetailModal() {
+      document.getElementById('calEventDetailModal').classList.add('hidden');
+    }
+
+    // =========================================================================
+    // KPI, GRAFIK, & TABEL RUMAH TANGGA
+    // =========================================================================
     function classifyStatus(statusStr) {
       const s = (statusStr || '').toUpperCase();
       if (s.includes('MAINTENANCE') || s.includes('TOLAK') || s.includes('RUSAK') || s.includes('KENDALA')) return 'MAINTENANCE';
@@ -783,18 +1325,23 @@
       `).join('');
     }
 
-    function openRuanganModal(id = null) {
+    function openRuanganModal(id = null, prefillDate = null) {
       const obj = id ? ruanganData.find(r => r.id === id) : null;
+      const defaultDate = prefillDate || new Date().toISOString().split('T')[0];
+
       document.getElementById('editRuanganId').value = obj ? obj.id : '';
       document.getElementById('ruanganModalTitle').innerText = obj ? 'Edit Peminjaman Ruangan' : 'Form Peminjaman Ruangan';
       document.getElementById('r_nama_peminjam').value = obj ? obj.nama_peminjam : '';
       document.getElementById('r_ruangan').value = obj ? obj.ruangan : '';
-      document.getElementById('r_tgl_pinjam').value = obj ? obj.tgl_pinjam : new Date().toISOString().split('T')[0];
-      document.getElementById('r_tgl_selesai').value = obj ? (obj.tgl_selesai || obj.tgl_pinjam) : new Date().toISOString().split('T')[0];
+      document.getElementById('r_tgl_pinjam').value = obj ? obj.tgl_pinjam : defaultDate;
+      document.getElementById('r_tgl_selesai').value = obj ? (obj.tgl_selesai || obj.tgl_pinjam) : defaultDate;
       document.getElementById('r_jam_mulai').value = obj ? (obj.jam_mulai || '') : '';
       document.getElementById('r_status').value = obj ? (obj.status || 'Disetujui') : 'Disetujui';
       document.getElementById('r_keperluan').value = obj ? (obj.keperluan || '') : '';
+
+      document.getElementById('ruanganConflictBox').classList.add('hidden');
       document.getElementById('ruanganModal').classList.remove('hidden');
+      previewRuanganConflict();
     }
 
     function closeRuanganModal() { document.getElementById('ruanganModal').classList.add('hidden'); }
@@ -806,11 +1353,28 @@
         nama_peminjam: document.getElementById('r_nama_peminjam').value,
         ruangan: document.getElementById('r_ruangan').value,
         tgl_pinjam: document.getElementById('r_tgl_pinjam').value,
-        tgl_selesai: document.getElementById('r_tgl_selesai').value,
+        tgl_selesai: document.getElementById('r_tgl_selesai').value || document.getElementById('r_tgl_pinjam').value,
         jam_mulai: document.getElementById('r_jam_mulai').value,
         status: document.getElementById('r_status').value,
         keperluan: document.getElementById('r_keperluan').value
       };
+
+      // VALIDASI ANTI-BENTROK RUANGAN SEBELUM SIMPAN
+      const conflict = findRuanganConflict(
+        payload.ruangan,
+        payload.tgl_pinjam,
+        payload.tgl_selesai,
+        payload.jam_mulai,
+        payload.status,
+        id
+      );
+
+      if (conflict) {
+        previewRuanganConflict();
+        showToast(`DITOLAK (BENTROK): ${conflict.ruangan} sudah dipakai ${conflict.nama_peminjam} pada ${conflict.tgl_pinjam}!`, "error");
+        return;
+      }
+
       const res = await fetch(id ? `/api/peminjaman-ruangan/${id}` : '/api/peminjaman-ruangan', {
         method: id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -859,16 +1423,21 @@
       `).join('');
     }
 
-    function openKendaraanModal(id = null) {
+    function openKendaraanModal(id = null, prefillDate = null) {
       const obj = id ? kendaraanData.find(k => k.id === id) : null;
+      const defaultDate = prefillDate || new Date().toISOString().split('T')[0];
+
       document.getElementById('editKendaraanId').value = obj ? obj.id : '';
       document.getElementById('kendaraanModalTitle').innerText = obj ? 'Edit Peminjaman Kendaraan' : 'Form Peminjaman Kendaraan';
       document.getElementById('k_nama_driver').value = obj ? obj.nama_driver : '';
       document.getElementById('k_kendaraan').value = obj ? obj.kendaraan : '';
-      document.getElementById('k_tgl_pinjam').value = obj ? obj.tgl_pinjam : new Date().toISOString().split('T')[0];
+      document.getElementById('k_tgl_pinjam').value = obj ? obj.tgl_pinjam : defaultDate;
       document.getElementById('k_status').value = obj ? (obj.status || 'Disetujui') : 'Disetujui';
       document.getElementById('k_tujuan').value = obj ? (obj.tujuan || '') : '';
+
+      document.getElementById('kendaraanConflictBox').classList.add('hidden');
       document.getElementById('kendaraanModal').classList.remove('hidden');
+      previewKendaraanConflict();
     }
 
     function closeKendaraanModal() { document.getElementById('kendaraanModal').classList.add('hidden'); }
@@ -883,6 +1452,21 @@
         status: document.getElementById('k_status').value,
         tujuan: document.getElementById('k_tujuan').value
       };
+
+      // VALIDASI ANTI-BENTROK KENDARAAN SEBELUM SIMPAN
+      const conflict = findKendaraanConflict(
+        payload.kendaraan,
+        payload.tgl_pinjam,
+        payload.status,
+        id
+      );
+
+      if (conflict) {
+        previewKendaraanConflict();
+        showToast(`DITOLAK (BENTROK): ${conflict.kendaraan} sudah dipakai ${conflict.nama_driver} pada ${conflict.tgl_pinjam}!`, "error");
+        return;
+      }
+
       const res = await fetch(id ? `/api/peminjaman-kendaraan/${id}` : '/api/peminjaman-kendaraan', {
         method: id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
