@@ -52,7 +52,7 @@
   <!-- SIDEBAR KIRI TERPADU (MAINTENANCE AC)                                     -->
   <!-- ========================================================================= -->
   <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
-    <div class="overflow-y-auto">
+    <div class="overflow-y-auto flex-1">
       <!-- BRANDING INSTANSI -->
       <div class="p-5 border-b border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -127,7 +127,7 @@
     </div>
 
     <!-- FOOTER SIDEBAR -->
-    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
+    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3 shrink-0">
       <a href="/executive?kiosk=1" class="nav-link w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 transition">
         <i class="fa-solid fa-tv"></i>
         <span>Mode Monitor TV (Kiosk)</span>
@@ -152,9 +152,14 @@
         <span class="font-extrabold text-xs tracking-wide">Maintenance AC • Sarpras</span>
       </div>
     </div>
-    <button type="button" onclick="openQrSheetModal()" class="px-2.5 py-1.5 bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5">
-      <i class="fa-solid fa-qrcode"></i> QR AC
-    </button>
+    <div class="flex items-center gap-2">
+      <button type="button" onclick="openQrSheetModal()" class="px-2.5 py-1.5 bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5">
+        <i class="fa-solid fa-qrcode"></i> QR AC
+      </button>
+      <button type="button" onclick="logoutMonsarpras()" class="px-2.5 py-1.5 bg-rose-600/30 text-rose-300 border border-rose-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1">
+        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+      </button>
+    </div>
   </div>
 
   <!-- ========================================================================= -->
@@ -188,6 +193,9 @@
           </button>
           <button type="button" onclick="openQrSheetModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
             <i class="fa-solid fa-qrcode text-amber-400"></i> Cetak QR Unit
+          </button>
+          <button type="button" onclick="logoutMonsarpras()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+            <i class="fa-solid fa-right-from-bracket"></i> Keluar
           </button>
         </div>
       </div>

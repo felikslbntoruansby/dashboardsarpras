@@ -76,7 +76,7 @@ function renderUserBadgeSidebar(profile, email) {
 
   const box = document.createElement('div');
   box.id = 'user-profile-box';
-  box.className = 'mt-auto p-3 m-3 rounded-xl bg-slate-800/90 border border-slate-700/80 text-slate-200 space-y-2';
+  box.className = 'p-3 mx-3 mb-2 rounded-xl bg-slate-800/95 border border-slate-700 text-slate-200 space-y-2 shrink-0';
   box.innerHTML = `
     <div class="flex items-center justify-between gap-2">
       <div class="min-w-0">
@@ -88,21 +88,34 @@ function renderUserBadgeSidebar(profile, email) {
       </span>
     </div>
     ${canViewAudit ? `
-      <button onclick="bukaModalAuditLog()" class="w-full py-1.5 px-3 rounded-lg bg-slate-700/70 hover:bg-slate-700 text-slate-200 border border-slate-600/60 text-xs font-medium transition flex items-center justify-center gap-1.5">
+      <button type="button" onclick="bukaModalAuditLog()" class="w-full py-1.5 px-3 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-slate-200 border border-slate-600/60 text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer">
         <span>📋 Jejak Audit (Log)</span>
       </button>
     ` : ''}
-    <button onclick="logoutMonsarpras()" class="w-full py-1.5 px-3 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/25 text-xs font-medium transition flex items-center justify-center gap-1.5">
+    <button type="button" onclick="logoutMonsarpras()" class="w-full py-1.5 px-3 rounded-lg bg-rose-600/20 hover:bg-rose-600/35 text-rose-300 border border-rose-500/30 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+      <i class="fa-solid fa-right-from-bracket"></i>
       <span>Keluar / Logout</span>
     </button>
   `;
-  sidebar.appendChild(box);
+
+  // Sisipkan tepat di atas blok footer sidebar agar selalu terlihat tanpa terpotong
+  const footerSidebar = sidebar.lastElementChild;
+  if (footerSidebar) {
+    sidebar.insertBefore(box, footerSidebar);
+  } else {
+    sidebar.appendChild(box);
+  }
 }
 
 // 4. Fungsi Logout
 window.logoutMonsarpras = async function() {
-  await authDb.auth.signOut();
-  window.location.href = 'login.html';
+  try {
+    await authDb.auth.signOut();
+  } finally {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+  }
 };
 
 // 5. Fungsi Global Pencatat Jejak Audit
@@ -136,7 +149,7 @@ window.bukaModalAuditLog = async function() {
             <h3 class="text-base font-bold text-slate-800">Jejak Audit & Riwayat Aktivitas Sistem</h3>
             <p class="text-xs text-slate-500">Menampilkan 50 aktivitas perubahan data terbaru di MONSARPRAS</p>
           </div>
-          <button onclick="document.getElementById('modal-audit-log').classList.add('hidden')" class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold">
+          <button type="button" onclick="document.getElementById('modal-audit-log').classList.add('hidden')" class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold">
             Tutup ✕
           </button>
         </div>
