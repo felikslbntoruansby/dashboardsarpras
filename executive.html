@@ -16,9 +16,10 @@
       100% { transform: scale(0.9); opacity: 0.8; }
     }
     .radar-pulse { animation: radarPulse 3s infinite ease-in-out; }
+    html { scroll-behavior: smooth; }
   </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 p-4 md:p-6 min-h-screen antialiased">
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen antialiased">
 
   <!-- LOADING OVERLAY -->
   <div id="pageLoader" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
@@ -170,334 +171,425 @@
     </div>
   </div>
 
+  <!-- BACKDROP SIDEBAR MOBILE -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
   <!-- ========================================================================= -->
-  <!-- TAMPILAN UTAMA EXECUTIVE COMMAND CENTER (MODE STANDAR)                    -->
+  <!-- SIDEBAR KIRI TERPADU (RESPONSIF DESKTOP & MOBILE)                         -->
   <!-- ========================================================================= -->
-  <div id="normalExecutiveView" class="max-w-7xl mx-auto space-y-6">
-    
-    <!-- HEADER UTAMA -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-      <div class="flex items-center space-x-4">
-        <div class="bg-gradient-to-tr from-slate-800 to-slate-700 p-3.5 rounded-xl shadow-md flex items-center justify-center">
-          <i class="fa-solid fa-chart-line text-amber-400 text-2xl"></i>
+  <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+    <div>
+      <!-- BRANDING INSTANSI -->
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0">
+            <i class="fa-solid fa-plane-departure text-white text-lg"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-blue-400 block">MONSARPRAS</span>
+            <h2 class="text-sm font-extrabold text-white leading-tight">Poltekbang SBY</h2>
+          </div>
         </div>
-        <div>
-          <p class="text-[10px] font-bold uppercase tracking-widest text-amber-600 flex items-center gap-1.5">
-            <i class="fa-solid fa-shield-halved text-[10px]"></i> EXECUTIVE COMMAND CENTER
-          </p>
-          <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-slate-900">
-            Ringkasan Eksekutif & Sistem Peringatan Dini
-          </h1>
-          <p class="text-xs text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya • Pemantauan Terpadu Inventaris, Rumah Tangga & AC</p>
-        </div>
+        <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
-      
-      <!-- NAVIGASI MODUL -->
-      <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-        <a href="/executive" class="nav-link px-3.5 py-2 bg-slate-900 text-white font-semibold text-xs rounded-xl shadow-sm">
-          <i class="fa-solid fa-gauge-high mr-1 text-amber-400"></i> Eksekutif
+
+      <!-- MENU NAVIGASI UTAMA (DETEKSI OTOMATIS HALAMAN AKTIF) -->
+      <div class="p-4 space-y-1.5">
+        <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Modul Layanan</p>
+
+        <a href="/" data-route="/" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-boxes-stacked w-4 text-center text-indigo-400"></i>
+          <span>Inventaris & Aset</span>
         </a>
-        <a href="/" class="nav-link px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold rounded-xl transition">
-          <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
+
+        <a href="/rumah-tangga" data-route="/rumah-tangga" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-building-user w-4 text-center text-blue-400"></i>
+          <span>Layanan Rumah Tangga</span>
         </a>
-        <a href="/rumah-tangga" class="nav-link px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold rounded-xl transition">
-          <i class="fa-solid fa-building-user mr-1"></i> Rumah Tangga
+
+        <a href="/ac" data-route="/ac" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-snowflake w-4 text-center text-cyan-400"></i>
+          <span>Maintenance AC</span>
         </a>
-        <a href="/ac" class="nav-link px-3.5 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 text-xs font-semibold rounded-xl transition">
-          <i class="fa-solid fa-snowflake mr-1"></i> Maintenance AC
+
+        <a href="/executive" data-route="/executive" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-chart-line w-4 text-center text-amber-400"></i>
+          <span>Executive Summary</span>
+        </a>
+      </div>
+
+      <!-- PINTASAN BAGIAN HALAMAN EKSEKUTIF -->
+      <div class="px-4 pt-2 pb-4 border-t border-slate-800/80 space-y-1.5">
+        <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Akses Cepat</p>
+        <a href="#sectionEarlyWarning" onclick="toggleMobileSidebar(false)" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-bell w-4 text-center text-rose-400"></i>
+          <span>Peringatan Dini (EWS)</span>
+        </a>
+        <a href="#sectionDivisionSummary" onclick="toggleMobileSidebar(false)" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-layer-group w-4 text-center text-cyan-400"></i>
+          <span>Kinerja 3 Divisi</span>
+        </a>
+        <a href="#sectionExecCharts" onclick="toggleMobileSidebar(false)" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-chart-pie w-4 text-center text-indigo-400"></i>
+          <span>Grafik Visualisasi</span>
+        </a>
+        <a href="#sectionPriorityTable" onclick="toggleMobileSidebar(false)" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-list-check w-4 text-center text-emerald-400"></i>
+          <span>Tindak Lanjut Mendesak</span>
         </a>
       </div>
     </div>
 
-    <!-- BAR AKSI CEPAT & TANGGAL LAPORAN -->
-    <div class="bg-white px-5 py-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
-      <div class="flex items-center gap-2.5 text-xs">
-        <span class="flex h-2.5 w-2.5 relative">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+    <!-- PINTASAN MODE MONITOR TV / KIOSK MODE -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
+      <button type="button" onclick="toggleMobileSidebar(false); enterKioskMode(true);" class="w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 transition active:scale-[0.98]">
+        <i class="fa-solid fa-tv"></i>
+        <span>Mode Monitor TV (Kiosk)</span>
+      </button>
+
+      <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Supabase Live
         </span>
-        <span class="font-bold text-slate-700">Status Sinkronisasi:</span>
-        <span id="lastSyncTime" class="text-slate-500 font-mono">Memuat data...</span>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
-        <button type="button" onclick="enterKioskMode(true)" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700 text-xs font-extrabold rounded-xl shadow-sm transition flex items-center gap-1.5">
-          <i class="fa-solid fa-tv"></i> Mode Monitor TV (Kiosk)
-        </button>
-        <button type="button" onclick="loadAllExecutiveData()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-          <i class="fa-solid fa-arrows-rotate"></i> Segarkan
-        </button>
-        <button type="button" onclick="exportExecutivePDF()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
-          <i class="fa-solid fa-file-pdf"></i> Cetak PDF
-        </button>
+        <span id="sidebarClock" class="font-mono font-bold text-slate-300">--:--</span>
       </div>
     </div>
+  </aside>
 
-    <!-- BAGIAN 1: PANEL PERINGATAN DINI (EARLY WARNING SYSTEM) -->
-    <div class="space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-bell text-rose-600"></i> Peringatan Dini & Prioritas Tindakan
-        </h2>
-        <span id="totalAlertsBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">0 Peringatan Aktif</span>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div onclick="openWarningModal('AC_OVERDUE')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-rose-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
-          <div class="flex justify-between items-start">
-            <span class="text-[11px] font-bold uppercase text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">Cuci AC Terlambat</span>
-            <i class="fa-solid fa-clock-rotate-left text-rose-600 text-base"></i>
-          </div>
-          <h3 id="warn-ac-overdue" class="text-3xl font-black text-slate-900 mt-3">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Jadwal cuci melewati tanggal hari ini</p>
-          <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-rose-600 group-hover:underline">
-            <span>Periksa Daftar Unit</span>
-            <span>&rarr;</span>
-          </div>
-        </div>
-
-        <div onclick="openWarningModal('AC_RUSAK')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-amber-500 border border-slate-200 shadow-sm hover:shadow-md transition group">
-          <div class="flex justify-between items-start">
-            <span class="text-[11px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">AC Perlu Perbaikan</span>
-            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-base"></i>
-          </div>
-          <h3 id="warn-ac-rusak" class="text-3xl font-black text-slate-900 mt-3">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Unit berstatus RUSAK / kendala teknis</p>
-          <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-amber-700 group-hover:underline">
-            <span>Lihat Unit Kendala</span>
-            <span>&rarr;</span>
-          </div>
-        </div>
-
-        <div onclick="openWarningModal('INV_KRITIS')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-orange-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
-          <div class="flex justify-between items-start">
-            <span class="text-[11px] font-bold uppercase text-orange-700 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200">Stok Barang Kritis</span>
-            <i class="fa-solid fa-box-open text-orange-600 text-base"></i>
-          </div>
-          <h3 id="warn-inv-kritis" class="text-3xl font-black text-slate-900 mt-3">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Item inventaris dengan sisa stok &le; 5</p>
-          <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-orange-600 group-hover:underline">
-            <span>Cek Barang Menipis</span>
-            <span>&rarr;</span>
-          </div>
-        </div>
-
-        <div onclick="openWarningModal('RT_PENDING')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-indigo-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
-          <div class="flex justify-between items-start">
-            <span class="text-[11px] font-bold uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">Antrean Rumah Tangga</span>
-            <i class="fa-solid fa-hourglass-half text-indigo-600 text-base"></i>
-          </div>
-          <h3 id="warn-rt-pending" class="text-3xl font-black text-slate-900 mt-3">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Peminjaman ruang/kendaraan diproses</p>
-          <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-indigo-600 group-hover:underline">
-            <span>Tinjau Permohonan</span>
-            <span>&rarr;</span>
-          </div>
-        </div>
+  <!-- TOP BAR KHUSUS MOBILE / TABLET -->
+  <div id="mobileTopBar" class="lg:hidden sticky top-0 z-30 bg-slate-900 text-white px-4 py-3 flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleMobileSidebar(true)" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200">
+        <i class="fa-solid fa-bars text-sm"></i>
+      </button>
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-chart-line text-amber-400"></i>
+        <span class="font-extrabold text-xs tracking-wide">Executive Summary • Sarpras</span>
       </div>
     </div>
+    <button type="button" onclick="enterKioskMode(true)" class="px-2.5 py-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5">
+      <i class="fa-solid fa-tv"></i> TV Mode
+    </button>
+  </div>
 
-    <!-- BAGIAN 2: RINGKASAN KINERJA PER DIVISI (3 KARTU UTAMA) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
-        <div>
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div class="flex items-center gap-2.5">
-              <div class="bg-cyan-100 text-cyan-700 p-2 rounded-lg">
-                <i class="fa-solid fa-snowflake"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-extrabold text-slate-900">Pemeliharaan Unit AC</h3>
-                <p class="text-[11px] text-slate-500">Kesiapan & Realisasi Cuci</p>
-              </div>
-            </div>
-            <a href="/ac" class="text-xs font-bold text-cyan-700 hover:underline">Buka &rarr;</a>
+  <!-- ========================================================================= -->
+  <!-- TAMPILAN UTAMA EXECUTIVE COMMAND CENTER (DENGAN OFFSET SIDEBAR DESKTOP)   -->
+  <!-- ========================================================================= -->
+  <div id="mainContentWrapper" class="lg:pl-64 transition-all duration-300">
+    <div id="normalExecutiveView" class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+      
+      <!-- HEADER UTAMA -->
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+        <div class="flex items-center space-x-4">
+          <div class="bg-gradient-to-tr from-slate-800 to-slate-700 p-3.5 rounded-xl shadow-md flex items-center justify-center">
+            <i class="fa-solid fa-chart-line text-amber-400 text-2xl"></i>
           </div>
-
-          <div class="grid grid-cols-3 gap-2 my-4 text-center">
-            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-              <span class="text-[10px] font-bold text-slate-500 block">Total Unit</span>
-              <strong id="sum-ac-units" class="text-lg font-black text-slate-900">0</strong>
-            </div>
-            <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
-              <span class="text-[10px] font-bold text-emerald-700 block">Selesai Cuci</span>
-              <strong id="sum-ac-done" class="text-lg font-black text-emerald-700">0</strong>
-            </div>
-            <div class="bg-indigo-50 p-2.5 rounded-xl border border-indigo-200">
-              <span class="text-[10px] font-bold text-indigo-700 block">Terjadwal</span>
-              <strong id="sum-ac-sched" class="text-lg font-black text-indigo-700">0</strong>
-            </div>
-          </div>
-
           <div>
-            <div class="flex justify-between text-xs font-bold mb-1">
-              <span class="text-slate-600">Persentase Realisasi Cuci</span>
-              <span id="sum-ac-pct" class="text-cyan-700">0%</span>
-            </div>
-            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-              <div id="bar-ac-pct" class="bg-cyan-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-amber-600 flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-[10px]"></i> EXECUTIVE COMMAND CENTER
+            </p>
+            <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-slate-900">
+              Ringkasan Eksekutif & Sistem Peringatan Dini
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya • Pemantauan Terpadu Inventaris, Rumah Tangga & AC</p>
           </div>
         </div>
-
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex justify-between items-center">
-          <span>Jadwal Cuci 7 Hari Ke Depan:</span>
-          <strong id="sum-ac-upcoming7" class="text-slate-900 font-extrabold">0 Unit</strong>
+        
+        <!-- TOMBOL AKSI CEPAT HEADER -->
+        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+          <button type="button" onclick="enterKioskMode(true)" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700 text-xs font-extrabold rounded-xl shadow-sm transition flex items-center gap-1.5">
+            <i class="fa-solid fa-tv"></i> Mode Monitor TV
+          </button>
+          <button type="button" onclick="exportExecutivePDF()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+          </button>
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
-        <div>
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div class="flex items-center gap-2.5">
-              <div class="bg-indigo-100 text-indigo-700 p-2 rounded-lg">
-                <i class="fa-solid fa-boxes-stacked"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-extrabold text-slate-900">Inventaris & Gudang</h3>
-                <p class="text-[11px] text-slate-500">Ketersediaan Stok Sarpras</p>
-              </div>
+      <!-- BAR STATUS SINKRONISASI -->
+      <div class="bg-white px-5 py-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div class="flex items-center gap-2.5 text-xs">
+          <span class="flex h-2.5 w-2.5 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span class="font-bold text-slate-700">Status Sinkronisasi:</span>
+          <span id="lastSyncTime" class="text-slate-500 font-mono">Memuat data...</span>
+        </div>
+
+        <button type="button" onclick="loadAllExecutiveData()" class="w-full sm:w-auto justify-center px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrows-rotate"></i> Segarkan Data Sekarang
+        </button>
+      </div>
+
+      <!-- BAGIAN 1: PANEL PERINGATAN DINI (EARLY WARNING SYSTEM) -->
+      <div id="sectionEarlyWarning" class="space-y-3 scroll-mt-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-bell text-rose-600"></i> Peringatan Dini & Prioritas Tindakan
+          </h2>
+          <span id="totalAlertsBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">0 Peringatan Aktif</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div onclick="openWarningModal('AC_OVERDUE')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-rose-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
+            <div class="flex justify-between items-start">
+              <span class="text-[11px] font-bold uppercase text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">Cuci AC Terlambat</span>
+              <i class="fa-solid fa-clock-rotate-left text-rose-600 text-base"></i>
             </div>
-            <a href="/" class="text-xs font-bold text-indigo-700 hover:underline">Buka &rarr;</a>
+            <h3 id="warn-ac-overdue" class="text-3xl font-black text-slate-900 mt-3">0</h3>
+            <p class="text-xs text-slate-500 mt-1">Jadwal cuci melewati tanggal hari ini</p>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-rose-600 group-hover:underline">
+              <span>Periksa Daftar Unit</span>
+              <span>&rarr;</span>
+            </div>
           </div>
 
-          <div class="grid grid-cols-3 gap-2 my-4 text-center">
-            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-              <span class="text-[10px] font-bold text-slate-500 block">Jenis Barang</span>
-              <strong id="sum-inv-types" class="text-lg font-black text-slate-900">0</strong>
+          <div onclick="openWarningModal('AC_RUSAK')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-amber-500 border border-slate-200 shadow-sm hover:shadow-md transition group">
+            <div class="flex justify-between items-start">
+              <span class="text-[11px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">AC Perlu Perbaikan</span>
+              <i class="fa-solid fa-triangle-exclamation text-amber-500 text-base"></i>
             </div>
-            <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
-              <span class="text-[10px] font-bold text-emerald-700 block">Stok Aman</span>
-              <strong id="sum-inv-safe" class="text-lg font-black text-emerald-700">0</strong>
-            </div>
-            <div class="bg-rose-50 p-2.5 rounded-xl border border-rose-200">
-              <span class="text-[10px] font-bold text-rose-700 block">Stok Habis</span>
-              <strong id="sum-inv-empty" class="text-lg font-black text-rose-700">0</strong>
+            <h3 id="warn-ac-rusak" class="text-3xl font-black text-slate-900 mt-3">0</h3>
+            <p class="text-xs text-slate-500 mt-1">Unit berstatus RUSAK / kendala teknis</p>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-amber-700 group-hover:underline">
+              <span>Lihat Unit Kendala</span>
+              <span>&rarr;</span>
             </div>
           </div>
 
+          <div onclick="openWarningModal('INV_KRITIS')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-orange-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
+            <div class="flex justify-between items-start">
+              <span class="text-[11px] font-bold uppercase text-orange-700 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200">Stok Barang Kritis</span>
+              <i class="fa-solid fa-box-open text-orange-600 text-base"></i>
+            </div>
+            <h3 id="warn-inv-kritis" class="text-3xl font-black text-slate-900 mt-3">0</h3>
+            <p class="text-xs text-slate-500 mt-1">Item inventaris dengan sisa stok &le; 5</p>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-orange-600 group-hover:underline">
+              <span>Cek Barang Menipis</span>
+              <span>&rarr;</span>
+            </div>
+          </div>
+
+          <div onclick="openWarningModal('RT_PENDING')" role="button" class="cursor-pointer bg-white p-5 rounded-2xl border-l-4 border-l-indigo-600 border border-slate-200 shadow-sm hover:shadow-md transition group">
+            <div class="flex justify-between items-start">
+              <span class="text-[11px] font-bold uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">Antrean Rumah Tangga</span>
+              <i class="fa-solid fa-hourglass-half text-indigo-600 text-base"></i>
+            </div>
+            <h3 id="warn-rt-pending" class="text-3xl font-black text-slate-900 mt-3">0</h3>
+            <p class="text-xs text-slate-500 mt-1">Peminjaman ruang/kendaraan diproses</p>
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center text-[11px] font-bold text-indigo-600 group-hover:underline">
+              <span>Tinjau Permohonan</span>
+              <span>&rarr;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BAGIAN 2: RINGKASAN KINERJA PER DIVISI (3 KARTU UTAMA) -->
+      <div id="sectionDivisionSummary" class="grid grid-cols-1 lg:grid-cols-3 gap-6 scroll-mt-6">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
           <div>
-            <div class="flex justify-between text-xs font-bold mb-1">
-              <span class="text-slate-600">Rasio Ketersediaan Stok Aman</span>
-              <span id="sum-inv-pct" class="text-indigo-700">0%</span>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="bg-cyan-100 text-cyan-700 p-2 rounded-lg">
+                  <i class="fa-solid fa-snowflake"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-extrabold text-slate-900">Pemeliharaan Unit AC</h3>
+                  <p class="text-[11px] text-slate-500">Kesiapan & Realisasi Cuci</p>
+                </div>
+              </div>
+              <a href="/ac" class="text-xs font-bold text-cyan-700 hover:underline">Buka &rarr;</a>
             </div>
-            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-              <div id="bar-inv-pct" class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+
+            <div class="grid grid-cols-3 gap-2 my-4 text-center">
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-500 block">Total Unit</span>
+                <strong id="sum-ac-units" class="text-lg font-black text-slate-900">0</strong>
+              </div>
+              <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
+                <span class="text-[10px] font-bold text-emerald-700 block">Selesai Cuci</span>
+                <strong id="sum-ac-done" class="text-lg font-black text-emerald-700">0</strong>
+              </div>
+              <div class="bg-indigo-50 p-2.5 rounded-xl border border-indigo-200">
+                <span class="text-[10px] font-bold text-indigo-700 block">Terjadwal</span>
+                <strong id="sum-ac-sched" class="text-lg font-black text-indigo-700">0</strong>
+              </div>
             </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-1">
+                <span class="text-slate-600">Persentase Realisasi Cuci</span>
+                <span id="sum-ac-pct" class="text-cyan-700">0%</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                <div id="bar-ac-pct" class="bg-cyan-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex justify-between items-center">
+            <span>Jadwal Cuci 7 Hari Ke Depan:</span>
+            <strong id="sum-ac-upcoming7" class="text-slate-900 font-extrabold">0 Unit</strong>
           </div>
         </div>
 
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex justify-between items-center">
-          <span>Total Fisik Barang Tersedia:</span>
-          <strong id="sum-inv-totalqty" class="text-slate-900 font-extrabold">0 Unit/Pcs</strong>
-        </div>
-      </div>
-
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
-        <div>
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div class="flex items-center gap-2.5">
-              <div class="bg-blue-100 text-blue-700 p-2 rounded-lg">
-                <i class="fa-solid fa-building-user"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-extrabold text-slate-900">Layanan Rumah Tangga</h3>
-                <p class="text-[11px] text-slate-500">Peminjaman Ruangan & Kendaraan</p>
-              </div>
-            </div>
-            <a href="/rumah-tangga" class="text-xs font-bold text-blue-700 hover:underline">Buka &rarr;</a>
-          </div>
-
-          <div class="grid grid-cols-3 gap-2 my-4 text-center">
-            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-              <span class="text-[10px] font-bold text-slate-500 block">Pinjam Ruang</span>
-              <strong id="sum-rt-ruang" class="text-lg font-black text-slate-900">0</strong>
-            </div>
-            <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-200">
-              <span class="text-[10px] font-bold text-blue-700 block">Kendaraan</span>
-              <strong id="sum-rt-kendaraan" class="text-lg font-black text-blue-700">0</strong>
-            </div>
-            <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-              <span class="text-[10px] font-bold text-amber-700 block">Bentrok Jadwal</span>
-              <strong id="sum-rt-conflict" class="text-lg font-black text-amber-700">0</strong>
-            </div>
-          </div>
-
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
           <div>
-            <div class="flex justify-between text-xs font-bold mb-1">
-              <span class="text-slate-600">Tingkat Penyelesaian Layanan</span>
-              <span id="sum-rt-pct" class="text-blue-700">0%</span>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="bg-indigo-100 text-indigo-700 p-2 rounded-lg">
+                  <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-extrabold text-slate-900">Inventaris & Gudang</h3>
+                  <p class="text-[11px] text-slate-500">Ketersediaan Stok Sarpras</p>
+                </div>
+              </div>
+              <a href="/" class="text-xs font-bold text-indigo-700 hover:underline">Buka &rarr;</a>
             </div>
-            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-              <div id="bar-rt-pct" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+
+            <div class="grid grid-cols-3 gap-2 my-4 text-center">
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-500 block">Jenis Barang</span>
+                <strong id="sum-inv-types" class="text-lg font-black text-slate-900">0</strong>
+              </div>
+              <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
+                <span class="text-[10px] font-bold text-emerald-700 block">Stok Aman</span>
+                <strong id="sum-inv-safe" class="text-lg font-black text-emerald-700">0</strong>
+              </div>
+              <div class="bg-rose-50 p-2.5 rounded-xl border border-rose-200">
+                <span class="text-[10px] font-bold text-rose-700 block">Stok Habis</span>
+                <strong id="sum-inv-empty" class="text-lg font-black text-rose-700">0</strong>
+              </div>
             </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-1">
+                <span class="text-slate-600">Rasio Ketersediaan Stok Aman</span>
+                <span id="sum-inv-pct" class="text-indigo-700">0%</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                <div id="bar-inv-pct" class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex justify-between items-center">
+            <span>Total Fisik Barang Tersedia:</span>
+            <strong id="sum-inv-totalqty" class="text-slate-900 font-extrabold">0 Unit/Pcs</strong>
           </div>
         </div>
 
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex justify-between items-center">
-          <span>Agenda Penggunaan Hari Ini:</span>
-          <strong id="sum-rt-today" class="text-slate-900 font-extrabold">0 Agenda</strong>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="bg-blue-100 text-blue-700 p-2 rounded-lg">
+                  <i class="fa-solid fa-building-user"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-extrabold text-slate-900">Layanan Rumah Tangga</h3>
+                  <p class="text-[11px] text-slate-500">Peminjaman Ruangan & Kendaraan</p>
+                </div>
+              </div>
+              <a href="/rumah-tangga" class="text-xs font-bold text-blue-700 hover:underline">Buka &rarr;</a>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 my-4 text-center">
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span class="text-[10px] font-bold text-slate-500 block">Pinjam Ruang</span>
+                <strong id="sum-rt-ruang" class="text-lg font-black text-slate-900">0</strong>
+              </div>
+              <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-200">
+                <span class="text-[10px] font-bold text-blue-700 block">Kendaraan</span>
+                <strong id="sum-rt-kendaraan" class="text-lg font-black text-blue-700">0</strong>
+              </div>
+              <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                <span class="text-[10px] font-bold text-amber-700 block">Bentrok Jadwal</span>
+                <strong id="sum-rt-conflict" class="text-lg font-black text-amber-700">0</strong>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-1">
+                <span class="text-slate-600">Tingkat Penyelesaian Layanan</span>
+                <span id="sum-rt-pct" class="text-blue-700">0%</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                <div id="bar-rt-pct" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex justify-between items-center">
+            <span>Agenda Penggunaan Hari Ini:</span>
+            <strong id="sum-rt-today" class="text-slate-900 font-extrabold">0 Agenda</strong>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- BAGIAN 3: VISUALISASI GRAFIK EKSEKUTIF -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-column text-cyan-600"></i> Kesiapan Unit AC per Gedung
-        </h3>
-        <div style="position: relative; height: 240px; width: 100%;">
-          <canvas id="execAcChart"></canvas>
-        </div>
-      </div>
-
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-indigo-600"></i> Komposisi Status Barang Inventaris
-        </h3>
-        <div style="position: relative; height: 240px; width: 100%;">
-          <canvas id="execInvChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- BAGIAN 4: TABEL DAFTAR TINDAKAN PRIORITAS TERATAS -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <div>
-          <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-            <i class="fa-solid fa-list-check text-rose-600"></i> Daftar Tindak Lanjut Mendesak (Top 15 Prioritas)
+      <!-- BAGIAN 3: VISUALISASI GRAFIK EKSEKUTIF -->
+      <div id="sectionExecCharts" class="grid grid-cols-1 lg:grid-cols-2 gap-6 scroll-mt-6">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-chart-column text-cyan-600"></i> Kesiapan Unit AC per Gedung
           </h3>
-          <p class="text-[11px] text-slate-500">Gabungan jadwal AC terlambat, unit AC rusak, stok barang menipis, dan antrean peminjaman.</p>
+          <div style="position: relative; height: 240px; width: 100%;">
+            <canvas id="execAcChart"></canvas>
+          </div>
         </div>
-        <select id="priorityFilter" onchange="renderPriorityTable()" class="bg-white border border-slate-300 text-slate-800 text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-slate-500">
-          <option value="ALL">Semua Kategori Peringatan</option>
-          <option value="AC">Khusus Maintenance AC</option>
-          <option value="INV">Khusus Stok Inventaris</option>
-          <option value="RT">Khusus Rumah Tangga</option>
-        </select>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie text-indigo-600"></i> Komposisi Status Barang Inventaris
+          </h3>
+          <div style="position: relative; height: 240px; width: 100%;">
+            <canvas id="execInvChart"></canvas>
+          </div>
+        </div>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
-          <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
-            <tr>
-              <th class="px-4 py-3 font-bold text-center">No</th>
-              <th class="px-4 py-3 font-bold">Tingkat Urgensi</th>
-              <th class="px-4 py-3 font-bold">Modul</th>
-              <th class="px-4 py-3 font-bold">Item / Kode / Ruangan</th>
-              <th class="px-4 py-3 font-bold">Keterangan Masalah</th>
-              <th class="px-4 py-3 font-bold text-center">Tautan Modul</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-priority" class="divide-y divide-slate-200">
-            <tr><td colspan="6" class="text-center py-6 text-slate-400">Menganalisis seluruh data sarpras...</td></tr>
-          </tbody>
-        </table>
+      <!-- BAGIAN 4: TABEL DAFTAR TINDAKAN PRIORITAS TERATAS -->
+      <div id="sectionPriorityTable" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden scroll-mt-6">
+        <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-rose-600"></i> Daftar Tindak Lanjut Mendesak (Top 15 Prioritas)
+            </h3>
+            <p class="text-[11px] text-slate-500">Gabungan jadwal AC terlambat, unit AC rusak, stok barang menipis, dan antrean peminjaman.</p>
+          </div>
+          <select id="priorityFilter" onchange="renderPriorityTable()" class="bg-white border border-slate-300 text-slate-800 text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-slate-500">
+            <option value="ALL">Semua Kategori Peringatan</option>
+            <option value="AC">Khusus Maintenance AC</option>
+            <option value="INV">Khusus Stok Inventaris</option>
+            <option value="RT">Khusus Rumah Tangga</option>
+          </select>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+            <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 font-bold text-center">No</th>
+                <th class="px-4 py-3 font-bold">Tingkat Urgensi</th>
+                <th class="px-4 py-3 font-bold">Modul</th>
+                <th class="px-4 py-3 font-bold">Item / Kode / Ruangan</th>
+                <th class="px-4 py-3 font-bold">Keterangan Masalah</th>
+                <th class="px-4 py-3 font-bold text-center">Tautan Modul</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-priority" class="divide-y divide-slate-200">
+              <tr><td colspan="6" class="text-center py-6 text-slate-400">Menganalisis seluruh data sarpras...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
     </div>
-
   </div>
 
   <!-- MODAL RINCIAN PERINGATAN DINI -->
@@ -565,6 +657,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      initSidebarActiveState();
+      startSidebarClock();
       initNavLoader();
       await loadAllExecutiveData();
 
@@ -573,7 +667,56 @@
       if (params.get('kiosk') === '1') {
         enterKioskMode(false);
       }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isKioskActive) {
+          exitKioskMode();
+        }
+      });
     });
+
+    // =========================================================================
+    // LOGIKA SIDEBAR TERPADU
+    // =========================================================================
+    function initSidebarActiveState() {
+      const currentPath = window.location.pathname.toLowerCase();
+      document.querySelectorAll('.sidebar-nav-item').forEach(link => {
+        const route = (link.getAttribute('data-route') || '').toLowerCase();
+        const isMatch =
+          (route === '/rumah-tangga' && (currentPath.includes('rumah-tangga') || currentPath.includes('rumahtangga'))) ||
+          (route === '/ac' && currentPath.includes('ac')) ||
+          (route === '/executive' && currentPath.includes('executive')) ||
+          (route === '/' && (currentPath === '/' || currentPath.endsWith('index.html') || currentPath.endsWith('index_3.html')));
+
+        if (isMatch) {
+          link.classList.remove('text-slate-300', 'hover:bg-slate-800/80');
+          link.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/25');
+        }
+      });
+    }
+
+    function toggleMobileSidebar(show) {
+      const sidebar = document.getElementById('appSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (show) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function startSidebarClock() {
+      const update = () => {
+        const el = document.getElementById('sidebarClock');
+        if (el) {
+          el.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+      };
+      update();
+      setInterval(update, 1000);
+    }
 
     function initNavLoader() {
       document.querySelectorAll('a.nav-link').forEach(link => {
@@ -644,7 +787,6 @@
     }
 
     function renderKioskDashboard() {
-      // Update KPI Besar Kiosk
       document.getElementById('kiosk-kpi-rt').innerText = listRtTodayItems.length.toLocaleString('id-ID');
       document.getElementById('kiosk-kpi-ac').innerText = listAcTodayAndOverdue.length.toLocaleString('id-ID');
       document.getElementById('kiosk-kpi-ac-rusak').innerText = listAcRusak.length.toLocaleString('id-ID');

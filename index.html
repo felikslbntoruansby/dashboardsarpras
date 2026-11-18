@@ -28,9 +28,19 @@
                 page-break-inside: avoid;
             }
         }
+
+        /* Mode Monitor TV / Kiosk Mode */
+        body.kiosk-active #appSidebar,
+        body.kiosk-active #mobileTopBar,
+        body.kiosk-active .kiosk-hide {
+            display: none !important;
+        }
+        body.kiosk-active #mainContentWrapper {
+            padding-left: 0 !important;
+        }
     </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 p-4 md:p-8 min-h-screen">
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen antialiased">
 
     <!-- CINEMATIC PLANE LOADING OVERLAY -->
     <div id="pageLoader" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
@@ -49,398 +59,514 @@
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
-        
-        <!-- Header Utama -->
-        <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- FLOATING EXIT BUTTON UNTUK MODE MONITOR TV (KIOSK) -->
+    <button id="exitKioskBtn" onclick="toggleKioskMode(false)" class="no-print hidden fixed bottom-5 right-5 z-[90] bg-slate-900/90 hover:bg-slate-900 text-white px-4 py-2.5 rounded-full shadow-2xl border border-slate-700 text-xs font-bold items-center gap-2 backdrop-blur-md transition">
+      <i class="fa-solid fa-compress text-amber-400"></i> Keluar Mode Monitor TV (ESC)
+    </button>
 
-            <div class="z-10">
-                <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
-                    <i class="fa-solid fa-boxes-stacked text-blue-600"></i> Dashboard Monitoring Inventaris Sarpras
-                </h1>
-                <p class="text-sm text-slate-500 mt-1">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase Data</p>
+    <!-- BACKDROP SIDEBAR MOBILE -->
+    <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="no-print fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+    <!-- ========================================================================= -->
+    <!-- SIDEBAR KIRI TERPADU (RESPONSIF DESKTOP & MOBILE)                         -->
+    <!-- ========================================================================= -->
+    <aside id="appSidebar" class="no-print fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+      <div>
+        <!-- BRANDING INSTANSI -->
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0">
+              <i class="fa-solid fa-plane-departure text-white text-lg"></i>
             </div>
-            <div class="flex gap-2 flex-wrap w-full md:w-auto z-10">
-                <a href="/rumah-tangga" class="nav-link flex-1 md:flex-none justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold py-2.5 px-4 rounded-xl shadow-sm text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
-                    <i class="fa-solid fa-building-user"></i> Rumah Tangga
-                </a>
-                <a href="/ac" class="nav-link flex-1 md:flex-none justify-center bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 font-bold py-2.5 px-4 rounded-xl shadow-sm text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
-                    <i class="fa-solid fa-snowflake"></i> Maintenance AC
-                </a>
-                <button onclick="openBulkQrModal()" class="flex-1 md:flex-none justify-center bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
-                    <i class="fa-solid fa-qrcode"></i> Cetak QR Rak
-                </button>
-                <button onclick="exportExecutiveSummaryPDF()" class="flex-1 md:flex-none justify-center bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
-                    <i class="fa-solid fa-file-pdf"></i> Laporan PDF
-                </button>
-                <button onclick="exportToExcel()" class="flex-1 md:flex-none justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
-                    <i class="fa-solid fa-file-excel"></i> Excel
-                </button>
-                <button onclick="openModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm text-xs md:text-sm transition active:scale-95">
-                    + Master Barang
-                </button>
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-widest text-blue-400 block">MONSARPRAS</span>
+              <h2 class="text-sm font-extrabold text-white leading-tight">Poltekbang SBY</h2>
             </div>
+          </div>
+          <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg">
+            <i class="fa-solid fa-xmark text-base"></i>
+          </button>
         </div>
 
-        <!-- SPANDUK ALERT STOK MINIMUM -->
-        <div id="stockAlertBanner" onclick="openInvKpiModal('KRITIS')" role="button" class="cursor-pointer hidden bg-amber-50 hover:bg-amber-100/80 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm border border-amber-200 transition">
-            <div class="flex items-center">
-                <div class="py-1"><i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl mr-3"></i></div>
-                <div>
-                    <p class="font-bold text-amber-800 text-sm">Peringatan Stok Kritis Minimum Barang! <span class="text-[11px] underline ml-1 text-amber-700">(Klik untuk lihat rincian & restok)</span></p>
-                    <p id="stockAlertList" class="text-xs text-amber-700 mt-0.5">Memuat daftar barang...</p>
-                </div>
-            </div>
+        <!-- MENU NAVIGASI UTAMA (DETEKSI OTOMATIS HALAMAN AKTIF) -->
+        <div class="p-4 space-y-1.5">
+          <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Modul Layanan</p>
+
+          <a href="/" data-route="/" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+            <i class="fa-solid fa-boxes-stacked w-4 text-center text-indigo-400"></i>
+            <span>Inventaris & Aset</span>
+          </a>
+
+          <a href="/rumah-tangga" data-route="/rumah-tangga" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+            <i class="fa-solid fa-building-user w-4 text-center text-blue-400"></i>
+            <span>Layanan Rumah Tangga</span>
+          </a>
+
+          <a href="/ac" data-route="/ac" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+            <i class="fa-solid fa-snowflake w-4 text-center text-cyan-400"></i>
+            <span>Maintenance AC</span>
+          </a>
+
+          <a href="/executive.html" data-route="/executive" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+            <i class="fa-solid fa-chart-line w-4 text-center text-emerald-400"></i>
+            <span>Executive Summary</span>
+          </a>
         </div>
 
-        <!-- SEKSI 1: BI SCORECARDS (4 KARTU INTERAKTIF DAPAT DIKLIK) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div onclick="openInvKpiModal('ALL')" role="button" tabindex="0" class="cursor-pointer bg-white hover:bg-blue-50/30 p-5 rounded-2xl border border-slate-200 hover:border-blue-400 shadow-sm transition-all duration-300 group active:scale-[0.99]">
-                <div class="flex justify-between items-start">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-blue-600 transition">Total Jenis Barang</p>
-                    <i class="fa-solid fa-boxes-stacked text-blue-600 text-xs"></i>
-                </div>
-                <h3 class="text-3xl font-black text-blue-600 mt-2" id="kpi-total-items">0</h3>
-                <div class="flex items-center justify-between mt-1">
-                    <p class="text-[11px] text-slate-500">Item Terdaftar di Master</p>
-                    <span class="text-[10px] text-blue-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-                </div>
-            </div>
-
-            <div onclick="openInvKpiModal('STOCK')" role="button" tabindex="0" class="cursor-pointer bg-white hover:bg-emerald-50/30 p-5 rounded-2xl border border-slate-200 hover:border-emerald-400 shadow-sm transition-all duration-300 group active:scale-[0.99]">
-                <div class="flex justify-between items-start">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-600 transition">Total Akumulasi Stok</p>
-                    <i class="fa-solid fa-layer-group text-emerald-600 text-xs"></i>
-                </div>
-                <h3 class="text-3xl font-black text-emerald-600 mt-2" id="kpi-total-stock">0</h3>
-                <div class="flex items-center justify-between mt-1">
-                    <p class="text-[11px] text-emerald-600">Unit Siap Pakai</p>
-                    <span class="text-[10px] text-emerald-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-                </div>
-            </div>
-
-            <div onclick="openInvKpiModal('OUT')" role="button" tabindex="0" class="cursor-pointer bg-white hover:bg-rose-50/30 p-5 rounded-2xl border border-slate-200 hover:border-rose-400 shadow-sm transition-all duration-300 group active:scale-[0.99]">
-                <div class="flex justify-between items-start">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-rose-600 transition">Barang Keluar (Terpakai)</p>
-                    <i class="fa-solid fa-dolly text-rose-600 text-xs"></i>
-                </div>
-                <h3 class="text-3xl font-black text-rose-600 mt-2" id="kpi-total-out">0</h3>
-                <div class="flex items-center justify-between mt-1">
-                    <p class="text-[11px] text-rose-600">Total Distribusi Unit</p>
-                    <span class="text-[10px] text-rose-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-                </div>
-            </div>
-
-            <div onclick="openInvKpiModal('KRITIS')" role="button" tabindex="0" class="cursor-pointer bg-white hover:bg-amber-50/30 p-5 rounded-2xl border border-slate-200 hover:border-amber-400 shadow-sm transition-all duration-300 group active:scale-[0.99]">
-                <div class="flex justify-between items-start">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-amber-600 transition">Barang Kritis (< 5 Unit)</p>
-                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xs"></i>
-                </div>
-                <h3 class="text-3xl font-black text-amber-500 mt-2" id="kpi-kritis-count">0</h3>
-                <div class="flex items-center justify-between mt-1">
-                    <p class="text-[11px] text-amber-600">Perlu Restok Segera</p>
-                    <span class="text-[10px] text-amber-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-                </div>
-            </div>
+        <!-- PINTASAN CEPAT HALAMAN INVENTARIS -->
+        <div class="px-4 pt-2 pb-4 border-t border-slate-800/80 space-y-1.5">
+          <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Akses Cepat</p>
+          <button type="button" onclick="switchInvMenu('MASTER'); toggleMobileSidebar(false);" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+            <i class="fa-solid fa-table-list w-4 text-center text-blue-400"></i>
+            <span>Rekap Master Stok</span>
+          </button>
+          <button type="button" onclick="switchInvMenu('KELOLA'); toggleMobileSidebar(false);" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+            <i class="fa-solid fa-right-left w-4 text-center text-emerald-400"></i>
+            <span>Kelola Stok (Restok / Ambil)</span>
+          </button>
+          <button type="button" onclick="switchInvMenu('HISTORI'); toggleMobileSidebar(false);" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+            <i class="fa-solid fa-clock-rotate-left w-4 text-center text-purple-400"></i>
+            <span>Histori Masuk & Keluar</span>
+          </button>
+          <button type="button" onclick="openBulkQrModal(); toggleMobileSidebar(false);" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+            <i class="fa-solid fa-qrcode w-4 text-center text-amber-400"></i>
+            <span>Cetak Stiker QR Rak</span>
+          </button>
         </div>
+      </div>
 
-        <!-- MENU NAVIGASI TERSENDIRI (REKAP STOK | KELOLA STOK | HISTORI TERPISAH) -->
-        <div class="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-2">
-            <button type="button" onclick="switchInvMenu('MASTER')" id="navBtn-MASTER" class="flex-1 py-3 px-4 rounded-xl bg-blue-600 text-white font-bold text-xs md:text-sm shadow-sm transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-table-list"></i> 1. Rekap Master Stok
-            </button>
-            <button type="button" onclick="switchInvMenu('KELOLA')" id="navBtn-KELOLA" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 font-bold text-xs md:text-sm transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-right-left"></i> 2. Kelola Stok (Restok & Ambil)
-            </button>
-            <button type="button" onclick="switchInvMenu('HISTORI')" id="navBtn-HISTORI" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-700 font-bold text-xs md:text-sm transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-clock-rotate-left"></i> 3. Histori Masuk & Keluar Terpisah
-            </button>
+      <!-- PINTASAN MODE MONITOR TV / KIOSK MODE -->
+      <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
+        <button onclick="toggleKioskMode(true)" class="w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 transition active:scale-[0.98]">
+          <i class="fa-solid fa-tv"></i>
+          <span>Mode Monitor TV (Kiosk)</span>
+        </button>
+
+        <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Supabase Live
+          </span>
+          <span id="sidebarClock" class="font-mono font-bold text-slate-300">--:--</span>
         </div>
+      </div>
+    </aside>
 
-        <!-- ========================================================================= -->
-        <!-- MENU 1: REKAP MASTER STOK & GRAFIK ANALYTICS                              -->
-        <!-- ========================================================================= -->
-        <div id="menuSection-MASTER" class="space-y-6">
-            <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-column text-blue-600"></i> Analisis Stok Akhir vs Keluar (Top 15 Barang)
-                    </h2>
-                    <div style="position: relative; height: 32vh; width: 100%;">
-                        <canvas id="stockChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-pie text-emerald-600"></i> Distribusi Status Kesehatan Stok
-                    </h2>
-                    <div style="position: relative; height: 32vh; width: 100%;">
-                        <canvas id="healthPieChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SEKSI 3: FAST-MOVING ITEMS -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-fire text-amber-500"></i> Analytics Fast-Moving Items (Barang Paling Sering Diambil)
-                </h2>
-                <div style="position: relative; height: 26vh; width: 100%;">
-                    <canvas id="fastMovingChart"></canvas>
-                </div>
-            </div>
-
-            <!-- TABEL UTAMA MASTER INVENTARIS -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-slate-50/70">
-                    <div class="w-full md:w-1/3">
-                        <input type="text" id="searchInput" onkeyup="filterData()" placeholder="🔍 Cari Kode atau Nama Barang..." class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div class="flex items-center gap-2.5 flex-wrap">
-                        <span id="itemCount" class="text-xs md:text-sm font-semibold text-slate-500">Memuat data...</span>
-                        <button onclick="openBulkQrModal()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition">
-                            <i class="fa-solid fa-qrcode mr-1"></i> Cetak Semua QR Rak
-                        </button>
-                        <button onclick="switchInvMenu('KELOLA')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition">
-                            <i class="fa-solid fa-right-left mr-1"></i> Input Restok / Ambil
-                        </button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-left border-collapse whitespace-nowrap">
-                        <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
-                            <tr>
-                                <th class="py-4 px-5">Kode Barang</th>
-                                <th class="py-4 px-5">Nama Barang</th>
-                                <th class="py-4 px-5 text-center">Stok Awal</th>
-                                <th class="py-4 px-5 text-center">Masuk</th>
-                                <th class="py-4 px-5 text-center">Keluar</th>
-                                <th class="py-4 px-5 text-center">Stok Akhir</th>
-                                <th class="py-4 px-5 text-center">Stiker QR</th>
-                                <th class="py-4 px-5 text-center">Aksi Master</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="text-slate-700 text-xs md:text-sm divide-y divide-slate-200">
-                            <tr><td colspan="8" class="text-center py-6 text-slate-400">Memuat data inventaris...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="flex justify-between items-center p-4 border-t border-slate-200 bg-slate-50 text-xs md:text-sm">
-                    <button id="prevBtn" onclick="changePage(-1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Previous</button>
-                    <span id="pageIndicator" class="font-semibold text-slate-600">Halaman 1</span>
-                    <button id="nextBtn" onclick="changePage(1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Next</button>
-                </div>
-            </div>
+    <!-- TOP BAR KHUSUS MOBILE / TABLET -->
+    <div id="mobileTopBar" class="no-print lg:hidden sticky top-0 z-30 bg-slate-900 text-white px-4 py-3 flex items-center justify-between shadow-md">
+      <div class="flex items-center gap-2.5">
+        <button onclick="toggleMobileSidebar(true)" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200">
+          <i class="fa-solid fa-bars text-sm"></i>
+        </button>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-boxes-stacked text-indigo-400"></i>
+          <span class="font-extrabold text-xs tracking-wide">Inventaris • Sarpras</span>
         </div>
+      </div>
+      <button onclick="toggleKioskMode(true)" class="px-2.5 py-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5">
+        <i class="fa-solid fa-tv"></i> TV Mode
+      </button>
+    </div>
 
-        <!-- ========================================================================= -->
-        <!-- MENU 2: MENU TERSENDIRI KELOLA STOK (FORM RESTOK & AMBIL BARANG)          -->
-        <!-- ========================================================================= -->
-        <div id="menuSection-KELOLA" class="hidden space-y-6">
-            <!-- BANNER KONFIRMASI JIKA BARU SAJA SCAN QR RAK -->
-            <div id="qrScanBanner" class="hidden bg-indigo-600 text-white p-4 rounded-2xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white/20 p-2.5 rounded-xl">
-                        <i class="fa-solid fa-qrcode text-xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-[11px] uppercase tracking-wider font-bold text-indigo-200">Mode Scan QR Rak Terdeteksi</p>
-                        <h3 id="qrScanItemLabel" class="text-sm md:text-base font-extrabold">Barang terpilih otomatis!</h3>
-                    </div>
-                </div>
-                <button type="button" onclick="document.getElementById('qtyOut').focus()" class="bg-white text-indigo-700 hover:bg-indigo-50 font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm">
-                    Langsung Isi Jumlah Ambil &darr;
-                </button>
-            </div>
+    <!-- ========================================================================= -->
+    <!-- KONTEN UTAMA (DENGAN OFFSET SIDEBAR DI DESKTOP)                            -->
+    <!-- ========================================================================= -->
+    <div id="mainContentWrapper" class="lg:pl-64 transition-all duration-300">
+      <div class="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+          
+          <!-- Header Utama -->
+          <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div class="bg-gradient-to-r from-blue-50 via-white to-emerald-50 p-4 rounded-2xl border border-blue-200 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="bg-blue-600 text-white p-3 rounded-xl">
-                        <i class="fa-solid fa-arrows-rotate text-lg"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-base font-extrabold text-slate-900">Menu Kelola Stok Barang (Terhubung Otomatis)</h2>
-                        <p class="text-xs text-slate-600">Setiap transaksi <strong>Restok (+ Masuk)</strong> atau <strong>Pengambilan (- Keluar)</strong> akan langsung memperbarui kolom Stok Akhir di Rekap Master serta masuk ke masing-masing Histori terpisah.</p>
-                    </div>
-                </div>
-            </div>
+              <div class="flex items-center space-x-4 z-10">
+                  <div class="bg-gradient-to-tr from-indigo-600 to-blue-600 p-3.5 rounded-xl shadow-md shadow-indigo-500/20 flex items-center justify-center">
+                      <i class="fa-solid fa-boxes-stacked text-white text-2xl"></i>
+                  </div>
+                  <div>
+                      <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-600 flex items-center gap-1.5">
+                          <i class="fa-solid fa-plane text-[9px]"></i> GUDANG & ASET SARPRAS
+                      </p>
+                      <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-slate-900">
+                          Dashboard Monitoring Inventaris Sarpras
+                      </h1>
+                      <p class="text-xs text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase Data</p>
+                  </div>
+              </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- FORM 2 (DIATAS SAAT MOBILE AGAR SCAN QR LANGSUNG FOKUS KE PENGAMBILAN) -->
-                <div class="bg-white rounded-2xl border-2 border-amber-200 shadow-sm overflow-hidden">
-                    <div class="bg-amber-500 text-white p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <i class="fa-solid fa-circle-minus text-xl"></i>
-                            <div>
-                                <h3 class="font-extrabold text-base">Form Pengambilan Barang (- Keluar)</h3>
-                                <p class="text-[11px] text-amber-50">Menambah kolom "Keluar" & mengurangi "Stok Akhir" + tercatat di Histori Keluar</p>
-                            </div>
-                        </div>
-                    </div>
-                    <form id="formAmbilDedicated" onsubmit="submitDedicatedTransaction(event, 'OUT')" class="p-5 space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Cari & Pilih Barang yang Diambil</label>
-                            <input type="text" id="searchSelectOut" oninput="populateStockSelects()" placeholder="Ketik kode/nama barang untuk memfilter daftar..." class="w-full border border-slate-200 bg-slate-50 text-slate-700 p-2 rounded-xl text-xs mb-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500">
-                            <select id="selectItemOut" onchange="updateSelectedStockBadge('OUT')" required class="w-full border border-slate-300 bg-white text-slate-900 font-semibold p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"></select>
-                            <p id="badgeStockOut" class="text-[11px] font-bold text-amber-700 mt-1.5">Sisa Stok Tersedia: -</p>
-                        </div>
+              <div class="flex gap-2 flex-wrap w-full md:w-auto z-10 kiosk-hide">
+                  <button onclick="openBulkQrModal()" class="flex-1 md:flex-none justify-center bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-3.5 rounded-xl shadow-sm text-xs flex items-center gap-1.5 transition active:scale-95">
+                      <i class="fa-solid fa-qrcode"></i> Cetak QR Rak
+                  </button>
+                  <button onclick="exportExecutiveSummaryPDF()" class="flex-1 md:flex-none justify-center bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3.5 rounded-xl shadow-sm text-xs flex items-center gap-1.5 transition active:scale-95">
+                      <i class="fa-solid fa-file-pdf"></i> Laporan PDF
+                  </button>
+                  <button onclick="exportToExcel()" class="flex-1 md:flex-none justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3.5 rounded-xl shadow-sm text-xs flex items-center gap-1.5 transition active:scale-95">
+                      <i class="fa-solid fa-file-excel"></i> Excel
+                  </button>
+                  <button onclick="openModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl shadow-sm text-xs transition active:scale-95">
+                      + Master Barang
+                  </button>
+              </div>
+          </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Diambil (Keluar)</label>
-                                <input type="number" id="qtyOut" min="1" value="1" required class="w-full border border-slate-300 bg-white text-slate-900 font-bold p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pengambil / Teknisi</label>
-                                <input type="text" id="picOut" required placeholder="Contoh: Budi (Teknisi Gedung)" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500">
-                            </div>
-                        </div>
+          <!-- SPANDUK ALERT STOK MINIMUM -->
+          <div id="stockAlertBanner" onclick="openInvKpiModal('KRITIS')" role="button" class="cursor-pointer hidden bg-amber-50 hover:bg-amber-100/80 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm border border-amber-200 transition">
+              <div class="flex items-center">
+                  <div class="py-1"><i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl mr-3"></i></div>
+                  <div>
+                      <p class="font-bold text-amber-800 text-sm">Peringatan Stok Kritis Minimum Barang! <span class="text-[11px] underline ml-1 text-amber-700">(Klik untuk lihat rincian & restok)</span></p>
+                      <p id="stockAlertList" class="text-xs text-amber-700 mt-0.5">Memuat daftar barang...</p>
+                  </div>
+              </div>
+          </div>
 
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Keperluan / Lokasi Pemasangan</label>
-                            <textarea id="notesOut" rows="2" placeholder="Contoh: Perbaikan kran toilet Gedung Umum Lt.2" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
-                        </div>
+          <!-- SEKSI 1: BI SCORECARDS (4 KARTU INTERAKTIF DAPAT DIKLIK) -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div onclick="openInvKpiModal('ALL')" role="button" tabindex="0" class="cursor-pointer bg-white hover:bg-blue-50/30 p-5 rounded-2xl border border-slate-200 hover:border-blue-400 shadow-sm transition-all duration-300 group active:scale-[0.99]">
+                  <div class="flex justify-between items-start">
+                      <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-blue-600 transition">Total Jenis Barang</p>
+                      <i class="fa-solid fa-boxes-stacked text-blue-600 text-xs"></i>
+                  </div>
+                  <h3 class="text-3xl font-black text-blue-600 mt-2" id="kpi-total-items">0</h3>
+                  <div class="flex items-center justify-between mt-1">
+                      <p class="text-[11px] text-slate-500">Item Terdaftar di Master</p>
+                      <span class="text-[10px] text-blue-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+                  </div>
+              </div>
 
-                        <button type="submit" id="btnSubmitOut" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-sm text-sm transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-minus-circle"></i> Simpan Pengambilan Barang (- Keluar)
-                        </button>
-                    </form>
-                </div>
+              <div onclick="openInvKpiModal('STOCK')" role="button" tabindex="0" class="cursor-pointer bg-white hover:bg-emerald-50/30 p-5 rounded-2xl border border-slate-200 hover:border-emerald-400 shadow-sm transition-all duration-300 group active:scale-[0.99]">
+                  <div class="flex justify-between items-start">
+                      <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-600 transition">Total Akumulasi Stok</p>
+                      <i class="fa-solid fa-layer-group text-emerald-600 text-xs"></i>
+                  </div>
+                  <h3 class="text-3xl font-black text-emerald-600 mt-2" id="kpi-total-stock">0</h3>
+                  <div class="flex items-center justify-between mt-1">
+                      <p class="text-[11px] text-emerald-600">Unit Siap Pakai</p>
+                      <span class="text-[10px] text-emerald-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+                  </div>
+              </div>
 
-                <!-- FORM 1: RESTOK / PENAMBAHAN STOK (IN) -->
-                <div class="bg-white rounded-2xl border-2 border-emerald-200 shadow-sm overflow-hidden">
-                    <div class="bg-emerald-600 text-white p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <i class="fa-solid fa-circle-plus text-xl"></i>
-                            <div>
-                                <h3 class="font-extrabold text-base">Form Penambahan Stok (+ Restok)</h3>
-                                <p class="text-[11px] text-emerald-100">Menambah kolom "Masuk" & "Stok Akhir" + tercatat di Histori Restok</p>
-                            </div>
-                        </div>
-                    </div>
-                    <form id="formRestokDedicated" onsubmit="submitDedicatedTransaction(event, 'IN')" class="p-5 space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Cari & Pilih Barang</label>
-                            <input type="text" id="searchSelectIn" oninput="populateStockSelects()" placeholder="Ketik kode/nama barang untuk memfilter daftar..." class="w-full border border-slate-200 bg-slate-50 text-slate-700 p-2 rounded-xl text-xs mb-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                            <select id="selectItemIn" onchange="updateSelectedStockBadge('IN')" required class="w-full border border-slate-300 bg-white text-slate-900 font-semibold p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"></select>
-                            <p id="badgeStockIn" class="text-[11px] font-bold text-emerald-700 mt-1.5">Sisa Stok Saat Ini: -</p>
-                        </div>
+              <div onclick="openInvKpiModal('OUT')" role="button" tabindex="0" class="cursor-pointer bg-white hover:bg-rose-50/30 p-5 rounded-2xl border border-slate-200 hover:border-rose-400 shadow-sm transition-all duration-300 group active:scale-[0.99]">
+                  <div class="flex justify-between items-start">
+                      <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-rose-600 transition">Barang Keluar (Terpakai)</p>
+                      <i class="fa-solid fa-dolly text-rose-600 text-xs"></i>
+                  </div>
+                  <h3 class="text-3xl font-black text-rose-600 mt-2" id="kpi-total-out">0</h3>
+                  <div class="flex items-center justify-between mt-1">
+                      <p class="text-[11px] text-rose-600">Total Distribusi Unit</p>
+                      <span class="text-[10px] text-rose-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+                  </div>
+              </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Restok (Masuk)</label>
-                                <input type="number" id="qtyIn" min="1" value="1" required class="w-full border border-slate-300 bg-white text-slate-900 font-bold p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Petugas Penerima / Sumber</label>
-                                <input type="text" id="picIn" required placeholder="Contoh: Gudang Sarpras / Toko" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                            </div>
-                        </div>
+              <div onclick="openInvKpiModal('KRITIS')" role="button" tabindex="0" class="cursor-pointer bg-white hover:bg-amber-50/30 p-5 rounded-2xl border border-slate-200 hover:border-amber-400 shadow-sm transition-all duration-300 group active:scale-[0.99]">
+                  <div class="flex justify-between items-start">
+                      <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-amber-600 transition">Barang Kritis (&lt; 5 Unit)</p>
+                      <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xs"></i>
+                  </div>
+                  <h3 class="text-3xl font-black text-amber-500 mt-2" id="kpi-kritis-count">0</h3>
+                  <div class="flex items-center justify-between mt-1">
+                      <p class="text-[11px] text-amber-600">Perlu Restok Segera</p>
+                      <span class="text-[10px] text-amber-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+                  </div>
+              </div>
+          </div>
 
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Pembelian / Restok</label>
-                            <textarea id="notesIn" rows="2" placeholder="Contoh: Pengadaan rutin bulan ini / Nota #123" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-                        </div>
+          <!-- MENU NAVIGASI TERSENDIRI (REKAP STOK | KELOLA STOK | HISTORI TERPISAH) -->
+          <div class="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-2 kiosk-hide">
+              <button type="button" onclick="switchInvMenu('MASTER')" id="navBtn-MASTER" class="flex-1 py-3 px-4 rounded-xl bg-blue-600 text-white font-bold text-xs md:text-sm shadow-sm transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-table-list"></i> 1. Rekap Master Stok
+              </button>
+              <button type="button" onclick="switchInvMenu('KELOLA')" id="navBtn-KELOLA" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 font-bold text-xs md:text-sm transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-right-left"></i> 2. Kelola Stok (Restok & Ambil)
+              </button>
+              <button type="button" onclick="switchInvMenu('HISTORI')" id="navBtn-HISTORI" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-700 font-bold text-xs md:text-sm transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-clock-rotate-left"></i> 3. Histori Masuk & Keluar Terpisah
+              </button>
+          </div>
 
-                        <button type="submit" id="btnSubmitIn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-sm text-sm transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-plus-circle"></i> Simpan Penambahan Stok (+ Masuk)
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
+          <!-- ========================================================================= -->
+          <!-- MENU 1: REKAP MASTER STOK & GRAFIK ANALYTICS                              -->
+          <!-- ========================================================================= -->
+          <div id="menuSection-MASTER" class="space-y-6">
+              <!-- SEKSI 2: DASHBOARD BI ANALYTICS GRAFIK -->
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                      <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                          <i class="fa-solid fa-chart-column text-blue-600"></i> Analisis Stok Akhir vs Keluar (Top 15 Barang)
+                      </h2>
+                      <div style="position: relative; height: 32vh; width: 100%;">
+                          <canvas id="stockChart"></canvas>
+                      </div>
+                  </div>
 
-        <!-- ========================================================================= -->
-        <!-- MENU 3: HISTORI TERPISAH (HISTORI RESTOK/MASUK VS HISTORI KELUAR/AMBIL)   -->
-        <!-- ========================================================================= -->
-        <div id="menuSection-HISTORI" class="hidden space-y-6">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                <div>
-                    <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-purple-600"></i> Buku Histori Transaksi Terpisah
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Riwayat transaksi <strong>Restok (Masuk)</strong> dan <strong>Pengambilan (Keluar)</strong> dipisahkan secara otomatis agar mudah diaudit.</p>
-                </div>
-                
-                <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap">
-                    <input type="month" id="logMonthFilter" onchange="filterLogsByMonth(true)" class="bg-white border border-slate-300 text-purple-700 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    <button onclick="resetLogMonthFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-2 rounded-xl border border-slate-300">Semua Bulan</button>
-                </div>
-            </div>
+                  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                      <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                          <i class="fa-solid fa-chart-pie text-emerald-600"></i> Distribusi Status Kesehatan Stok
+                      </h2>
+                      <div style="position: relative; height: 32vh; width: 100%;">
+                          <canvas id="healthPieChart"></canvas>
+                      </div>
+                  </div>
+              </div>
 
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <!-- TABEL HISTORI 1: PENAMBAHAN STOK / RESTOK (IN) -->
-                <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm overflow-hidden flex flex-col">
-                    <div class="p-4 bg-emerald-50 border-b border-emerald-200 flex flex-wrap justify-between items-center gap-2">
-                        <div>
-                            <h3 class="text-sm font-extrabold text-emerald-900 flex items-center gap-2">
-                                <i class="fa-solid fa-arrow-down-wide-short text-emerald-600"></i> Histori Restok / Barang Masuk (+ IN)
-                            </h3>
-                            <p class="text-[11px] text-emerald-700" id="countLogIn">0 transaksi masuk</p>
-                        </div>
-                        <button onclick="exportLogsByTypePDF('IN')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-3 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition">
-                            <i class="fa-solid fa-file-pdf"></i> Cetak PDF Masuk
-                        </button>
-                    </div>
+              <!-- SEKSI 3: FAST-MOVING ITEMS -->
+              <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                  <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                      <i class="fa-solid fa-fire text-amber-500"></i> Analytics Fast-Moving Items (Barang Paling Sering Diambil)
+                  </h2>
+                  <div style="position: relative; height: 26vh; width: 100%;">
+                      <canvas id="fastMovingChart"></canvas>
+                  </div>
+              </div>
 
-                    <div class="overflow-x-auto max-h-[460px]">
-                        <table class="min-w-full text-left border-collapse whitespace-nowrap text-xs">
-                            <thead class="bg-slate-100 text-slate-600 sticky top-0 border-b border-slate-200">
-                                <tr>
-                                    <th class="py-3 px-3">Tanggal</th>
-                                    <th class="py-3 px-3">Barang</th>
-                                    <th class="py-3 px-3 text-center">Masuk</th>
-                                    <th class="py-3 px-3">Penerima</th>
-                                    <th class="py-3 px-3">Catatan</th>
-                                    <th class="py-3 px-3 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="logTableBodyIn" class="divide-y divide-slate-200 text-slate-700">
-                                <tr><td colspan="6" class="text-center py-5 text-slate-400">Memuat histori barang masuk...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+              <!-- TABEL UTAMA MASTER INVENTARIS -->
+              <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                  <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-slate-50/70">
+                      <div class="w-full md:w-1/3">
+                          <input type="text" id="searchInput" onkeyup="filterData()" placeholder="🔍 Cari Kode atau Nama Barang..." class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      </div>
+                      <div class="flex items-center gap-2.5 flex-wrap kiosk-hide">
+                          <span id="itemCount" class="text-xs md:text-sm font-semibold text-slate-500">Memuat data...</span>
+                          <button onclick="openBulkQrModal()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition">
+                              <i class="fa-solid fa-qrcode mr-1"></i> Cetak Semua QR Rak
+                          </button>
+                          <button onclick="switchInvMenu('KELOLA')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition">
+                              <i class="fa-solid fa-right-left mr-1"></i> Input Restok / Ambil
+                          </button>
+                      </div>
+                  </div>
 
-                <!-- TABEL HISTORI 2: PENGAMBILAN / BARANG KELUAR (OUT) -->
-                <div class="bg-white rounded-2xl border border-rose-200 shadow-sm overflow-hidden flex flex-col">
-                    <div class="p-4 bg-rose-50 border-b border-rose-200 flex flex-wrap justify-between items-center gap-2">
-                        <div>
-                            <h3 class="text-sm font-extrabold text-rose-900 flex items-center gap-2">
-                                <i class="fa-solid fa-arrow-up-right-from-square text-rose-600"></i> Histori Pengambilan / Barang Keluar (- OUT)
-                            </h3>
-                            <p class="text-[11px] text-rose-700" id="countLogOut">0 transaksi keluar</p>
-                        </div>
-                        <button onclick="exportLogsByTypePDF('OUT')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-1.5 px-3 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition">
-                            <i class="fa-solid fa-file-pdf"></i> Cetak PDF Keluar
-                        </button>
-                    </div>
+                  <div class="overflow-x-auto">
+                      <table class="min-w-full text-left border-collapse whitespace-nowrap">
+                          <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
+                              <tr>
+                                  <th class="py-4 px-5">Kode Barang</th>
+                                  <th class="py-4 px-5">Nama Barang</th>
+                                  <th class="py-4 px-5 text-center">Stok Awal</th>
+                                  <th class="py-4 px-5 text-center">Masuk</th>
+                                  <th class="py-4 px-5 text-center">Keluar</th>
+                                  <th class="py-4 px-5 text-center">Stok Akhir</th>
+                                  <th class="py-4 px-5 text-center kiosk-hide">Stiker QR</th>
+                                  <th class="py-4 px-5 text-center kiosk-hide">Aksi Master</th>
+                              </tr>
+                          </thead>
+                          <tbody id="tableBody" class="text-slate-700 text-xs md:text-sm divide-y divide-slate-200">
+                              <tr><td colspan="8" class="text-center py-6 text-slate-400">Memuat data inventaris...</td></tr>
+                          </tbody>
+                      </table>
+                  </div>
 
-                    <div class="overflow-x-auto max-h-[460px]">
-                        <table class="min-w-full text-left border-collapse whitespace-nowrap text-xs">
-                            <thead class="bg-slate-100 text-slate-600 sticky top-0 border-b border-slate-200">
-                                <tr>
-                                    <th class="py-3 px-3">Tanggal</th>
-                                    <th class="py-3 px-3">Barang</th>
-                                    <th class="py-3 px-3 text-center">Keluar</th>
-                                    <th class="py-3 px-3">Pengambil</th>
-                                    <th class="py-3 px-3">Keperluan</th>
-                                    <th class="py-3 px-3 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="logTableBodyOut" class="divide-y divide-slate-200 text-slate-700">
-                                <tr><td colspan="6" class="text-center py-5 text-slate-400">Memuat histori barang keluar...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+                  <div class="flex justify-between items-center p-4 border-t border-slate-200 bg-slate-50 text-xs md:text-sm kiosk-hide">
+                      <button id="prevBtn" onclick="changePage(-1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Previous</button>
+                      <span id="pageIndicator" class="font-semibold text-slate-600">Halaman 1</span>
+                      <button id="nextBtn" onclick="changePage(1)" class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold py-1.5 px-4 rounded-xl disabled:cursor-not-allowed transition">Next</button>
+                  </div>
+              </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- MENU 2: MENU TERSENDIRI KELOLA STOK (FORM RESTOK & AMBIL BARANG)          -->
+          <!-- ========================================================================= -->
+          <div id="menuSection-KELOLA" class="hidden space-y-6">
+              <!-- BANNER KONFIRMASI JIKA BARU SAJA SCAN QR RAK -->
+              <div id="qrScanBanner" class="hidden bg-indigo-600 text-white p-4 rounded-2xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                      <div class="bg-white/20 p-2.5 rounded-xl">
+                          <i class="fa-solid fa-qrcode text-xl"></i>
+                      </div>
+                      <div>
+                          <p class="text-[11px] uppercase tracking-wider font-bold text-indigo-200">Mode Scan QR Rak Terdeteksi</p>
+                          <h3 id="qrScanItemLabel" class="text-sm md:text-base font-extrabold">Barang terpilih otomatis!</h3>
+                      </div>
+                  </div>
+                  <button type="button" onclick="document.getElementById('qtyOut').focus()" class="bg-white text-indigo-700 hover:bg-indigo-50 font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm">
+                      Langsung Isi Jumlah Ambil &darr;
+                  </button>
+              </div>
+
+              <div class="bg-gradient-to-r from-blue-50 via-white to-emerald-50 p-4 rounded-2xl border border-blue-200 flex items-center justify-between gap-4">
+                  <div class="flex items-center gap-3">
+                      <div class="bg-blue-600 text-white p-3 rounded-xl">
+                          <i class="fa-solid fa-arrows-rotate text-lg"></i>
+                      </div>
+                      <div>
+                          <h2 class="text-base font-extrabold text-slate-900">Menu Kelola Stok Barang (Terhubung Otomatis)</h2>
+                          <p class="text-xs text-slate-600">Setiap transaksi <strong>Restok (+ Masuk)</strong> atau <strong>Pengambilan (- Keluar)</strong> akan langsung memperbarui kolom Stok Akhir di Rekap Master serta masuk ke masing-masing Histori terpisah.</p>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <!-- FORM 2 (DIATAS SAAT MOBILE AGAR SCAN QR LANGSUNG FOKUS KE PENGAMBILAN) -->
+                  <div class="bg-white rounded-2xl border-2 border-amber-200 shadow-sm overflow-hidden">
+                      <div class="bg-amber-500 text-white p-4 flex items-center justify-between">
+                          <div class="flex items-center gap-2.5">
+                              <i class="fa-solid fa-circle-minus text-xl"></i>
+                              <div>
+                                  <h3 class="font-extrabold text-base">Form Pengambilan Barang (- Keluar)</h3>
+                                  <p class="text-[11px] text-amber-50">Menambah kolom "Keluar" & mengurangi "Stok Akhir" + tercatat di Histori Keluar</p>
+                              </div>
+                          </div>
+                      </div>
+                      <form id="formAmbilDedicated" onsubmit="submitDedicatedTransaction(event, 'OUT')" class="p-5 space-y-4">
+                          <div>
+                              <label class="block text-xs font-bold text-slate-700 mb-1">Cari & Pilih Barang yang Diambil</label>
+                              <input type="text" id="searchSelectOut" oninput="populateStockSelects()" placeholder="Ketik kode/nama barang untuk memfilter daftar..." class="w-full border border-slate-200 bg-slate-50 text-slate-700 p-2 rounded-xl text-xs mb-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                              <select id="selectItemOut" onchange="updateSelectedStockBadge('OUT')" required class="w-full border border-slate-300 bg-white text-slate-900 font-semibold p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"></select>
+                              <p id="badgeStockOut" class="text-[11px] font-bold text-amber-700 mt-1.5">Sisa Stok Tersedia: -</p>
+                          </div>
+
+                          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div>
+                                  <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Diambil (Keluar)</label>
+                                  <input type="number" id="qtyOut" min="1" value="1" required class="w-full border border-slate-300 bg-white text-slate-900 font-bold p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pengambil / Teknisi</label>
+                                  <input type="text" id="picOut" required placeholder="Contoh: Budi (Teknisi Gedung)" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500">
+                              </div>
+                          </div>
+
+                          <div>
+                              <label class="block text-xs font-bold text-slate-700 mb-1">Keperluan / Lokasi Pemasangan</label>
+                              <textarea id="notesOut" rows="2" placeholder="Contoh: Perbaikan kran toilet Gedung Umum Lt.2" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+                          </div>
+
+                          <button type="submit" id="btnSubmitOut" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-sm text-sm transition flex items-center justify-center gap-2">
+                              <i class="fa-solid fa-minus-circle"></i> Simpan Pengambilan Barang (- Keluar)
+                          </button>
+                      </form>
+                  </div>
+
+                  <!-- FORM 1: RESTOK / PENAMBAHAN STOK (IN) -->
+                  <div class="bg-white rounded-2xl border-2 border-emerald-200 shadow-sm overflow-hidden">
+                      <div class="bg-emerald-600 text-white p-4 flex items-center justify-between">
+                          <div class="flex items-center gap-2.5">
+                              <i class="fa-solid fa-circle-plus text-xl"></i>
+                              <div>
+                                  <h3 class="font-extrabold text-base">Form Penambahan Stok (+ Restok)</h3>
+                                  <p class="text-[11px] text-emerald-100">Menambah kolom "Masuk" & "Stok Akhir" + tercatat di Histori Restok</p>
+                              </div>
+                          </div>
+                      </div>
+                      <form id="formRestokDedicated" onsubmit="submitDedicatedTransaction(event, 'IN')" class="p-5 space-y-4">
+                          <div>
+                              <label class="block text-xs font-bold text-slate-700 mb-1">Cari & Pilih Barang</label>
+                              <input type="text" id="searchSelectIn" oninput="populateStockSelects()" placeholder="Ketik kode/nama barang untuk memfilter daftar..." class="w-full border border-slate-200 bg-slate-50 text-slate-700 p-2 rounded-xl text-xs mb-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                              <select id="selectItemIn" onchange="updateSelectedStockBadge('IN')" required class="w-full border border-slate-300 bg-white text-slate-900 font-semibold p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"></select>
+                              <p id="badgeStockIn" class="text-[11px] font-bold text-emerald-700 mt-1.5">Sisa Stok Saat Ini: -</p>
+                          </div>
+
+                          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div>
+                                  <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Restok (Masuk)</label>
+                                  <input type="number" id="qtyIn" min="1" value="1" required class="w-full border border-slate-300 bg-white text-slate-900 font-bold p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                              </div>
+                              <div>
+                                  <label class="block text-xs font-bold text-slate-700 mb-1">Petugas Penerima / Sumber</label>
+                                  <input type="text" id="picIn" required placeholder="Contoh: Gudang Sarpras / Toko" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                              </div>
+                          </div>
+
+                          <div>
+                              <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Pembelian / Restok</label>
+                              <textarea id="notesIn" rows="2" placeholder="Contoh: Pengadaan rutin bulan ini / Nota #123" class="w-full border border-slate-300 bg-white text-slate-900 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                          </div>
+
+                          <button type="submit" id="btnSubmitIn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-sm text-sm transition flex items-center justify-center gap-2">
+                              <i class="fa-solid fa-plus-circle"></i> Simpan Penambahan Stok (+ Masuk)
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- MENU 3: HISTORI TERPISAH (HISTORI RESTOK/MASUK VS HISTORI KELUAR/AMBIL)   -->
+          <!-- ========================================================================= -->
+          <div id="menuSection-HISTORI" class="hidden space-y-6">
+              <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                  <div>
+                      <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                          <i class="fa-solid fa-clock-rotate-left text-purple-600"></i> Buku Histori Transaksi Terpisah
+                      </h2>
+                      <p class="text-xs text-slate-500 mt-0.5">Riwayat transaksi <strong>Restok (Masuk)</strong> dan <strong>Pengambilan (Keluar)</strong> dipisahkan secara otomatis agar mudah diaudit.</p>
+                  </div>
+                  
+                  <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap">
+                      <input type="month" id="logMonthFilter" onchange="filterLogsByMonth(true)" class="bg-white border border-slate-300 text-purple-700 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                      <button onclick="resetLogMonthFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-2 rounded-xl border border-slate-300">Semua Bulan</button>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  <!-- TABEL HISTORI 1: PENAMBAHAN STOK / RESTOK (IN) -->
+                  <div class="bg-white rounded-2xl border border-emerald-200 shadow-sm overflow-hidden flex flex-col">
+                      <div class="p-4 bg-emerald-50 border-b border-emerald-200 flex flex-wrap justify-between items-center gap-2">
+                          <div>
+                              <h3 class="text-sm font-extrabold text-emerald-900 flex items-center gap-2">
+                                  <i class="fa-solid fa-arrow-down-wide-short text-emerald-600"></i> Histori Restok / Barang Masuk (+ IN)
+                              </h3>
+                              <p class="text-[11px] text-emerald-700" id="countLogIn">0 transaksi masuk</p>
+                          </div>
+                          <button onclick="exportLogsByTypePDF('IN')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-3 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition">
+                              <i class="fa-solid fa-file-pdf"></i> Cetak PDF Masuk
+                          </button>
+                      </div>
+
+                      <div class="overflow-x-auto max-h-[460px]">
+                          <table class="min-w-full text-left border-collapse whitespace-nowrap text-xs">
+                              <thead class="bg-slate-100 text-slate-600 sticky top-0 border-b border-slate-200">
+                                  <tr>
+                                      <th class="py-3 px-3">Tanggal</th>
+                                      <th class="py-3 px-3">Barang</th>
+                                      <th class="py-3 px-3 text-center">Masuk</th>
+                                      <th class="py-3 px-3">Penerima</th>
+                                      <th class="py-3 px-3">Catatan</th>
+                                      <th class="py-3 px-3 text-center">Aksi</th>
+                                  </tr>
+                              </thead>
+                              <tbody id="logTableBodyIn" class="divide-y divide-slate-200 text-slate-700">
+                                  <tr><td colspan="6" class="text-center py-5 text-slate-400">Memuat histori barang masuk...</td></tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <!-- TABEL HISTORI 2: PENGAMBILAN / BARANG KELUAR (OUT) -->
+                  <div class="bg-white rounded-2xl border border-rose-200 shadow-sm overflow-hidden flex flex-col">
+                      <div class="p-4 bg-rose-50 border-b border-rose-200 flex flex-wrap justify-between items-center gap-2">
+                          <div>
+                              <h3 class="text-sm font-extrabold text-rose-900 flex items-center gap-2">
+                                  <i class="fa-solid fa-arrow-up-right-from-square text-rose-600"></i> Histori Pengambilan / Barang Keluar (- OUT)
+                              </h3>
+                              <p class="text-[11px] text-rose-700" id="countLogOut">0 transaksi keluar</p>
+                          </div>
+                          <button onclick="exportLogsByTypePDF('OUT')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-1.5 px-3 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition">
+                              <i class="fa-solid fa-file-pdf"></i> Cetak PDF Keluar
+                          </button>
+                      </div>
+
+                      <div class="overflow-x-auto max-h-[460px]">
+                          <table class="min-w-full text-left border-collapse whitespace-nowrap text-xs">
+                              <thead class="bg-slate-100 text-slate-600 sticky top-0 border-b border-slate-200">
+                                  <tr>
+                                      <th class="py-3 px-3">Tanggal</th>
+                                      <th class="py-3 px-3">Barang</th>
+                                      <th class="py-3 px-3 text-center">Keluar</th>
+                                      <th class="py-3 px-3">Pengambil</th>
+                                      <th class="py-3 px-3">Keperluan</th>
+                                      <th class="py-3 px-3 text-center">Aksi</th>
+                                  </tr>
+                              </thead>
+                              <tbody id="logTableBodyOut" class="divide-y divide-slate-200 text-slate-700">
+                                  <tr><td colspan="6" class="text-center py-5 text-slate-400">Memuat histori barang keluar...</td></tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
     </div>
 
     <!-- ========================================================================= -->
@@ -561,7 +687,7 @@
         </div>
     </div>
 
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+    <div id="toastContainer" class="no-print fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
     <script>
         let inventory = [];
@@ -573,17 +699,104 @@
         let selectedLogMonth = '';
         let activeInvKpiType = null;
         let qrTargetSingleItemId = null;
+        let kioskAutoRefreshTimer = null;
 
         let stockChartInstance = null;
         let healthPieChartInstance = null;
         let fastMovingChartInstance = null;
 
         document.addEventListener("DOMContentLoaded", async function() {
+            initSidebarActiveState();
+            startSidebarClock();
             initNavLoader();
             await loadSavedLogMonthFilter();
             await loadInventory();
             handleIncomingQrScanUrl();
+
+            if (new URLSearchParams(window.location.search).get('kiosk') === '1') {
+                toggleKioskMode(true);
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && document.body.classList.contains('kiosk-active')) {
+                    toggleKioskMode(false);
+                }
+            });
         });
+
+        // =========================================================================
+        // LOGIKA SIDEBAR TERPADU & MODE MONITOR TV (KIOSK)
+        // =========================================================================
+        function initSidebarActiveState() {
+            const currentPath = window.location.pathname.toLowerCase();
+            document.querySelectorAll('.sidebar-nav-item').forEach(link => {
+                const route = (link.getAttribute('data-route') || '').toLowerCase();
+                const isMatch =
+                    (route === '/rumah-tangga' && (currentPath.includes('rumah-tangga') || currentPath.includes('rumahtangga'))) ||
+                    (route === '/ac' && currentPath.includes('ac')) ||
+                    (route === '/executive' && currentPath.includes('executive')) ||
+                    (route === '/' && (currentPath === '/' || currentPath.endsWith('index.html') || currentPath.endsWith('index_3.html')));
+
+                if (isMatch) {
+                    link.classList.remove('text-slate-300', 'hover:bg-slate-800/80');
+                    link.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/25');
+                }
+            });
+        }
+
+        function toggleMobileSidebar(show) {
+            const sidebar = document.getElementById('appSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (show) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        function startSidebarClock() {
+            const update = () => {
+                const el = document.getElementById('sidebarClock');
+                if (el) {
+                    el.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+            };
+            update();
+            setInterval(update, 1000);
+        }
+
+        function toggleKioskMode(enable) {
+            const exitBtn = document.getElementById('exitKioskBtn');
+            toggleMobileSidebar(false);
+
+            if (enable) {
+                document.body.classList.add('kiosk-active');
+                exitBtn.classList.remove('hidden');
+                exitBtn.classList.add('flex');
+
+                if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                }
+
+                if (kioskAutoRefreshTimer) clearInterval(kioskAutoRefreshTimer);
+                kioskAutoRefreshTimer = setInterval(loadInventory, 30000);
+                showToast("Mode Monitor TV Aktif (Auto-refresh 30 detik)", "success");
+            } else {
+                document.body.classList.remove('kiosk-active');
+                exitBtn.classList.add('hidden');
+                exitBtn.classList.remove('flex');
+
+                if (document.fullscreenElement && document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                }
+                if (kioskAutoRefreshTimer) {
+                    clearInterval(kioskAutoRefreshTimer);
+                    kioskAutoRefreshTimer = null;
+                }
+            }
+        }
 
         // DETEKSI OTOMATIS JIKA HALAMAN DIBUKA DARI HASIL SCAN QR RAK (?scan_item=A001 atau ?scan_id=12)
         function handleIncomingQrScanUrl() {
@@ -877,7 +1090,7 @@
                     const loader = document.getElementById('pageLoader');
                     if (loader) {
                         loader.classList.remove('opacity-0', 'pointer-events-none');
-                        setTimeout(() => { window.location.href = target; }, 400);
+                        setTimeout(() => { window.location.href = target; }, 350);
                     } else {
                         window.location.href = target;
                     }
@@ -1443,12 +1656,12 @@
                         <td class="py-3 px-5 text-center text-emerald-600 font-semibold">+${item.inQty || 0}</td>
                         <td class="py-3 px-5 text-center text-rose-600 font-semibold">-${item.outQty || 0}</td>
                         <td class="py-3 px-5 text-center ${textClass}">${finalStock}</td>
-                        <td class="py-3 px-5 text-center">
+                        <td class="py-3 px-5 text-center kiosk-hide">
                             <button onclick="openSingleQrModal(${item.id})" class="bg-slate-100 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-300 text-xs px-2.5 py-1 rounded-lg font-bold transition inline-flex items-center gap-1" title="Cetak Stiker QR Rak">
                                 <i class="fa-solid fa-qrcode"></i> QR
                             </button>
                         </td>
-                        <td class="py-3 px-5 text-center">
+                        <td class="py-3 px-5 text-center kiosk-hide">
                             <button onclick="editItem(${item.id})" class="text-blue-600 hover:underline text-xs mr-2 font-semibold">Edit</button>
                             <button onclick="deleteItem(${item.id})" class="text-rose-600 hover:underline text-xs font-semibold">Hapus</button>
                         </td>

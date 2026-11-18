@@ -16,9 +16,19 @@
       100% { transform: scale(0.9); opacity: 0.8; }
     }
     .radar-pulse { animation: radarPulse 3s infinite ease-in-out; }
+
+    /* Mode Monitor TV / Kiosk Mode */
+    body.kiosk-active #appSidebar,
+    body.kiosk-active #mobileTopBar,
+    body.kiosk-active .kiosk-hide {
+      display: none !important;
+    }
+    body.kiosk-active #mainContentWrapper {
+      padding-left: 0 !important;
+    }
   </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 p-4 md:p-6 min-h-screen antialiased">
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen antialiased">
 
   <!-- CINEMATIC PLANE LOADING OVERLAY -->
   <div id="pageLoader" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
@@ -37,299 +47,405 @@
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto space-y-6">
+  <!-- FLOATING EXIT BUTTON UNTUK MODE MONITOR TV (KIOSK) -->
+  <button id="exitKioskBtn" onclick="toggleKioskMode(false)" class="hidden fixed bottom-5 right-5 z-[90] bg-slate-900/90 hover:bg-slate-900 text-white px-4 py-2.5 rounded-full shadow-2xl border border-slate-700 text-xs font-bold items-center gap-2 backdrop-blur-md transition">
+    <i class="fa-solid fa-compress text-amber-400"></i> Keluar Mode Monitor TV (ESC)
+  </button>
 
-    <!-- HEADER UTAMA -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-      <div class="absolute right-0 top-0 -mr-10 -mt-10 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="flex items-center space-x-4">
-        <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 p-3.5 rounded-xl shadow-md shadow-blue-500/20 flex items-center justify-center">
-          <i class="fa-solid fa-building-user text-white text-2xl"></i>
+  <!-- BACKDROP SIDEBAR MOBILE -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SIDEBAR KIRI TERPADU (RESPONSIF DESKTOP & MOBILE)                         -->
+  <!-- ========================================================================= -->
+  <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+    <div>
+      <!-- BRANDING INSTANSI -->
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0">
+            <i class="fa-solid fa-plane-departure text-white text-lg"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-blue-400 block">MONSARPRAS</span>
+            <h2 class="text-sm font-extrabold text-white leading-tight">Poltekbang SBY</h2>
+          </div>
         </div>
-        <div>
-          <p class="text-[10px] font-bold uppercase tracking-widest text-blue-600 flex items-center gap-1.5">
-            <i class="fa-solid fa-plane text-[9px]"></i> BIDANG UMUM
-          </p>
-          <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-slate-900">
-            Dashboard Layanan Rumah Tangga
-          </h1>
-          <p class="text-xs text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase</p>
-        </div>
+        <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
 
-      <!-- NAVIGASI MENU -->
-      <div class="flex items-center space-x-2 w-full md:w-auto">
-        <a href="/" class="nav-link px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold rounded-xl transition">
-          <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
+      <!-- MENU NAVIGASI UTAMA (DETEKSI OTOMATIS HALAMAN AKTIF) -->
+      <div class="p-4 space-y-1.5">
+        <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Modul Layanan</p>
+
+        <a href="/" data-route="/" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-boxes-stacked w-4 text-center text-indigo-400"></i>
+          <span>Inventaris & Aset</span>
         </a>
-        <a href="/rumah-tangga" class="nav-link px-4 py-2 bg-blue-600 text-white font-semibold text-xs rounded-xl shadow-sm">
-          <i class="fa-solid fa-building-user mr-1"></i> Rumah Tangga
+
+        <a href="/rumah-tangga" data-route="/rumah-tangga" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-building-user w-4 text-center text-blue-400"></i>
+          <span>Layanan Rumah Tangga</span>
         </a>
-        <a href="/ac" class="nav-link px-4 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 text-xs font-semibold rounded-xl transition">
-          <i class="fa-solid fa-snowflake mr-1"></i> Maintenance AC
+
+        <a href="/ac" data-route="/ac" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-snowflake w-4 text-center text-cyan-400"></i>
+          <span>Maintenance AC</span>
+        </a>
+
+        <a href="/executive.html" data-route="/executive" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-chart-line w-4 text-center text-emerald-400"></i>
+          <span>Executive Summary</span>
+        </a>
+      </div>
+
+      <!-- PINTASAN CEPAT HALAMAN INI -->
+      <div class="px-4 pt-2 pb-4 border-t border-slate-800/80 space-y-1.5">
+        <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Akses Cepat</p>
+        <a href="#kalenderSection" onclick="toggleMobileSidebar(false)" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-calendar-days w-4 text-center text-amber-400"></i>
+          <span>Kalender Jadwal</span>
+        </a>
+        <a href="#ruanganSection" onclick="toggleMobileSidebar(false)" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-door-open w-4 text-center text-blue-400"></i>
+          <span>Data Ruangan / Aula</span>
+        </a>
+        <a href="#kendaraanSection" onclick="toggleMobileSidebar(false)" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-car-side w-4 text-center text-indigo-400"></i>
+          <span>Data Kendaraan Dinas</span>
         </a>
       </div>
     </div>
 
-    <!-- WIDGET MOTIVASI HARIAN -->
-    <div class="bg-gradient-to-r from-blue-50 via-white to-indigo-50 p-4 rounded-2xl border border-blue-200 shadow-sm flex items-center gap-4 hover:border-blue-300 transition">
-      <div class="bg-blue-100 text-blue-600 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-blue-200">
-        <i class="fa-solid fa-quote-left text-xl"></i>
-      </div>
-      <div class="flex-1">
-        <div class="flex items-center gap-2">
-          <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-200">MOTIVASI HARIAN RUMAH TANGGA</span>
-          <span id="quoteDate" class="text-[10px] text-slate-500"></span>
-        </div>
-        <p id="quoteText" class="text-xs md:text-sm font-medium text-slate-700 mt-1 italic">
-          "Pelayanan terbaik lahir dari koordinasi yang solid dan sikap ramah."
-        </p>
-        <p id="quoteAuthor" class="text-[11px] font-bold text-blue-600 mt-0.5">— Tim Rumah Tangga Poltekbang</p>
-      </div>
-      <button onclick="changeQuote()" title="Ganti Motivasi" class="bg-white hover:bg-slate-100 text-slate-600 p-2.5 rounded-xl text-xs transition border border-slate-200 shadow-sm active:scale-95">
-        <i class="fa-solid fa-rotate text-blue-600"></i>
+    <!-- PINTASAN MODE MONITOR TV / KIOSK MODE -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
+      <button onclick="toggleKioskMode(true)" class="w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 transition active:scale-[0.98]">
+        <i class="fa-solid fa-tv"></i>
+        <span>Mode Monitor TV (Kiosk)</span>
       </button>
-    </div>
 
-    <!-- SEKSI 1: KPI SCORECARDS (DAPAT DIKLIK UNTUK MELIHAT RINCIAN DATA) -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div onclick="openRtKpiModal('TOTAL')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 hover:bg-blue-50/30 transition duration-300 active:scale-[0.99]">
-        <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-blue-600 transition">Total Layanan</p>
-          <i class="fa-solid fa-folder-open text-blue-600 text-xs"></i>
-        </div>
-        <h3 class="text-3xl font-black text-blue-600 mt-2" id="kpi-total-rt">0</h3>
-        <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-slate-500">Permohonan Terdaftar</p>
-          <span class="text-[10px] text-blue-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-        </div>
-      </div>
-
-      <div onclick="openRtKpiModal('DISETUJUI')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-400 hover:bg-emerald-50/30 transition duration-300 active:scale-[0.99]">
-        <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-600 transition">Permohonan Disetujui</p>
-          <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
-        </div>
-        <h3 class="text-3xl font-black text-emerald-600 mt-2" id="kpi-disetujui-rt">0</h3>
-        <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-emerald-600">Status Disetujui / Aktif</p>
-          <span class="text-[10px] text-emerald-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-        </div>
-      </div>
-
-      <div onclick="openRtKpiModal('PROSES')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-amber-400 hover:bg-amber-50/30 transition duration-300 active:scale-[0.99]">
-        <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-amber-600 transition">Sedang Diproses</p>
-          <i class="fa-solid fa-clock text-amber-500 text-xs"></i>
-        </div>
-        <h3 class="text-3xl font-black text-amber-500 mt-2" id="kpi-proses-rt">0</h3>
-        <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-amber-600">Menunggu Verifikasi</p>
-          <span class="text-[10px] text-amber-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-        </div>
-      </div>
-
-      <div onclick="openRtKpiModal('MAINTENANCE')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-rose-400 hover:bg-rose-50/30 transition duration-300 active:scale-[0.99]">
-        <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-rose-600 transition">Maintenance / Ditolak</p>
-          <i class="fa-solid fa-triangle-exclamation text-rose-600 text-xs"></i>
-        </div>
-        <h3 class="text-3xl font-black text-rose-600 mt-2" id="kpi-maintenance-rt">0</h3>
-        <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-rose-600">Kendala / Perawatan</p>
-          <span class="text-[10px] text-rose-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-        </div>
+      <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Supabase Live
+        </span>
+        <span id="sidebarClock" class="font-mono font-bold text-slate-300">--:--</span>
       </div>
     </div>
+  </aside>
 
-    <!-- ========================================================================= -->
-    <!-- SEKSI BARU: KALENDER INTERAKTIF PEMINJAMAN RUANGAN & KENDARAAN            -->
-    <!-- ========================================================================= -->
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-      <div class="p-4 md:p-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-blue-50/40 to-indigo-50/40 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-        <div>
+  <!-- TOP BAR KHUSUS MOBILE / TABLET -->
+  <div id="mobileTopBar" class="lg:hidden sticky top-0 z-30 bg-slate-900 text-white px-4 py-3 flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleMobileSidebar(true)" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200">
+        <i class="fa-solid fa-bars text-sm"></i>
+      </button>
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-building-user text-blue-400"></i>
+        <span class="font-extrabold text-xs tracking-wide">Rumah Tangga • Sarpras</span>
+      </div>
+    </div>
+    <button onclick="toggleKioskMode(true)" class="px-2.5 py-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5">
+      <i class="fa-solid fa-tv"></i> TV Mode
+    </button>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- KONTEN UTAMA (DENGAN OFFSET SIDEBAR DI DESKTOP)                            -->
+  <!-- ========================================================================= -->
+  <div id="mainContentWrapper" class="lg:pl-64 transition-all duration-300">
+    <div class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+
+      <!-- HEADER UTAMA -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+        <div class="absolute right-0 top-0 -mr-10 -mt-10 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex items-center space-x-4">
+          <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 p-3.5 rounded-xl shadow-md shadow-blue-500/20 flex items-center justify-center">
+            <i class="fa-solid fa-building-user text-white text-2xl"></i>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-600 flex items-center gap-1.5">
+              <i class="fa-solid fa-plane text-[9px]"></i> BIDANG UMUM
+            </p>
+            <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-slate-900">
+              Dashboard Layanan Rumah Tangga
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya • Analytics BI Real-time Supabase</p>
+          </div>
+        </div>
+
+        <!-- INDIKATOR STATUS & TOMBOL KIOSK -->
+        <div class="flex items-center gap-2 self-end md:self-center kiosk-hide">
+          <button onclick="loadAllRtData(); showToast('Data berhasil disegarkan!', 'success')" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrows-rotate text-blue-600"></i> Refresh
+          </button>
+          <button onclick="toggleKioskMode(true)" class="hidden sm:flex px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold rounded-xl transition items-center gap-1.5" title="Tampilkan penuh di layar TV Lobi">
+            <i class="fa-solid fa-tv"></i> Layar TV
+          </button>
+        </div>
+      </div>
+
+      <!-- WIDGET MOTIVASI HARIAN -->
+      <div class="bg-gradient-to-r from-blue-50 via-white to-indigo-50 p-4 rounded-2xl border border-blue-200 shadow-sm flex items-center gap-4 hover:border-blue-300 transition">
+        <div class="bg-blue-100 text-blue-600 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-blue-200">
+          <i class="fa-solid fa-quote-left text-xl"></i>
+        </div>
+        <div class="flex-1">
           <div class="flex items-center gap-2">
-            <span class="bg-blue-600 text-white text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full">ANTI-BENTROK AKTIF</span>
-            <span class="text-[11px] text-slate-500 font-medium">Klik tanggal kosong untuk booking cepat • Klik jadwal untuk detail</span>
+            <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-200">MOTIVASI HARIAN RUMAH TANGGA</span>
+            <span id="quoteDate" class="text-[10px] text-slate-500"></span>
           </div>
-          <h2 class="text-base md:text-lg font-extrabold text-slate-900 mt-1 flex items-center gap-2">
-            <i class="fa-solid fa-calendar-days text-blue-600"></i> Kalender Interaktif Peminjaman Ruangan & Kendaraan
+          <p id="quoteText" class="text-xs md:text-sm font-medium text-slate-700 mt-1 italic">
+            "Pelayanan terbaik lahir dari koordinasi yang solid dan sikap ramah."
+          </p>
+          <p id="quoteAuthor" class="text-[11px] font-bold text-blue-600 mt-0.5">— Tim Rumah Tangga Poltekbang</p>
+        </div>
+        <button onclick="changeQuote()" title="Ganti Motivasi" class="kiosk-hide bg-white hover:bg-slate-100 text-slate-600 p-2.5 rounded-xl text-xs transition border border-slate-200 shadow-sm active:scale-95">
+          <i class="fa-solid fa-rotate text-blue-600"></i>
+        </button>
+      </div>
+
+      <!-- SEKSI 1: KPI SCORECARDS (DAPAT DIKLIK UNTUK MELIHAT RINCIAN DATA) -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div onclick="openRtKpiModal('TOTAL')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 hover:bg-blue-50/30 transition duration-300 active:scale-[0.99]">
+          <div class="flex justify-between items-start">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-blue-600 transition">Total Layanan</p>
+            <i class="fa-solid fa-folder-open text-blue-600 text-xs"></i>
+          </div>
+          <h3 class="text-3xl font-black text-blue-600 mt-2" id="kpi-total-rt">0</h3>
+          <div class="flex items-center justify-between mt-1">
+            <p class="text-[11px] text-slate-500">Permohonan Terdaftar</p>
+            <span class="text-[10px] text-blue-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          </div>
+        </div>
+
+        <div onclick="openRtKpiModal('DISETUJUI')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-400 hover:bg-emerald-50/30 transition duration-300 active:scale-[0.99]">
+          <div class="flex justify-between items-start">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-600 transition">Permohonan Disetujui</p>
+            <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
+          </div>
+          <h3 class="text-3xl font-black text-emerald-600 mt-2" id="kpi-disetujui-rt">0</h3>
+          <div class="flex items-center justify-between mt-1">
+            <p class="text-[11px] text-emerald-600">Status Disetujui / Aktif</p>
+            <span class="text-[10px] text-emerald-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          </div>
+        </div>
+
+        <div onclick="openRtKpiModal('PROSES')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-amber-400 hover:bg-amber-50/30 transition duration-300 active:scale-[0.99]">
+          <div class="flex justify-between items-start">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-amber-600 transition">Sedang Diproses</p>
+            <i class="fa-solid fa-clock text-amber-500 text-xs"></i>
+          </div>
+          <h3 class="text-3xl font-black text-amber-500 mt-2" id="kpi-proses-rt">0</h3>
+          <div class="flex items-center justify-between mt-1">
+            <p class="text-[11px] text-amber-600">Menunggu Verifikasi</p>
+            <span class="text-[10px] text-amber-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          </div>
+        </div>
+
+        <div onclick="openRtKpiModal('MAINTENANCE')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-rose-400 hover:bg-rose-50/30 transition duration-300 active:scale-[0.99]">
+          <div class="flex justify-between items-start">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-rose-600 transition">Maintenance / Ditolak</p>
+            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-xs"></i>
+          </div>
+          <h3 class="text-3xl font-black text-rose-600 mt-2" id="kpi-maintenance-rt">0</h3>
+          <div class="flex items-center justify-between mt-1">
+            <p class="text-[11px] text-rose-600">Kendala / Perawatan</p>
+            <span class="text-[10px] text-rose-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- SEKSI KALENDER INTERAKTIF PEMINJAMAN RUANGAN & KENDARAAN                  -->
+      <!-- ========================================================================= -->
+      <div id="kalenderSection" class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200 scroll-mt-6">
+        <div class="p-4 md:p-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 via-blue-50/40 to-indigo-50/40 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="bg-blue-600 text-white text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full">ANTI-BENTROK AKTIF</span>
+              <span class="text-[11px] text-slate-500 font-medium">Klik tanggal kosong untuk booking cepat • Klik jadwal untuk detail</span>
+            </div>
+            <h2 class="text-base md:text-lg font-extrabold text-slate-900 mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-calendar-days text-blue-600"></i> Kalender Interaktif Peminjaman Ruangan & Kendaraan
+            </h2>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            <!-- FILTER JENIS KALENDER -->
+            <select id="calFilterType" onchange="renderInteractiveCalendar()" class="bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="ALL">Semua Jadwal (Ruangan & Kendaraan)</option>
+              <option value="RUANGAN">Hanya Peminjaman Ruangan</option>
+              <option value="KENDARAAN">Hanya Peminjaman Kendaraan</option>
+            </select>
+
+            <!-- SWITCH BULANAN / MINGGUAN -->
+            <div class="inline-flex rounded-xl bg-slate-200/80 p-1">
+              <button type="button" id="calModeMonthBtn" onclick="setCalendarViewMode('MONTH')" class="px-3 py-1.5 rounded-lg bg-white text-blue-700 font-bold text-xs shadow-sm transition">
+                Bulanan
+              </button>
+              <button type="button" id="calModeWeekBtn" onclick="setCalendarViewMode('WEEK')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-xs transition">
+                Mingguan
+              </button>
+            </div>
+
+            <!-- NAVIGASI PERIODE -->
+            <div class="inline-flex items-center gap-1 bg-white border border-slate-300 rounded-xl p-1">
+              <button type="button" onclick="navigateCalendar(-1)" class="px-2.5 py-1 hover:bg-slate-100 rounded-lg text-slate-700 text-xs font-bold" title="Sebelumnya">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <span id="calPeriodLabel" class="px-2.5 text-xs font-extrabold text-slate-800 min-w-[130px] text-center">November 2026</span>
+              <button type="button" onclick="navigateCalendar(1)" class="px-2.5 py-1 hover:bg-slate-100 rounded-lg text-slate-700 text-xs font-bold" title="Berikutnya">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+
+            <button type="button" onclick="goToCalendarToday()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition">
+              Hari Ini
+            </button>
+          </div>
+        </div>
+
+        <!-- LEGENDA WARNA -->
+        <div class="px-5 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-[11px]">
+          <div class="flex flex-wrap items-center gap-4">
+            <span class="flex items-center gap-1.5 font-semibold text-slate-600">
+              <span class="w-2.5 h-2.5 rounded-sm bg-blue-600 inline-block"></span> Ruangan (Disetujui)
+            </span>
+            <span class="flex items-center gap-1.5 font-semibold text-slate-600">
+              <span class="w-2.5 h-2.5 rounded-sm bg-indigo-600 inline-block"></span> Kendaraan (Disetujui)
+            </span>
+            <span class="flex items-center gap-1.5 font-semibold text-slate-600">
+              <span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span> Sedang Diproses
+            </span>
+            <span class="flex items-center gap-1.5 font-semibold text-slate-600">
+              <span class="w-2.5 h-2.5 rounded-sm bg-rose-600 inline-block"></span> Maintenance / Ditolak
+            </span>
+          </div>
+          <span id="calSummaryBadge" class="font-bold text-blue-700">0 jadwal tampil</span>
+        </div>
+
+        <!-- GRID KALENDER BULANAN / MINGGUAN -->
+        <div class="p-3 md:p-4 overflow-x-auto">
+          <div class="min-w-[760px]">
+            <div id="calDayHeaders" class="grid grid-cols-7 gap-1.5 mb-1.5">
+              <div class="text-center text-[11px] font-extrabold uppercase text-rose-600 py-1.5 bg-rose-50/70 rounded-lg">Minggu</div>
+              <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Senin</div>
+              <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Selasa</div>
+              <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Rabu</div>
+              <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Kamis</div>
+              <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Jumat</div>
+              <div class="text-center text-[11px] font-extrabold uppercase text-blue-600 py-1.5 bg-blue-50/70 rounded-lg">Sabtu</div>
+            </div>
+            <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEKSI 2: GRAFIK ANALYTICS -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-chart-column text-blue-600"></i> Analytics Komparasi Peminjaman Ruangan & Kendaraan
           </h2>
+          <div style="position: relative; height: 230px; width: 100%;">
+            <canvas id="rtComboChart"></canvas>
+          </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-          <!-- FILTER JENIS KALENDER -->
-          <select id="calFilterType" onchange="renderInteractiveCalendar()" class="bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="ALL">Semua Jadwal (Ruangan & Kendaraan)</option>
-            <option value="RUANGAN">Hanya Peminjaman Ruangan</option>
-            <option value="KENDARAAN">Hanya Peminjaman Kendaraan</option>
-          </select>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie text-emerald-600"></i> Rasio Persetujuan Layanan Rumah Tangga
+          </h2>
+          <div style="position: relative; height: 230px; width: 100%;">
+            <canvas id="rtPieChart"></canvas>
+          </div>
+        </div>
+      </div>
 
-          <!-- SWITCH BULANAN / MINGGUAN -->
-          <div class="inline-flex rounded-xl bg-slate-200/80 p-1">
-            <button type="button" id="calModeMonthBtn" onclick="setCalendarViewMode('MONTH')" class="px-3 py-1.5 rounded-lg bg-white text-blue-700 font-bold text-xs shadow-sm transition">
-              Bulanan
+      <!-- SEKSI 3: TABEL PEMINJAMAN RUANGAN -->
+      <div id="ruanganSection" class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200 scroll-mt-6">
+        <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-4">
+          <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-door-open text-blue-600"></i> Daftar Peminjaman Ruangan & Aula
+          </h2>
+          <div class="flex flex-wrap items-center gap-2 kiosk-hide">
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="searchRuangan" oninput="renderRuanganTable()" placeholder="Cari peminjam / ruangan..." class="bg-white border border-slate-300 text-slate-800 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button onclick="exportRuanganPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-pdf"></i> Cetak PDF
             </button>
-            <button type="button" id="calModeWeekBtn" onclick="setCalendarViewMode('WEEK')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-xs transition">
-              Mingguan
+            <button onclick="openRuanganModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+              + Pinjam Ruangan
             </button>
           </div>
+        </div>
 
-          <!-- NAVIGASI PERIODE -->
-          <div class="inline-flex items-center gap-1 bg-white border border-slate-300 rounded-xl p-1">
-            <button type="button" onclick="navigateCalendar(-1)" class="px-2.5 py-1 hover:bg-slate-100 rounded-lg text-slate-700 text-xs font-bold" title="Sebelumnya">
-              <i class="fa-solid fa-chevron-left"></i>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+            <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3.5 font-bold text-center">No</th>
+                <th class="px-5 py-3.5 font-bold">Nama Peminjam</th>
+                <th class="px-5 py-3.5 font-bold">Ruangan / Aula</th>
+                <th class="px-5 py-3.5 font-bold">Tanggal Pinjam</th>
+                <th class="px-5 py-3.5 font-bold">Jam</th>
+                <th class="px-5 py-3.5 font-bold">Keperluan</th>
+                <th class="px-5 py-3.5 font-bold">Status</th>
+                <th class="px-5 py-3.5 font-bold text-center kiosk-hide">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-ruangan" class="divide-y divide-slate-200">
+              <tr><td colspan="8" class="text-center py-5 text-slate-400">Memuat data ruangan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SEKSI 4: TABEL PEMINJAMAN KENDARAAN DINAS -->
+      <div id="kendaraanSection" class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200 scroll-mt-6">
+        <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-4">
+          <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-car-side text-indigo-600"></i> Daftar Peminjaman Kendaraan Dinas
+          </h2>
+          <div class="flex flex-wrap items-center gap-2 kiosk-hide">
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="searchKendaraan" oninput="renderKendaraanTable()" placeholder="Cari driver / kendaraan..." class="bg-white border border-slate-300 text-slate-800 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <button onclick="exportKendaraanPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-pdf"></i> Cetak PDF
             </button>
-            <span id="calPeriodLabel" class="px-2.5 text-xs font-extrabold text-slate-800 min-w-[130px] text-center">November 2026</span>
-            <button type="button" onclick="navigateCalendar(1)" class="px-2.5 py-1 hover:bg-slate-100 rounded-lg text-slate-700 text-xs font-bold" title="Berikutnya">
-              <i class="fa-solid fa-chevron-right"></i>
+            <button onclick="openKendaraanModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+              + Pinjam Kendaraan
             </button>
           </div>
+        </div>
 
-          <button type="button" onclick="goToCalendarToday()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition">
-            Hari Ini
-          </button>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+            <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3.5 font-bold text-center">No</th>
+                <th class="px-5 py-3.5 font-bold">Nama Peminjam / Driver</th>
+                <th class="px-5 py-3.5 font-bold">Kendaraan</th>
+                <th class="px-5 py-3.5 font-bold">Tanggal Pinjam</th>
+                <th class="px-5 py-3.5 font-bold">Tujuan</th>
+                <th class="px-5 py-3.5 font-bold">Status</th>
+                <th class="px-5 py-3.5 font-bold text-center kiosk-hide">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-kendaraan" class="divide-y divide-slate-200">
+              <tr><td colspan="7" class="text-center py-5 text-slate-400">Memuat data kendaraan...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- LEGENDA WARNA -->
-      <div class="px-5 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-[11px]">
-        <div class="flex flex-wrap items-center gap-4">
-          <span class="flex items-center gap-1.5 font-semibold text-slate-600">
-            <span class="w-2.5 h-2.5 rounded-sm bg-blue-600 inline-block"></span> Ruangan (Disetujui)
-          </span>
-          <span class="flex items-center gap-1.5 font-semibold text-slate-600">
-            <span class="w-2.5 h-2.5 rounded-sm bg-indigo-600 inline-block"></span> Kendaraan (Disetujui)
-          </span>
-          <span class="flex items-center gap-1.5 font-semibold text-slate-600">
-            <span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span> Sedang Diproses
-          </span>
-          <span class="flex items-center gap-1.5 font-semibold text-slate-600">
-            <span class="w-2.5 h-2.5 rounded-sm bg-rose-600 inline-block"></span> Maintenance / Ditolak
-          </span>
-        </div>
-        <span id="calSummaryBadge" class="font-bold text-blue-700">0 jadwal tampil</span>
-      </div>
-
-      <!-- GRID KALENDER BULANAN / MINGGUAN -->
-      <div class="p-3 md:p-4 overflow-x-auto">
-        <div class="min-w-[760px]">
-          <div id="calDayHeaders" class="grid grid-cols-7 gap-1.5 mb-1.5">
-            <div class="text-center text-[11px] font-extrabold uppercase text-rose-600 py-1.5 bg-rose-50/70 rounded-lg">Minggu</div>
-            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Senin</div>
-            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Selasa</div>
-            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Rabu</div>
-            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Kamis</div>
-            <div class="text-center text-[11px] font-extrabold uppercase text-slate-600 py-1.5 bg-slate-100 rounded-lg">Jumat</div>
-            <div class="text-center text-[11px] font-extrabold uppercase text-blue-600 py-1.5 bg-blue-50/70 rounded-lg">Sabtu</div>
-          </div>
-          <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
-        </div>
-      </div>
     </div>
-
-    <!-- SEKSI 2: GRAFIK ANALYTICS -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-column text-blue-600"></i> Analytics Komparasi Peminjaman Ruangan & Kendaraan
-        </h2>
-        <div style="position: relative; height: 230px; width: 100%;">
-          <canvas id="rtComboChart"></canvas>
-        </div>
-      </div>
-
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-emerald-600"></i> Rasio Persetujuan Layanan Rumah Tangga
-        </h2>
-        <div style="position: relative; height: 230px; width: 100%;">
-          <canvas id="rtPieChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- SEKSI 3: TABEL PEMINJAMAN RUANGAN -->
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-      <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-4">
-        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-door-open text-blue-600"></i> Daftar Peminjaman Ruangan & Aula
-        </h2>
-        <div class="flex flex-wrap items-center gap-2">
-          <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="searchRuangan" oninput="renderRuanganTable()" placeholder="Cari peminjam / ruangan..." class="bg-white border border-slate-300 text-slate-800 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-          </div>
-          <button onclick="exportRuanganPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
-          </button>
-          <button onclick="openRuanganModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
-            + Pinjam Ruangan
-          </button>
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
-          <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
-            <tr>
-              <th class="px-4 py-3.5 font-bold text-center">No</th>
-              <th class="px-5 py-3.5 font-bold">Nama Peminjam</th>
-              <th class="px-5 py-3.5 font-bold">Ruangan / Aula</th>
-              <th class="px-5 py-3.5 font-bold">Tanggal Pinjam</th>
-              <th class="px-5 py-3.5 font-bold">Jam</th>
-              <th class="px-5 py-3.5 font-bold">Keperluan</th>
-              <th class="px-5 py-3.5 font-bold">Status</th>
-              <th class="px-5 py-3.5 font-bold text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-ruangan" class="divide-y divide-slate-200">
-            <tr><td colspan="8" class="text-center py-5 text-slate-400">Memuat data ruangan...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- SEKSI 4: TABEL PEMINJAMAN KENDARAAN DINAS -->
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-      <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-4">
-        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-car-side text-indigo-600"></i> Daftar Peminjaman Kendaraan Dinas
-        </h2>
-        <div class="flex flex-wrap items-center gap-2">
-          <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="searchKendaraan" oninput="renderKendaraanTable()" placeholder="Cari driver / kendaraan..." class="bg-white border border-slate-300 text-slate-800 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <button onclick="exportKendaraanPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
-          </button>
-          <button onclick="openKendaraanModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
-            + Pinjam Kendaraan
-          </button>
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
-          <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
-            <tr>
-              <th class="px-4 py-3.5 font-bold text-center">No</th>
-              <th class="px-5 py-3.5 font-bold">Nama Peminjam / Driver</th>
-              <th class="px-5 py-3.5 font-bold">Kendaraan</th>
-              <th class="px-5 py-3.5 font-bold">Tanggal Pinjam</th>
-              <th class="px-5 py-3.5 font-bold">Tujuan</th>
-              <th class="px-5 py-3.5 font-bold">Status</th>
-              <th class="px-5 py-3.5 font-bold text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-kendaraan" class="divide-y divide-slate-200">
-            <tr><td colspan="7" class="text-center py-5 text-slate-400">Memuat data kendaraan...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
   </div>
 
   <!-- MODAL PILIH BOOKING CEPAT DARI KLIK TANGGAL KALENDER -->
@@ -386,7 +502,7 @@
           <p id="calEvKeperluan" class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-slate-700">-</p>
         </div>
       </div>
-      <div class="flex justify-end gap-2 pt-3 border-t border-slate-200" id="calEvActions"></div>
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-200 kiosk-hide" id="calEvActions"></div>
     </div>
   </div>
 
@@ -560,6 +676,7 @@
     let ruanganData = [];
     let kendaraanData = [];
     let activeRtKpiType = null;
+    let kioskAutoRefreshTimer = null;
 
     // STATE KALENDER INTERAKTIF
     let calendarViewMode = 'MONTH'; // 'MONTH' | 'WEEK'
@@ -576,10 +693,99 @@
     ];
 
     document.addEventListener('DOMContentLoaded', () => {
+      initSidebarActiveState();
+      startSidebarClock();
       initNavLoader();
       initQuote();
       loadAllRtData();
+
+      // Cek jika dibuka langsung dengan parameter ?kiosk=1
+      if (new URLSearchParams(window.location.search).get('kiosk') === '1') {
+        toggleKioskMode(true);
+      }
+
+      // Pintasan tombol ESC untuk keluar dari Mode Monitor TV
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.body.classList.contains('kiosk-active')) {
+          toggleKioskMode(false);
+        }
+      });
     });
+
+    // =========================================================================
+    // LOGIKA SIDEBAR TERPADU & MODE MONITOR TV (KIOSK)
+    // =========================================================================
+    function initSidebarActiveState() {
+      const currentPath = window.location.pathname.toLowerCase();
+      document.querySelectorAll('.sidebar-nav-item').forEach(link => {
+        const route = (link.getAttribute('data-route') || '').toLowerCase();
+        const isMatch =
+          (route === '/rumah-tangga' && (currentPath.includes('rumah-tangga') || currentPath.includes('rumahtangga'))) ||
+          (route === '/ac' && currentPath.includes('ac')) ||
+          (route === '/executive' && currentPath.includes('executive')) ||
+          (route === '/' && (currentPath === '/' || currentPath.endsWith('index.html')));
+
+        if (isMatch) {
+          link.classList.remove('text-slate-300', 'hover:bg-slate-800/80');
+          link.classList.add('bg-blue-600', 'text-white', 'shadow-md', 'shadow-blue-600/25');
+        }
+      });
+    }
+
+    function toggleMobileSidebar(show) {
+      const sidebar = document.getElementById('appSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (show) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function startSidebarClock() {
+      const update = () => {
+        const el = document.getElementById('sidebarClock');
+        if (el) {
+          el.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+      };
+      update();
+      setInterval(update, 1000);
+    }
+
+    function toggleKioskMode(enable) {
+      const exitBtn = document.getElementById('exitKioskBtn');
+      toggleMobileSidebar(false);
+
+      if (enable) {
+        document.body.classList.add('kiosk-active');
+        exitBtn.classList.remove('hidden');
+        exitBtn.classList.add('flex');
+
+        if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+
+        // Auto-refresh data tiap 30 detik saat Mode TV aktif
+        if (kioskAutoRefreshTimer) clearInterval(kioskAutoRefreshTimer);
+        kioskAutoRefreshTimer = setInterval(loadAllRtData, 30000);
+        showToast("Mode Monitor TV Aktif (Auto-refresh 30 detik)", "success");
+      } else {
+        document.body.classList.remove('kiosk-active');
+        exitBtn.classList.add('hidden');
+        exitBtn.classList.remove('flex');
+
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+        if (kioskAutoRefreshTimer) {
+          clearInterval(kioskAutoRefreshTimer);
+          kioskAutoRefreshTimer = null;
+        }
+      }
+    }
 
     function initNavLoader() {
       document.querySelectorAll('a.nav-link').forEach(link => {
@@ -683,7 +889,7 @@
     }
 
     function parseTimeRangeMinutes(timeStr) {
-      if (!timeStr) return [0, 24 * 60]; // Jika jam kosong, dianggap seharian penuh
+      if (!timeStr) return [0, 24 * 60];
       const matches = String(timeStr).match(/(\d{1,2})[:.](\d{2})/g);
       if (!matches || matches.length === 0) return [0, 24 * 60];
 
@@ -693,7 +899,6 @@
       };
 
       const start = toMins(matches[0]);
-      // Jika hanya jam mulai ditulis (misal "07:00:00"), anggap durasi default 4 jam (240 menit) agar tetap terlindungi dari bentrok
       const end = matches.length >= 2 ? toMins(matches[1]) : Math.min(start + 240, 24 * 60);
       return [start, Math.max(end, start + 30)];
     }
@@ -718,11 +923,9 @@
         const e2 = existing.tgl_selesai && existing.tgl_selesai >= s2 ? existing.tgl_selesai : s2;
         if (!s2) continue;
 
-        // Cek irisan rentang tanggal
         const dateOverlap = (s1 <= e2) && (e1 >= s2);
         if (!dateOverlap) continue;
 
-        // Cek irisan jam
         const [tStart2, tEnd2] = parseTimeRangeMinutes(existing.jam_mulai);
         const timeOverlap = (tStart1 < tEnd2) && (tEnd1 > tStart2);
         if (timeOverlap) {
@@ -884,7 +1087,7 @@
         periodLabel.innerText = calendarCursorDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 
         const firstDayOfMonth = new Date(year, month, 1);
-        const startWeekday = firstDayOfMonth.getDay(); // 0 = Minggu
+        const startWeekday = firstDayOfMonth.getDay();
         const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
 
         for (let i = startWeekday - 1; i >= 0; i--) {
@@ -898,7 +1101,6 @@
           daysList.push({ date: new Date(year, month + 1, nextIdx), isCurrentMonth: false });
         }
       } else {
-        // MODE MINGGUAN (MINGGU - SABTU)
         const curr = new Date(calendarCursorDate);
         const sunday = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay());
         const saturday = new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate() + 6);
@@ -954,7 +1156,7 @@
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 ${dayNumBadge}
-                <span class="opacity-0 group-hover:opacity-100 text-[10px] bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 px-1.5 py-0.5 rounded font-bold transition" title="Tambah jadwal di tanggal ini">+</span>
+                <span class="kiosk-hide opacity-0 group-hover:opacity-100 text-[10px] bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 px-1.5 py-0.5 rounded font-bold transition" title="Tambah jadwal di tanggal ini">+</span>
               </div>
               <div class="space-y-1">
                 ${eventsHtml}
@@ -968,6 +1170,7 @@
     }
 
     function openCalQuickBook(ymdStr) {
+      if (document.body.classList.contains('kiosk-active')) return;
       selectedQuickDateStr = ymdStr;
       document.getElementById('calQuickDateTitle').innerText = `Tanggal: ${ymdStr}`;
       document.getElementById('calQuickBookModal').classList.remove('hidden');
@@ -1317,7 +1520,7 @@
           <td class="px-5 py-3.5 text-slate-600">${r.jam_mulai || '-'}</td>
           <td class="px-5 py-3.5 text-slate-600">${r.keperluan || '-'}</td>
           <td class="px-5 py-3.5">${getStatusBadge(r.status)}</td>
-          <td class="px-5 py-3.5 text-center space-x-2">
+          <td class="px-5 py-3.5 text-center space-x-2 kiosk-hide">
             <button onclick="openRuanganModal(${r.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
             <button onclick="deleteRuangan(${r.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
           </td>
@@ -1359,7 +1562,6 @@
         keperluan: document.getElementById('r_keperluan').value
       };
 
-      // VALIDASI ANTI-BENTROK RUANGAN SEBELUM SIMPAN
       const conflict = findRuanganConflict(
         payload.ruangan,
         payload.tgl_pinjam,
@@ -1415,7 +1617,7 @@
           <td class="px-5 py-3.5 font-mono text-amber-700 font-semibold">${k.tgl_pinjam || '-'}</td>
           <td class="px-5 py-3.5 text-slate-600">${k.tujuan || '-'}</td>
           <td class="px-5 py-3.5">${getStatusBadge(k.status)}</td>
-          <td class="px-5 py-3.5 text-center space-x-2">
+          <td class="px-5 py-3.5 text-center space-x-2 kiosk-hide">
             <button onclick="openKendaraanModal(${k.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
             <button onclick="deleteKendaraan(${k.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
           </td>
@@ -1453,7 +1655,6 @@
         tujuan: document.getElementById('k_tujuan').value
       };
 
-      // VALIDASI ANTI-BENTROK KENDARAAN SEBELUM SIMPAN
       const conflict = findKendaraanConflict(
         payload.kendaraan,
         payload.tgl_pinjam,
