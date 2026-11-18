@@ -22,9 +22,10 @@
     .sticky-col-2 { position: sticky; left: 48px; z-index: 10; background-color: #ffffff; }
     thead .sticky-col-1, thead .sticky-col-2 { background-color: #f1f5f9; }
     tbody tr:hover .sticky-col-1, tbody tr:hover .sticky-col-2 { background-color: #f8fafc; }
+    html { scroll-behavior: smooth; }
   </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 p-4 md:p-6 min-h-screen antialiased">
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen antialiased">
 
   <!-- CINEMATIC PLANE LOADING OVERLAY -->
   <div id="pageLoader" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col justify-center items-center transition-opacity duration-500 opacity-0 pointer-events-none">
@@ -43,312 +44,417 @@
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto space-y-6">
-    
-    <!-- HEADER UTAMA -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-      <div class="absolute right-0 top-0 -mr-10 -mt-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="flex items-center space-x-4">
-        <div class="bg-gradient-to-tr from-cyan-600 to-blue-600 p-3.5 rounded-xl shadow-md shadow-cyan-500/20 flex items-center justify-center">
-          <i class="fa-solid fa-snowflake text-white text-2xl"></i>
+  <!-- BACKDROP SIDEBAR MOBILE -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SIDEBAR KIRI TERPADU (MAINTENANCE AC)                                     -->
+  <!-- ========================================================================= -->
+  <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+    <div class="overflow-y-auto">
+      <!-- BRANDING INSTANSI -->
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0">
+            <i class="fa-solid fa-plane-departure text-white text-lg"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-blue-400 block">MONSARPRAS</span>
+            <h2 class="text-sm font-extrabold text-white leading-tight">Poltekbang SBY</h2>
+          </div>
         </div>
-        <div>
-          <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-600 flex items-center gap-1.5">
-            <i class="fa-solid fa-plane text-[9px]"></i> TEKNIK & MAINTENANCE
-          </p>
-          <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-slate-900 flex items-center gap-3">
-            Dashboard Maintenance & Jadwal Cuci Per-Unit AC
-          </h1>
-          <p class="text-xs text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya • Rekap Matriks 20x Service & Cuci per Unit AC</p>
-        </div>
+        <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
-      
-      <!-- NAVIGASI MENU -->
-      <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-        <a href="/executive" class="nav-link px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 text-xs font-semibold rounded-xl transition">
-          <i class="fa-solid fa-gauge-high mr-1 text-amber-400"></i> Eksekutif
+
+      <!-- MENU MODUL LAYANAN -->
+      <div class="p-4 space-y-1.5">
+        <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">MODUL LAYANAN</p>
+
+        <a href="/" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-boxes-stacked w-4 text-center text-indigo-400"></i>
+          <span>Inventaris & Aset</span>
         </a>
-        <a href="/" class="nav-link px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold rounded-xl transition">
-          <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventaris
+
+        <a href="/rumah-tangga" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-building-user w-4 text-center text-blue-400"></i>
+          <span>Layanan Rumah Tangga</span>
         </a>
-        <a href="/rumah-tangga" class="nav-link px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold rounded-xl transition">
-          <i class="fa-solid fa-building-user mr-1"></i> Rumah Tangga
+
+        <!-- MENU AKTIF: MAINTENANCE AC -->
+        <a href="/ac" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-600/25 transition">
+          <i class="fa-solid fa-snowflake w-4 text-center text-cyan-300"></i>
+          <span>Maintenance AC</span>
         </a>
-        <a href="/ac" class="nav-link px-3.5 py-2 bg-cyan-600 text-white font-semibold text-xs rounded-xl shadow-sm">
-          <i class="fa-solid fa-snowflake mr-1"></i> Maintenance AC
+
+        <a href="/executive" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-chart-line w-4 text-center text-emerald-400"></i>
+          <span>Executive Summary</span>
         </a>
+      </div>
+
+      <!-- MENU AKSES CEPAT KHUSUS MAINTENANCE AC -->
+      <div class="px-4 pt-2 pb-4 border-t border-slate-800/80 space-y-1.5">
+        <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">AKSES CEPAT</p>
+
+        <button type="button" onclick="toggleMobileSidebar(false); switchMainView('MATRIX'); document.getElementById('section-MATRIX').scrollIntoView();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-table-columns w-4 text-center text-blue-400"></i>
+          <span>Data Unit & Matriks 20x</span>
+        </button>
+
+        <button type="button" onclick="toggleMobileSidebar(false); switchMainView('MONTHLY'); document.getElementById('section-MONTHLY').scrollIntoView();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-calendar-days w-4 text-center text-emerald-400"></i>
+          <span>Jadwal Cuci Per-Bulan</span>
+        </button>
+
+        <button type="button" onclick="toggleMobileSidebar(false); openScheduleModal();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-calendar-check w-4 text-center text-indigo-400"></i>
+          <span>Generate Jadwal 20x</span>
+        </button>
+
+        <button type="button" onclick="toggleMobileSidebar(false); openModal();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-plus-circle w-4 text-center text-cyan-400"></i>
+          <span>Tambah Unit AC Baru</span>
+        </button>
+
+        <button type="button" onclick="toggleMobileSidebar(false); openQrSheetModal();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-qrcode w-4 text-center text-amber-400"></i>
+          <span>Cetak Stiker QR Unit</span>
+        </button>
       </div>
     </div>
 
-    <!-- WIDGET MOTIVASI HARIAN -->
-    <div class="bg-gradient-to-r from-cyan-50 via-white to-indigo-50 p-4 rounded-2xl border border-cyan-200 shadow-sm flex items-center gap-4 hover:border-cyan-300 transition">
-      <div class="bg-cyan-100 text-cyan-700 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-cyan-200">
-        <i class="fa-solid fa-quote-left text-xl"></i>
+    <!-- FOOTER SIDEBAR -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
+      <a href="/executive?kiosk=1" class="nav-link w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 transition">
+        <i class="fa-solid fa-tv"></i>
+        <span>Mode Monitor TV (Kiosk)</span>
+      </a>
+      <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Supabase Live
+        </span>
+        <span id="sidebarClock" class="font-mono font-bold text-slate-300">--:--</span>
       </div>
-      <div class="flex-1">
-        <div class="flex items-center gap-2">
-          <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cyan-200">MOTIVASI HARIAN SARPRAS</span>
-          <span id="quoteDate" class="text-[10px] text-slate-500"></span>
-        </div>
-        <p id="quoteText" class="text-xs md:text-sm font-medium text-slate-700 mt-1 italic">
-          "Kenyamanan fasilitas kampus adalah cerminan dari dedikasi dan kerja keras kita."
-        </p>
-        <p id="quoteAuthor" class="text-[11px] font-bold text-cyan-700 mt-0.5">— Tim K3 & Sarpras Poltekbang</p>
-      </div>
-      <button type="button" onclick="changeQuote()" title="Ganti Motivasi" class="bg-white hover:bg-slate-100 text-slate-600 p-2.5 rounded-xl text-xs transition border border-slate-200 shadow-sm active:scale-95">
-        <i class="fa-solid fa-rotate text-cyan-600"></i>
+    </div>
+  </aside>
+
+  <!-- TOP BAR KHUSUS MOBILE / TABLET -->
+  <div class="lg:hidden sticky top-0 z-30 bg-slate-900 text-white px-4 py-3 flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleMobileSidebar(true)" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200">
+        <i class="fa-solid fa-bars text-sm"></i>
       </button>
-    </div>
-
-    <!-- SEKSI 1: KPI SCORECARDS -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div onclick="openKpiModal('TOTAL')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-cyan-400 hover:bg-cyan-50/30 transition duration-300 active:scale-[0.99]">
-        <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-cyan-700 transition">Total Unit AC</p>
-          <i class="fa-solid fa-snowflake text-cyan-600 text-xs"></i>
-        </div>
-        <h3 class="text-3xl font-black text-cyan-600 mt-2" id="kpi-unique-ac">0</h3>
-        <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-slate-500" id="kpi-total-sched">0 Total Slot Jadwal</p>
-          <span class="text-[10px] text-cyan-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-        </div>
-      </div>
-
-      <div onclick="openKpiModal('SELESAI')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-400 hover:bg-emerald-50/30 transition duration-300 active:scale-[0.99]">
-        <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-700 transition">Selesai Dicuci</p>
-          <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
-        </div>
-        <h3 class="text-3xl font-black text-emerald-600 mt-2" id="kpi-selesai-ac">0</h3>
-        <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-emerald-600">Slot Cuci Selesai / Baik</p>
-          <span class="text-[10px] text-emerald-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-        </div>
-      </div>
-
-      <div onclick="openKpiModal('MENDATANG')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-indigo-400 hover:bg-indigo-50/30 transition duration-300 active:scale-[0.99]">
-        <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-indigo-700 transition">Jadwal Mendatang</p>
-          <i class="fa-solid fa-calendar-check text-indigo-600 text-xs"></i>
-        </div>
-        <h3 class="text-3xl font-black text-indigo-600 mt-2" id="kpi-proses-ac">0</h3>
-        <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-indigo-600">Antrean Cuci 1–20</p>
-          <span class="text-[10px] text-indigo-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-        </div>
-      </div>
-
-      <div onclick="openKpiModal('RUSAK')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-rose-400 hover:bg-rose-50/30 transition duration-300 active:scale-[0.99]">
-        <div class="flex justify-between items-start">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-rose-700 transition">Perlu Perhatian</p>
-          <i class="fa-solid fa-triangle-exclamation text-rose-600 text-xs"></i>
-        </div>
-        <h3 class="text-3xl font-black text-rose-600 mt-2" id="kpi-rusak-ac">0</h3>
-        <div class="flex items-center justify-between mt-1">
-          <p class="text-[11px] text-rose-600">Unit AC Rusak / Kendala</p>
-          <span class="text-[10px] text-rose-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
-        </div>
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-snowflake text-cyan-400"></i>
+        <span class="font-extrabold text-xs tracking-wide">Maintenance AC • Sarpras</span>
       </div>
     </div>
+    <button type="button" onclick="openQrSheetModal()" class="px-2.5 py-1.5 bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5">
+      <i class="fa-solid fa-qrcode"></i> QR AC
+    </button>
+  </div>
 
-    <!-- MENU SWITCH ANTARA DATA PER-UNIT AC & JADWAL BULANAN -->
-    <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-3">
-      <div class="flex items-center gap-2 w-full lg:w-auto">
-        <button type="button" onclick="switchMainView('MATRIX')" id="viewBtn-MATRIX" class="flex-1 lg:flex-none px-4 py-2.5 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-table-columns"></i> Data Unit & Matriks 20x Cuci
-        </button>
-        <button type="button" onclick="switchMainView('MONTHLY')" id="viewBtn-MONTHLY" class="flex-1 lg:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-indigo-700 border border-indigo-200 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-calendar-days text-indigo-600"></i> Jadwal Service & Cuci Per-Bulan
+  <!-- ========================================================================= -->
+  <!-- KONTEN UTAMA DASHBOARD MAINTENANCE AC (DENGAN OFFSET SIDEBAR DESKTOP)      -->
+  <!-- ========================================================================= -->
+  <div class="lg:pl-64 p-4 md:p-6 transition-all duration-300">
+    <div class="max-w-7xl mx-auto space-y-6">
+      
+      <!-- HEADER UTAMA -->
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+        <div class="absolute right-0 top-0 -mr-10 -mt-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex items-center space-x-4">
+          <div class="bg-gradient-to-tr from-cyan-600 to-blue-600 p-3.5 rounded-xl shadow-md shadow-cyan-500/20 flex items-center justify-center">
+            <i class="fa-solid fa-snowflake text-white text-2xl"></i>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-600 flex items-center gap-1.5">
+              <i class="fa-solid fa-plane text-[9px]"></i> TEKNIK & MAINTENANCE
+            </p>
+            <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-slate-900 flex items-center gap-3">
+              Dashboard Maintenance & Jadwal Cuci Per-Unit AC
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">Politeknik Penerbangan Surabaya • Rekap Matriks 20x Service & Cuci per Unit AC</p>
+          </div>
+        </div>
+        
+        <!-- TOMBOL AKSI CEPAT HEADER -->
+        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+          <button type="button" onclick="openModal()" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> Tambah Unit
+          </button>
+          <button type="button" onclick="openQrSheetModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+            <i class="fa-solid fa-qrcode text-amber-400"></i> Cetak QR Unit
+          </button>
+        </div>
+      </div>
+
+      <!-- WIDGET MOTIVASI HARIAN -->
+      <div class="bg-gradient-to-r from-cyan-50 via-white to-indigo-50 p-4 rounded-2xl border border-cyan-200 shadow-sm flex items-center gap-4 hover:border-cyan-300 transition">
+        <div class="bg-cyan-100 text-cyan-700 p-3 rounded-xl hidden sm:flex items-center justify-center shrink-0 border border-cyan-200">
+          <i class="fa-solid fa-quote-left text-xl"></i>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <span class="bg-cyan-100 text-cyan-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cyan-200">MOTIVASI HARIAN SARPRAS</span>
+            <span id="quoteDate" class="text-[10px] text-slate-500"></span>
+          </div>
+          <p id="quoteText" class="text-xs md:text-sm font-medium text-slate-700 mt-1 italic">
+            "Kenyamanan fasilitas kampus adalah cerminan dari dedikasi dan kerja keras kita."
+          </p>
+          <p id="quoteAuthor" class="text-[11px] font-bold text-cyan-700 mt-0.5">— Tim K3 & Sarpras Poltekbang</p>
+        </div>
+        <button type="button" onclick="changeQuote()" title="Ganti Motivasi" class="bg-white hover:bg-slate-100 text-slate-600 p-2.5 rounded-xl text-xs transition border border-slate-200 shadow-sm active:scale-95">
+          <i class="fa-solid fa-rotate text-cyan-600"></i>
         </button>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
-        <button type="button" onclick="openScheduleModal()" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-          <i class="fa-solid fa-calendar-check"></i> Generate Jadwal 20x
-        </button>
-        <button type="button" onclick="openImportModal()" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-          <i class="fa-solid fa-file-excel"></i> Import Excel
-        </button>
-        <button type="button" onclick="openModal()" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
-          + Tambah Unit
-        </button>
-        <button type="button" onclick="openQrSheetModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
-          <i class="fa-solid fa-qrcode text-amber-400"></i> Cetak QR Unit
-        </button>
-      </div>
-    </div>
-
-    <!-- TAMPILAN 1: DATA UNIT AC & MATRIKS JADWAL 20X PER-UNIT -->
-    <div id="section-MATRIX" class="space-y-6">
-      <!-- GRAFIK ANALYTICS -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-chart-bar text-cyan-600"></i> Sebaran Jumlah Unit AC per Gedung
-          </h2>
-          <div style="position: relative; height: 220px; width: 100%;">
-            <canvas id="acLocationChart"></canvas>
+      <!-- SEKSI 1: KPI SCORECARDS -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div onclick="openKpiModal('TOTAL')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-cyan-400 hover:bg-cyan-50/30 transition duration-300 active:scale-[0.99]">
+          <div class="flex justify-between items-start">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-cyan-700 transition">Total Unit AC</p>
+            <i class="fa-solid fa-snowflake text-cyan-600 text-xs"></i>
+          </div>
+          <h3 class="text-3xl font-black text-cyan-600 mt-2" id="kpi-unique-ac">0</h3>
+          <div class="flex items-center justify-between mt-1">
+            <p class="text-[11px] text-slate-500" id="kpi-total-sched">0 Total Slot Jadwal</p>
+            <span class="text-[10px] text-cyan-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
           </div>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-chart-pie text-emerald-600"></i> Progres Realisasi Cuci AC
-          </h2>
-          <div style="position: relative; height: 220px; width: 100%;">
-            <canvas id="acStatusPieChart"></canvas>
+        <div onclick="openKpiModal('SELESAI')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-400 hover:bg-emerald-50/30 transition duration-300 active:scale-[0.99]">
+          <div class="flex justify-between items-start">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-emerald-700 transition">Selesai Dicuci</p>
+            <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
+          </div>
+          <h3 class="text-3xl font-black text-emerald-600 mt-2" id="kpi-selesai-ac">0</h3>
+          <div class="flex items-center justify-between mt-1">
+            <p class="text-[11px] text-emerald-600">Slot Cuci Selesai / Baik</p>
+            <span class="text-[10px] text-emerald-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          </div>
+        </div>
+
+        <div onclick="openKpiModal('MENDATANG')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-indigo-400 hover:bg-indigo-50/30 transition duration-300 active:scale-[0.99]">
+          <div class="flex justify-between items-start">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-indigo-700 transition">Jadwal Mendatang</p>
+            <i class="fa-solid fa-calendar-check text-indigo-600 text-xs"></i>
+          </div>
+          <h3 class="text-3xl font-black text-indigo-600 mt-2" id="kpi-proses-ac">0</h3>
+          <div class="flex items-center justify-between mt-1">
+            <p class="text-[11px] text-indigo-600">Antrean Cuci 1–20</p>
+            <span class="text-[10px] text-indigo-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
+          </div>
+        </div>
+
+        <div onclick="openKpiModal('RUSAK')" role="button" tabindex="0" class="cursor-pointer group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-rose-400 hover:bg-rose-50/30 transition duration-300 active:scale-[0.99]">
+          <div class="flex justify-between items-start">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-rose-700 transition">Perlu Perhatian</p>
+            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-xs"></i>
+          </div>
+          <h3 class="text-3xl font-black text-rose-600 mt-2" id="kpi-rusak-ac">0</h3>
+          <div class="flex items-center justify-between mt-1">
+            <p class="text-[11px] text-rose-600">Unit AC Rusak / Kendala</p>
+            <span class="text-[10px] text-rose-600 font-bold opacity-80 group-hover:underline">Lihat Data &rarr;</span>
           </div>
         </div>
       </div>
 
-      <!-- FILTER GEDUNG & PENCARIAN -->
-      <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-        <div class="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-1">
-          <button type="button" onclick="filterByLocation('SEMUA')" id="tab-SEMUA" class="tab-btn px-4 py-2 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow-sm transition whitespace-nowrap">
-            <i class="fa-solid fa-layer-group mr-1.5"></i> SEMUA GEDUNG
-          </button>
-          <button type="button" onclick="filterByLocation('G. UMUM')" id="tab-G. UMUM" class="tab-btn px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs rounded-xl transition whitespace-nowrap">
-            <i class="fa-solid fa-building mr-1.5 text-cyan-600"></i> G. UMUM
-          </button>
-          <button type="button" onclick="filterByLocation('G. LAB')" id="tab-G. LAB" class="tab-btn px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs rounded-xl transition whitespace-nowrap">
-            <i class="fa-solid fa-flask mr-1.5 text-emerald-600"></i> G. LAB
-          </button>
-          <button type="button" onclick="filterByLocation('G. ASRAMA')" id="tab-G. ASRAMA" class="tab-btn px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs rounded-xl transition whitespace-nowrap">
-            <i class="fa-solid fa-bed mr-1.5 text-amber-500"></i> G. ASRAMA
-          </button>
-          <button type="button" onclick="filterByLocation('G. TPU')" id="tab-G. TPU" class="tab-btn px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs rounded-xl transition whitespace-nowrap">
-            <i class="fa-solid fa-plane-arrival mr-1.5 text-purple-600"></i> G. TPU
-          </button>
-        </div>
-
+      <!-- MENU SWITCH ANTARA DATA PER-UNIT AC & JADWAL BULANAN -->
+      <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-3">
         <div class="flex items-center gap-2 w-full lg:w-auto">
-          <div class="relative flex-1 lg:w-72">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari kode unit, ruang, merk..." class="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
-          </div>
-          <button type="button" onclick="exportMatrixPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5 whitespace-nowrap">
-            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+          <button type="button" onclick="switchMainView('MATRIX')" id="viewBtn-MATRIX" class="flex-1 lg:flex-none px-4 py-2.5 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-table-columns"></i> Data Unit & Matriks 20x Cuci
+          </button>
+          <button type="button" onclick="switchMainView('MONTHLY')" id="viewBtn-MONTHLY" class="flex-1 lg:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-indigo-700 border border-indigo-200 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-calendar-days text-indigo-600"></i> Jadwal Service & Cuci Per-Bulan
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+          <button type="button" onclick="openScheduleModal()" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-calendar-check"></i> Generate Jadwal 20x
+          </button>
+          <button type="button" onclick="openImportModal()" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-file-excel"></i> Import Excel
           </button>
         </div>
       </div>
 
-      <!-- TABEL MATRIKS PER-UNIT AC -->
-      <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-        <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <i class="fa-solid fa-snowflake text-cyan-600"></i> Daftar Unit AC & Matriks 20x Jadwal Cuci
+      <!-- TAMPILAN 1: DATA UNIT AC & MATRIKS JADWAL 20X PER-UNIT -->
+      <div id="section-MATRIX" class="space-y-6">
+        <!-- GRAFIK ANALYTICS -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-chart-bar text-cyan-600"></i> Sebaran Jumlah Unit AC per Gedung
             </h2>
-            <p class="text-[11px] text-slate-500 mt-0.5">Klik pada <span class="text-cyan-700 font-bold underline">Kode Unit AC</span> untuk melihat seluruh rincian spesifikasi & 20 jadwal cucinya. Klik kotak tanggal untuk mengubah status selesai.</p>
+            <div style="position: relative; height: 220px; width: 100%;">
+              <canvas id="acLocationChart"></canvas>
+            </div>
           </div>
-        </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
-            <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200" id="thead-matrix"></thead>
-            <tbody id="tbody-ac" class="divide-y divide-slate-200">
-              <tr><td colspan="26" class="text-center py-5 text-slate-400">Memuat data unit AC...</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="p-4 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div class="text-slate-500" id="pagination-info">Menampilkan 0 - 0 dari 0 unit AC</div>
-          <div class="flex items-center space-x-1.5" id="pagination-controls"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAMPILAN 2: MENU TERSENDIRI JADWAL PEMBERSIHAN & SERVICE AC PER-BULAN -->
-    <div id="section-MONTHLY" class="hidden space-y-5">
-      <div class="bg-white p-5 rounded-2xl border border-indigo-200 shadow-sm space-y-4">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <i class="fa-solid fa-calendar-check text-indigo-600"></i> Jadwal Pembersihan & Service AC Per-Bulan
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-chart-pie text-emerald-600"></i> Progres Realisasi Cuci AC
             </h2>
-            <p class="text-xs text-slate-500 mt-0.5">Pilih bulan untuk melihat daftar lengkap unit AC yang dijadwalkan untuk dicuci atau diservis pada bulan tersebut.</p>
-          </div>
-          <button type="button" onclick="exportMonthlyPDF()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2">
-            <i class="fa-solid fa-file-pdf"></i> Cetak Daftar Jadwal Bulan Ini (PDF)
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-200">
-          <div>
-            <label class="block text-[11px] font-bold text-indigo-700 uppercase mb-1">Pilih Bulan & Tahun</label>
-            <select id="monthSelector" onchange="renderMonthlyTable()" class="w-full bg-white border border-indigo-300 text-slate-900 font-bold text-xs rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Filter Gedung</label>
-            <select id="monthlyGedungFilter" onchange="renderMonthlyTable()" class="w-full bg-white border border-slate-300 text-slate-800 font-semibold text-xs rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-              <option value="SEMUA">Semua Gedung</option>
-              <option value="G. UMUM">G. UMUM</option>
-              <option value="G. LAB">G. LAB</option>
-              <option value="G. ASRAMA">G. ASRAMA</option>
-              <option value="G. TPU">G. TPU</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Status Pengerjaan</label>
-            <select id="monthlyStatusFilter" onchange="renderMonthlyTable()" class="w-full bg-white border border-slate-300 text-slate-800 font-semibold text-xs rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-              <option value="ALL">Semua Status Bulan Ini</option>
-              <option value="PENDING">Belum Dicuci (Terjadwal / Proses)</option>
-              <option value="DONE">Sudah Selesai Dicuci (BAIK)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Cari Ruang / Kode AC</label>
-            <input type="text" id="monthlySearchInput" oninput="renderMonthlyTable()" placeholder="Ketik ruang / kode AC..." class="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+            <div style="position: relative; height: 220px; width: 100%;">
+              <canvas id="acStatusPieChart"></canvas>
+            </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-3 pt-2">
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
-            <span class="text-xs text-slate-600 font-semibold">Total AC Bulan Ini</span>
-            <span class="text-lg font-black text-cyan-600" id="month-kpi-total">0</span>
+        <!-- FILTER GEDUNG & PENCARIAN -->
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+          <div class="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-1">
+            <button type="button" onclick="filterByLocation('SEMUA')" id="tab-SEMUA" class="tab-btn px-4 py-2 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow-sm transition whitespace-nowrap">
+              <i class="fa-solid fa-layer-group mr-1.5"></i> SEMUA GEDUNG
+            </button>
+            <button type="button" onclick="filterByLocation('G. UMUM')" id="tab-G. UMUM" class="tab-btn px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs rounded-xl transition whitespace-nowrap">
+              <i class="fa-solid fa-building mr-1.5 text-cyan-600"></i> G. UMUM
+            </button>
+            <button type="button" onclick="filterByLocation('G. LAB')" id="tab-G. LAB" class="tab-btn px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs rounded-xl transition whitespace-nowrap">
+              <i class="fa-solid fa-flask mr-1.5 text-emerald-600"></i> G. LAB
+            </button>
+            <button type="button" onclick="filterByLocation('G. ASRAMA')" id="tab-G. ASRAMA" class="tab-btn px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs rounded-xl transition whitespace-nowrap">
+              <i class="fa-solid fa-bed mr-1.5 text-amber-500"></i> G. ASRAMA
+            </button>
+            <button type="button" onclick="filterByLocation('G. TPU')" id="tab-G. TPU" class="tab-btn px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs rounded-xl transition whitespace-nowrap">
+              <i class="fa-solid fa-plane-arrival mr-1.5 text-purple-600"></i> G. TPU
+            </button>
           </div>
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
-            <span class="text-xs text-slate-600 font-semibold">Belum Dicuci</span>
-            <span class="text-lg font-black text-indigo-600" id="month-kpi-pending">0</span>
+
+          <div class="flex items-center gap-2 w-full lg:w-auto">
+            <div class="relative flex-1 lg:w-72">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari kode unit, ruang, merk..." class="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
+            </div>
+            <button type="button" onclick="exportMatrixPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5 whitespace-nowrap">
+              <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+            </button>
           </div>
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
-            <span class="text-xs text-slate-600 font-semibold">Sudah Selesai</span>
-            <span class="text-lg font-black text-emerald-600" id="month-kpi-done">0</span>
+        </div>
+
+        <!-- TABEL MATRIKS PER-UNIT AC -->
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+          <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-snowflake text-cyan-600"></i> Daftar Unit AC & Matriks 20x Jadwal Cuci
+              </h2>
+              <p class="text-[11px] text-slate-500 mt-0.5">Klik pada <span class="text-cyan-700 font-bold underline">Kode Unit AC</span> untuk melihat seluruh rincian spesifikasi & 20 jadwal cucinya. Klik kotak tanggal untuk mengubah status selesai.</p>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+              <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200" id="thead-matrix"></thead>
+              <tbody id="tbody-ac" class="divide-y divide-slate-200">
+                <tr><td colspan="26" class="text-center py-5 text-slate-400">Memuat data unit AC...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-4 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+            <div class="text-slate-500" id="pagination-info">Menampilkan 0 - 0 dari 0 unit AC</div>
+            <div class="flex items-center space-x-1.5" id="pagination-controls"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAMPILAN 2: MENU TERSENDIRI JADWAL PEMBERSIHAN & SERVICE AC PER-BULAN -->
+      <div id="section-MONTHLY" class="hidden space-y-5">
+        <div class="bg-white p-5 rounded-2xl border border-indigo-200 shadow-sm space-y-4">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-calendar-check text-indigo-600"></i> Jadwal Pembersihan & Service AC Per-Bulan
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Pilih bulan untuk melihat daftar lengkap unit AC yang dijadwalkan untuk dicuci atau diservis pada bulan tersebut.</p>
+            </div>
+            <button type="button" onclick="exportMonthlyPDF()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2">
+              <i class="fa-solid fa-file-pdf"></i> Cetak Daftar Jadwal Bulan Ini (PDF)
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-200">
+            <div>
+              <label class="block text-[11px] font-bold text-indigo-700 uppercase mb-1">Pilih Bulan & Tahun</label>
+              <select id="monthSelector" onchange="renderMonthlyTable()" class="w-full bg-white border border-indigo-300 text-slate-900 font-bold text-xs rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Filter Gedung</label>
+              <select id="monthlyGedungFilter" onchange="renderMonthlyTable()" class="w-full bg-white border border-slate-300 text-slate-800 font-semibold text-xs rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <option value="SEMUA">Semua Gedung</option>
+                <option value="G. UMUM">G. UMUM</option>
+                <option value="G. LAB">G. LAB</option>
+                <option value="G. ASRAMA">G. ASRAMA</option>
+                <option value="G. TPU">G. TPU</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Status Pengerjaan</label>
+              <select id="monthlyStatusFilter" onchange="renderMonthlyTable()" class="w-full bg-white border border-slate-300 text-slate-800 font-semibold text-xs rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <option value="ALL">Semua Status Bulan Ini</option>
+                <option value="PENDING">Belum Dicuci (Terjadwal / Proses)</option>
+                <option value="DONE">Sudah Selesai Dicuci (BAIK)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Cari Ruang / Kode AC</label>
+              <input type="text" id="monthlySearchInput" oninput="renderMonthlyTable()" placeholder="Ketik ruang / kode AC..." class="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 pt-2">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+              <span class="text-xs text-slate-600 font-semibold">Total AC Bulan Ini</span>
+              <span class="text-lg font-black text-cyan-600" id="month-kpi-total">0</span>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+              <span class="text-xs text-slate-600 font-semibold">Belum Dicuci</span>
+              <span class="text-lg font-black text-indigo-600" id="month-kpi-pending">0</span>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+              <span class="text-xs text-slate-600 font-semibold">Sudah Selesai</span>
+              <span class="text-lg font-black text-emerald-600" id="month-kpi-done">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+              <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
+                <tr>
+                  <th class="px-4 py-3.5 font-bold text-center">No</th>
+                  <th class="px-4 py-3.5 font-bold">Tanggal Jadwal</th>
+                  <th class="px-4 py-3.5 font-bold">Kode Unit AC</th>
+                  <th class="px-4 py-3.5 font-bold">Gedung / Lantai / Ruang</th>
+                  <th class="px-4 py-3.5 font-bold">Merk & Kapasitas</th>
+                  <th class="px-4 py-3.5 font-bold">Siklus Cuci</th>
+                  <th class="px-4 py-3.5 font-bold">Status</th>
+                  <th class="px-4 py-3.5 font-bold text-center">Aksi Cepat</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-monthly" class="divide-y divide-slate-200">
+                <tr><td colspan="8" class="text-center py-6 text-slate-400">Memuat jadwal bulanan...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="p-4 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+            <div class="text-slate-500" id="monthly-pagination-info">Menampilkan 0 - 0 dari 0 jadwal</div>
+            <div class="flex items-center space-x-1.5" id="monthly-pagination-controls"></div>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
-            <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
-              <tr>
-                <th class="px-4 py-3.5 font-bold text-center">No</th>
-                <th class="px-4 py-3.5 font-bold">Tanggal Jadwal</th>
-                <th class="px-4 py-3.5 font-bold">Kode Unit AC</th>
-                <th class="px-4 py-3.5 font-bold">Gedung / Lantai / Ruang</th>
-                <th class="px-4 py-3.5 font-bold">Merk & Kapasitas</th>
-                <th class="px-4 py-3.5 font-bold">Siklus Cuci</th>
-                <th class="px-4 py-3.5 font-bold">Status</th>
-                <th class="px-4 py-3.5 font-bold text-center">Aksi Cepat</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-monthly" class="divide-y divide-slate-200">
-              <tr><td colspan="8" class="text-center py-6 text-slate-400">Memuat jadwal bulanan...</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="p-4 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div class="text-slate-500" id="monthly-pagination-info">Menampilkan 0 - 0 dari 0 jadwal</div>
-          <div class="flex items-center space-x-1.5" id="monthly-pagination-controls"></div>
-        </div>
-      </div>
     </div>
-
   </div>
 
   <!-- MODAL RINCIAN DATA DARI KLIK KARTU KPI -->
@@ -650,7 +756,31 @@
         .replace(/"/g, '&quot;');
     }
 
+    function toggleMobileSidebar(show) {
+      const sidebar = document.getElementById('appSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (show) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function startSidebarClock() {
+      const update = () => {
+        const el = document.getElementById('sidebarClock');
+        if (el) {
+          el.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+      };
+      update();
+      setInterval(update, 1000);
+    }
+
     document.addEventListener('DOMContentLoaded', () => { 
+      startSidebarClock();
       initNavLoader();
       initQuote();
       renderMatrixHeader();
