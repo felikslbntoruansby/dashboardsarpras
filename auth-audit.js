@@ -1,0 +1,212 @@
+// auth-audit.js
+const AUTH_SUPABASE_URL = 'https://xlompxgjdifbthgpkphv.supabase.co';
+const AUTH_SUPABASE_KEY = 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
+
+const authDb = window.supabase.createClient(AUTH_SUPABASE_URL, AUTH_SUPABASE_KEY);
+window.currentUserProfile = null;
+
+// 1. Inisialisasi Sesi & Hak Akses
+async function initRoleAccess() {
+  if (!window.supabase) {
+    console.error('Library @supabase/supabase-js belum dimuat sebelum auth-audit.js');
+    return;
+  }
+
+  const { data: { session }, error: sessionErr } = await authDb.auth.getSession();
+
+  if (sessionErr || !session) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const { data: profile, error: profErr } = await authDb
+    .from('user_profiles')
+    .select('*')
+    .eq('id', session.user.id)
+    .single();
+
+  if (profErr || !profile) {
+    alert('Profil peran tidak ditemukan di user_profiles. Silakan hubungi Super Admin.');
+    await authDb.auth.signOut();
+    window.location.href = 'login.html';
+    return;
+  }
+
+  window.currentUserProfile = profile;
+  renderUserBadgeSidebar(profile, session.user.email);
+  applyRolePermissions(profile.role);
+
+  // Pantau elemen dinamis (misalnya baris tabel yang baru dirender dari Supabase)
+  const observer = new MutationObserver(() => applyRolePermissions(profile.role));
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// 2. Terapkan Pembatasan Akses UI Berdasarkan Role
+function applyRolePermissions(role) {
+  // Khusus Super Admin (Hapus Data, Import Excel, Tambah Master)
+  if (role !== 'super_admin') {
+    document.querySelectorAll('.role-admin-only').forEach(el => {
+      el.style.display = 'none';
+    });
+  }
+
+  // Operasional (Update Cuci AC, Stok Keluar) -> Dikunci untuk Viewer
+  if (role === 'viewer') {
+    document.querySelectorAll('.role-operator-action').forEach(el => {
+      el.disabled = true;
+      el.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+      el.title = 'Mode Pimpinan / Viewer (Hanya Lihat)';
+    });
+  }
+}
+
+// 3. Render Kartu Profil, Tombol Audit Log, & Tombol Logout di Sidebar
+function renderUserBadgeSidebar(profile, email) {
+  const sidebar = document.querySelector('aside');
+  if (!sidebar || document.getElementById('user-profile-box')) return;
+
+  const roleLabels = {
+    super_admin: { text: 'Super Admin', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
+    teknisi: { text: 'Teknisi', color: 'bg-sky-500/20 text-sky-300 border-sky-500/30' },
+    viewer: { text: 'Pimpinan', color: 'bg-amber-500/20 text-amber-300 border-amber-500/30' }
+  };
+
+  const badge = roleLabels[profile.role] || roleLabels.viewer;
+  const canViewAudit = profile.role === 'super_admin' || profile.role === 'viewer';
+
+  const box = document.createElement('div');
+  box.id = 'user-profile-box';
+  box.className = 'mt-auto p-3 m-3 rounded-xl bg-slate-800/90 border border-slate-700/80 text-slate-200 space-y-2';
+  box.innerHTML = `
+    <div class="flex items-center justify-between gap-2">
+      <div class="min-w-0">
+        <p class="text-xs font-semibold text-white truncate">${profile.nama_lengkap}</p>
+        <p class="text-[11px] text-slate-400 truncate">${profile.jabatan || email}</p>
+      </div>
+      <span class="px-2 py-0.5 text-[10px] font-medium rounded-full border ${badge.color} shrink-0">
+        ${badge.text}
+      </span>
+    </div>
+    ${canViewAudit ? `
+      <button onclick="bukaModalAuditLog()" class="w-full py-1.5 px-3 rounded-lg bg-slate-700/70 hover:bg-slate-700 text-slate-200 border border-slate-600/60 text-xs font-medium transition flex items-center justify-center gap-1.5">
+        <span>📋 Jejak Audit (Log)</span>
+      </button>
+    ` : ''}
+    <button onclick="logoutMonsarpras()" class="w-full py-1.5 px-3 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/25 text-xs font-medium transition flex items-center justify-center gap-1.5">
+      <span>Keluar / Logout</span>
+    </button>
+  `;
+  sidebar.appendChild(box);
+}
+
+// 4. Fungsi Logout
+window.logoutMonsarpras = async function() {
+  await authDb.auth.signOut();
+  window.location.href = 'login.html';
+};
+
+// 5. Fungsi Global Pencatat Jejak Audit
+window.catatLogAktivitas = async function({ modul, aksi, targetData, detail = {} }) {
+  if (!window.currentUserProfile) return;
+
+  const { error } = await authDb.from('activity_logs').insert([{
+    user_id: window.currentUserProfile.id,
+    user_name: window.currentUserProfile.nama_lengkap,
+    user_role: window.currentUserProfile.role,
+    modul: modul,
+    aksi: aksi,
+    target_data: targetData,
+    detail: detail
+  }]);
+
+  if (error) console.error('Gagal mencatat log aktivitas:', error.message);
+};
+
+// 6. Modal Penampil Jejak Audit (Activity Logs)
+window.bukaModalAuditLog = async function() {
+  let modal = document.getElementById('modal-audit-log');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-audit-log';
+    modal.className = 'fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4';
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <div>
+            <h3 class="text-base font-bold text-slate-800">Jejak Audit & Riwayat Aktivitas Sistem</h3>
+            <p class="text-xs text-slate-500">Menampilkan 50 aktivitas perubahan data terbaru di MONSARPRAS</p>
+          </div>
+          <button onclick="document.getElementById('modal-audit-log').classList.add('hidden')" class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold">
+            Tutup ✕
+          </button>
+        </div>
+        <div id="audit-log-body" class="p-6 overflow-y-auto flex-1 text-sm text-slate-600">
+          Memuat riwayat aktivitas...
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  } else {
+    modal.classList.remove('hidden');
+  }
+
+  const container = document.getElementById('audit-log-body');
+  container.innerHTML = '<p class="text-center py-8 text-slate-400">Memuat data log dari Supabase...</p>';
+
+  const { data: logs, error } = await authDb
+    .from('activity_logs')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) {
+    container.innerHTML = `<p class="text-rose-600">Gagal memuat log: ${error.message}</p>`;
+    return;
+  }
+
+  if (!logs || logs.length === 0) {
+    container.innerHTML = '<p class="text-center py-8 text-slate-400">Belum ada aktivitas yang tercatat.</p>';
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead class="bg-slate-100 text-slate-600 uppercase font-semibold border-b border-slate-200">
+          <tr>
+            <th class="py-3 px-4">Waktu</th>
+            <th class="py-3 px-4">Petugas</th>
+            <th class="py-3 px-4">Modul</th>
+            <th class="py-3 px-4">Aksi</th>
+            <th class="py-3 px-4">Data yang Diubah</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          ${logs.map(log => {
+            const waktu = new Date(log.created_at).toLocaleString('id-ID', {
+              day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            return `
+              <tr class="hover:bg-slate-50">
+                <td class="py-2.5 px-4 whitespace-nowrap text-slate-500">${waktu}</td>
+                <td class="py-2.5 px-4 font-medium text-slate-800">
+                  ${log.user_name}
+                  <span class="block text-[10px] text-slate-400 uppercase">${log.user_role}</span>
+                </td>
+                <td class="py-2.5 px-4 text-slate-700">${log.modul}</td>
+                <td class="py-2.5 px-4">
+                  <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold border border-blue-200">
+                    ${log.aksi}
+                  </span>
+                </td>
+                <td class="py-2.5 px-4 text-slate-700">${log.target_data}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+};
+
+document.addEventListener('DOMContentLoaded', initRoleAccess);

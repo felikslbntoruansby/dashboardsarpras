@@ -11,6 +11,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @keyframes radarPulse {
       0% { transform: scale(0.9); opacity: 0.8; }
@@ -108,12 +109,12 @@
           <span>Jadwal Cuci Per-Bulan</span>
         </button>
 
-        <button type="button" onclick="toggleMobileSidebar(false); openScheduleModal();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+        <button type="button" onclick="toggleMobileSidebar(false); openScheduleModal();" class="role-admin-only w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
           <i class="fa-solid fa-calendar-check w-4 text-center text-indigo-400"></i>
           <span>Generate Jadwal 20x</span>
         </button>
 
-        <button type="button" onclick="toggleMobileSidebar(false); openModal();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+        <button type="button" onclick="toggleMobileSidebar(false); openModal();" class="role-admin-only w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
           <i class="fa-solid fa-plus-circle w-4 text-center text-cyan-400"></i>
           <span>Tambah Unit AC Baru</span>
         </button>
@@ -182,7 +183,7 @@
         
         <!-- TOMBOL AKSI CEPAT HEADER -->
         <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
-          <button type="button" onclick="openModal()" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+          <button type="button" onclick="openModal()" class="role-admin-only px-3.5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
             <i class="fa-solid fa-plus"></i> Tambah Unit
           </button>
           <button type="button" onclick="openQrSheetModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
@@ -274,10 +275,10 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
-          <button type="button" onclick="openScheduleModal()" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+          <button type="button" onclick="openScheduleModal()" class="role-admin-only px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
             <i class="fa-solid fa-calendar-check"></i> Generate Jadwal 20x
           </button>
-          <button type="button" onclick="openImportModal()" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+          <button type="button" onclick="openImportModal()" class="role-admin-only px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
             <i class="fa-solid fa-file-excel"></i> Import Excel
           </button>
         </div>
@@ -622,7 +623,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
           <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan Data</button>
+          <button type="submit" class="role-admin-only px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan Data</button>
         </div>
       </form>
     </div>
@@ -658,7 +659,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
           <button type="button" onclick="closeScheduleModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" id="btnSubmitSchedule" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm">Buat Jadwal Per-AC</button>
+          <button type="submit" id="btnSubmitSchedule" class="role-admin-only px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm">Buat Jadwal Per-AC</button>
         </div>
       </form>
     </div>
@@ -676,7 +677,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
           <button type="button" onclick="closeImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" id="btnSubmitImport" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm">Mulai Import</button>
+          <button type="submit" id="btnSubmitImport" class="role-admin-only px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm">Mulai Import</button>
         </div>
       </form>
     </div>
@@ -1171,7 +1172,7 @@
                 <td class="px-4 py-3 text-slate-600">${escHtml(item.merk_ac || '-')} ${item.kapasitas ? '(' + escHtml(item.kapasitas) + ')' : ''}</td>
                 <td class="px-4 py-3 text-indigo-700 font-semibold">${escHtml(item.catatan || item.jenis_pekerjaan || '-')}</td>
                 <td class="px-4 py-3 text-center">
-                  <button type="button" onclick="toggleScheduleStatus(${item.id})" class="${btnClass} px-3 py-1 rounded-lg text-[11px] font-bold transition">${btnLabel}</button>
+                  <button type="button" onclick="toggleScheduleStatus(${item.id})" class="role-operator-action ${btnClass} px-3 py-1 rounded-lg text-[11px] font-bold transition">${btnLabel}</button>
                 </td>
               </tr>
             `;
@@ -1321,7 +1322,7 @@
 
             cycleCells += `
               <td class="px-2 py-2.5 text-center border-l border-slate-200">
-                <button type="button" onclick="toggleScheduleStatus(${sched.id})" title="Klik untuk ubah status Cuci ke-${c + 1} (${escHtml(sched.tgl_servis)})" class="${pillStyle} border px-2 py-1 rounded-lg text-[10px] font-mono font-bold transition active:scale-95">
+                <button type="button" onclick="toggleScheduleStatus(${sched.id})" title="Klik untuk ubah status Cuci ke-${c + 1} (${escHtml(sched.tgl_servis)})" class="role-operator-action ${pillStyle} border px-2 py-1 rounded-lg text-[10px] font-mono font-bold transition active:scale-95">
                   ${iconStatus}${escHtml(formatShortDate(sched.tgl_servis))}
                 </button>
               </td>
@@ -1345,8 +1346,8 @@
             ${cycleCells}
             <td class="px-4 py-3 text-center space-x-2 border-l border-slate-200">
               <button type="button" onclick="openUnitDetailModal('${escJs(unit.kode_unit)}')" class="text-cyan-700 hover:underline font-bold text-xs">Detail</button>
-              <button type="button" onclick="editItem(${unit.baseRow.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
-              <button type="button" onclick="deleteUnit('${escJs(unit.kode_unit)}')" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
+              <button type="button" onclick="editItem(${unit.baseRow.id})" class="role-admin-only text-blue-600 hover:underline font-bold text-xs">Edit</button>
+              <button type="button" onclick="deleteUnit('${escJs(unit.kode_unit)}')" class="role-admin-only text-rose-600 hover:underline font-bold text-xs">Hapus</button>
             </td>
           </tr>
         `;
@@ -1438,7 +1439,7 @@
             <td class="px-4 py-3.5 text-indigo-700 font-semibold">${escHtml(item.catatan || item.jenis_pekerjaan || '-')}</td>
             <td class="px-4 py-3.5">${statusBadge}</td>
             <td class="px-4 py-3.5 text-center space-x-2">
-              <button type="button" onclick="toggleScheduleStatus(${item.id})" class="${btnClass} px-3 py-1 rounded-lg font-bold text-[11px] transition">${btnLabel}</button>
+              <button type="button" onclick="toggleScheduleStatus(${item.id})" class="role-operator-action ${btnClass} px-3 py-1 rounded-lg font-bold text-[11px] transition">${btnLabel}</button>
             </td>
           </tr>
         `;
@@ -1484,7 +1485,7 @@
         const badgeColor = isDone ? 'text-emerald-700' : 'text-indigo-700';
 
         return `
-          <button type="button" onclick="toggleScheduleStatus(${s.id})" class="${cardStyle} border p-3 rounded-xl text-left transition flex flex-col justify-between">
+          <button type="button" onclick="toggleScheduleStatus(${s.id})" class="role-operator-action ${cardStyle} border p-3 rounded-xl text-left transition flex flex-col justify-between">
             <div class="flex justify-between items-center w-full">
               <span class="text-[10px] font-bold uppercase text-slate-500">Cuci ke-${idx + 1}</span>
               <span class="text-[9px] font-black ${badgeColor}">${badgeText}</span>
@@ -1616,6 +1617,11 @@
     }
 
     async function toggleScheduleStatus(id) {
+      if (window.currentUserProfile && window.currentUserProfile.role === 'viewer') {
+        showToast("Akses ditolak: Mode Pimpinan (Hanya Lihat).", "error");
+        return;
+      }
+
       const item = acData.find(i => i.id === id);
       if (!item) return;
 
@@ -1638,6 +1644,15 @@
           if (activeDetailKode) openUnitDetailModal(activeDetailKode, true);
           if (activeKpiType) renderKpiModalTable();
           showToast(`${item.kode_unit} (${item.tgl_servis}) -> ${nextStatus === 'BAIK' ? 'Selesai Dicuci' : 'Terjadwal'}`, "success");
+
+          if (window.catatLogAktivitas) {
+            await window.catatLogAktivitas({
+              modul: 'Maintenance AC',
+              aksi: 'UPDATE_CUCI',
+              targetData: `${item.kode_unit} (${item.tgl_servis}) — ${item.ruang || item.gedung || ''}`,
+              detail: { status_lama: currentStatus, status_baru: nextStatus, catatan: item.catatan }
+            });
+          }
         }
       } catch (err) {
         showToast("Gagal memperbarui status: " + err.message, "error");
@@ -1645,6 +1660,11 @@
     }
 
     function openModal(editObj = null) {
+      if (window.currentUserProfile && window.currentUserProfile.role !== 'super_admin') {
+        showToast("Akses ditolak: Hanya Super Admin yang dapat menambah atau mengedit master unit AC.", "error");
+        return;
+      }
+
       document.getElementById('editId').value = editObj ? editObj.id : '';
       document.getElementById('modalTitle').innerText = editObj ? "Edit Data Unit AC" : "Input Data Unit AC";
       document.getElementById('kategori_gedung').value = editObj ? (editObj.kategori_gedung || 'G. UMUM') : 'G. UMUM';
@@ -1670,10 +1690,20 @@
     }
 
     function closeModal() { document.getElementById('acModal').classList.add('hidden'); }
-    function openImportModal() { document.getElementById('importModal').classList.remove('hidden'); }
+    function openImportModal() {
+      if (window.currentUserProfile && window.currentUserProfile.role !== 'super_admin') {
+        showToast("Akses ditolak: Hanya Super Admin yang dapat melakukan Import Excel.", "error");
+        return;
+      }
+      document.getElementById('importModal').classList.remove('hidden');
+    }
     function closeImportModal() { document.getElementById('importModal').classList.add('hidden'); }
 
     function openScheduleModal() {
+      if (window.currentUserProfile && window.currentUserProfile.role !== 'super_admin') {
+        showToast("Akses ditolak: Hanya Super Admin yang dapat membuat jadwal massal.", "error");
+        return;
+      }
       document.getElementById('schedStartDate').value = new Date().toISOString().split('T')[0];
       document.getElementById('scheduleModal').classList.remove('hidden');
     }
@@ -1754,6 +1784,14 @@
 
       try {
         await sendBulkInChunks(generatedItems, false, btn, "Buat Jadwal Per-AC");
+        if (window.catatLogAktivitas) {
+          await window.catatLogAktivitas({
+            modul: 'Maintenance AC',
+            aksi: 'GENERATE_JADWAL',
+            targetData: `${groupedUnits.length} Unit AC (${totalCycles}x siklus mulai ${startDateStr})`,
+            detail: { interval_hari: intervalDays, total_slot: generatedItems.length }
+          });
+        }
         showToast(`Berhasil membuat jadwal ${totalCycles}x cuci untuk masing-masing ${groupedUnits.length} unit AC!`, "success");
         closeScheduleModal();
         await loadAcData();
@@ -1877,6 +1915,13 @@
 
           btn.disabled = true;
           await sendBulkInChunks(parsedItems, false, btn, "Mulai Import");
+          if (window.catatLogAktivitas) {
+            await window.catatLogAktivitas({
+              modul: 'Maintenance AC',
+              aksi: 'IMPORT_EXCEL',
+              targetData: `${parsedItems.length} Unit AC dari file ${file.name}`
+            });
+          }
           showToast(`Berhasil meng-import ${parsedItems.length.toLocaleString('id-ID')} unit AC!`, "success");
           closeImportModal();
           await loadAcData();
@@ -1896,11 +1941,25 @@
     }
 
     async function deleteUnit(kodeUnit) {
+      if (window.currentUserProfile && window.currentUserProfile.role !== 'super_admin') {
+        showToast("Akses ditolak: Hanya Super Admin yang dapat menghapus unit AC.", "error");
+        return;
+      }
+
       if (confirm(`Hapus seluruh jadwal unit AC ${kodeUnit} dari database?`)) {
         try {
           const rowsToDelete = acData.filter(i => i.kode_unit === kodeUnit);
+          const lokasiInfo = rowsToDelete[0] ? (rowsToDelete[0].ruang || rowsToDelete[0].gedung || '') : '';
           for (const r of rowsToDelete) {
             await fetch(`/api/maintenance-ac/${r.id}`, { method: 'DELETE' });
+          }
+          if (window.catatLogAktivitas) {
+            await window.catatLogAktivitas({
+              modul: 'Maintenance AC',
+              aksi: 'HAPUS_DATA',
+              targetData: `Unit AC ${kodeUnit} (${lokasiInfo})`,
+              detail: { total_baris_dihapus: rowsToDelete.length }
+            });
           }
           showToast(`Unit ${kodeUnit} berhasil dihapus!`, "success");
           await loadAcData();
@@ -1910,6 +1969,11 @@
 
     async function handleFormSubmit(e) {
       e.preventDefault();
+      if (window.currentUserProfile && window.currentUserProfile.role !== 'super_admin') {
+        showToast("Akses ditolak: Hanya Super Admin yang dapat menyimpan master unit AC.", "error");
+        return;
+      }
+
       const editId = document.getElementById('editId').value;
       const gedung = document.getElementById('gedung').value;
       const lantai = document.getElementById('lantai').value;
@@ -1942,6 +2006,14 @@
 
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (res.ok) {
+        if (window.catatLogAktivitas) {
+          await window.catatLogAktivitas({
+            modul: 'Maintenance AC',
+            aksi: editId ? 'EDIT_DATA' : 'TAMBAH_DATA',
+            targetData: `${payload.kode_unit} — ${payload.ruang || payload.gedung}`,
+            detail: { status: payload.status, merk: payload.merk_ac }
+          });
+        }
         closeModal();
         showToast(editId ? "Data AC berhasil diubah!" : "Data AC berhasil ditambah!", "success");
         await loadAcData();
@@ -2151,5 +2223,6 @@
       printWin.document.close();
     }
   </script>
+  <script src="auth-audit.js"></script>
 </body>
 </html>

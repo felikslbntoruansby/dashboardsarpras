@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @keyframes radarPulse {
       0% { transform: scale(0.9); opacity: 0.8; }
@@ -59,7 +60,7 @@
   <!-- SIDEBAR KIRI TERPADU (RESPONSIF DESKTOP & MOBILE)                         -->
   <!-- ========================================================================= -->
   <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
-    <div>
+    <div class="overflow-y-auto">
       <!-- BRANDING INSTANSI -->
       <div class="p-5 border-b border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -378,7 +379,7 @@
             <button onclick="exportRuanganPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
               <i class="fa-solid fa-file-pdf"></i> Cetak PDF
             </button>
-            <button onclick="openRuanganModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+            <button onclick="openRuanganModal()" class="role-operator-action px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
               + Pinjam Ruangan
             </button>
           </div>
@@ -419,7 +420,7 @@
             <button onclick="exportKendaraanPDF()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
               <i class="fa-solid fa-file-pdf"></i> Cetak PDF
             </button>
-            <button onclick="openKendaraanModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+            <button onclick="openKendaraanModal()" class="role-operator-action px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
               + Pinjam Kendaraan
             </button>
           </div>
@@ -460,11 +461,11 @@
       </div>
       <p class="text-xs text-slate-500 mb-4">Pilih jenis layanan yang ingin dijadwalkan pada tanggal ini:</p>
       <div class="space-y-2.5">
-        <button onclick="quickBookFromCalendar('RUANGAN')" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-between transition">
+        <button onclick="quickBookFromCalendar('RUANGAN')" class="role-operator-action w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-between transition">
           <span><i class="fa-solid fa-door-open mr-2"></i> Pinjam Ruangan / Aula</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
-        <button onclick="quickBookFromCalendar('KENDARAAN')" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-between transition">
+        <button onclick="quickBookFromCalendar('KENDARAAN')" class="role-operator-action w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-between transition">
           <span><i class="fa-solid fa-car-side mr-2"></i> Pinjam Kendaraan Dinas</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
@@ -615,7 +616,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
           <button type="button" onclick="closeRuanganModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" id="btnSubmitRuangan" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
+          <button type="submit" id="btnSubmitRuangan" class="role-operator-action px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
         </div>
       </form>
     </div>
@@ -664,7 +665,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
           <button type="button" onclick="closeKendaraanModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
-          <button type="submit" id="btnSubmitKendaraan" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
+          <button type="submit" id="btnSubmitKendaraan" class="role-operator-action px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm">Simpan</button>
         </div>
       </form>
     </div>
@@ -679,7 +680,7 @@
     let kioskAutoRefreshTimer = null;
 
     // STATE KALENDER INTERAKTIF
-    let calendarViewMode = 'MONTH'; // 'MONTH' | 'WEEK'
+    let calendarViewMode = 'MONTH';
     let calendarCursorDate = new Date();
     let selectedQuickDateStr = '';
 
@@ -699,12 +700,10 @@
       initQuote();
       loadAllRtData();
 
-      // Cek jika dibuka langsung dengan parameter ?kiosk=1
       if (new URLSearchParams(window.location.search).get('kiosk') === '1') {
         toggleKioskMode(true);
       }
 
-      // Pintasan tombol ESC untuk keluar dari Mode Monitor TV
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && document.body.classList.contains('kiosk-active')) {
           toggleKioskMode(false);
@@ -712,9 +711,6 @@
       });
     });
 
-    // =========================================================================
-    // LOGIKA SIDEBAR TERPADU & MODE MONITOR TV (KIOSK)
-    // =========================================================================
     function initSidebarActiveState() {
       const currentPath = window.location.pathname.toLowerCase();
       document.querySelectorAll('.sidebar-nav-item').forEach(link => {
@@ -768,7 +764,6 @@
           document.documentElement.requestFullscreen().catch(() => {});
         }
 
-        // Auto-refresh data tiap 30 detik saat Mode TV aktif
         if (kioskAutoRefreshTimer) clearInterval(kioskAutoRefreshTimer);
         kioskAutoRefreshTimer = setInterval(loadAllRtData, 30000);
         showToast("Mode Monitor TV Aktif (Auto-refresh 30 detik)", "success");
@@ -881,9 +876,6 @@
       if (dlK) dlK.innerHTML = uniqueCars.map(name => `<option value="${name}">`).join('');
     }
 
-    // =========================================================================
-    // LOGIKA DETEKSI ANTI-BENTROK (RUANGAN & KENDARAAN)
-    // =========================================================================
     function normalizeText(str) {
       return String(str || '').trim().toUpperCase().replace(/\s+/g, ' ');
     }
@@ -991,9 +983,6 @@
       }
     }
 
-    // =========================================================================
-    // RENDER KALENDER INTERAKTIF BULANAN & MINGGUAN
-    // =========================================================================
     function formatDateYMD(dateObj) {
       const y = dateObj.getFullYear();
       const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1171,6 +1160,10 @@
 
     function openCalQuickBook(ymdStr) {
       if (document.body.classList.contains('kiosk-active')) return;
+      if (window.currentUserProfile && window.currentUserProfile.role === 'viewer') {
+        showToast("Mode Pimpinan (Hanya Lihat): Tidak dapat membuat jadwal baru.", "error");
+        return;
+      }
       selectedQuickDateStr = ymdStr;
       document.getElementById('calQuickDateTitle').innerText = `Tanggal: ${ymdStr}`;
       document.getElementById('calQuickBookModal').classList.remove('hidden');
@@ -1198,6 +1191,8 @@
       const keperluan = document.getElementById('calEvKeperluan');
       const actions = document.getElementById('calEvActions');
 
+      const isViewer = window.currentUserProfile && window.currentUserProfile.role === 'viewer';
+
       if (jenis === 'RUANGAN') {
         const r = ruanganData.find(item => item.id === id);
         if (!r) return;
@@ -1209,13 +1204,17 @@
         status.innerHTML = getStatusBadge(r.status);
         keperluan.innerText = r.keperluan || '-';
 
-        const approveBtn = classifyStatus(r.status) === 'PROSES'
-          ? `<button onclick="closeCalEventDetailModal(); quickApproveService('RUANGAN', ${r.id})" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs">Setujui</button>`
-          : '';
-        actions.innerHTML = `
-          ${approveBtn}
-          <button onclick="closeCalEventDetailModal(); openRuanganModal(${r.id})" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs">Edit Jadwal</button>
-        `;
+        if (isViewer) {
+          actions.innerHTML = `<span class="text-[11px] text-slate-400 italic">Mode Pimpinan (Hanya Lihat)</span>`;
+        } else {
+          const approveBtn = classifyStatus(r.status) === 'PROSES'
+            ? `<button onclick="closeCalEventDetailModal(); quickApproveService('RUANGAN', ${r.id})" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs">Setujui</button>`
+            : '';
+          actions.innerHTML = `
+            ${approveBtn}
+            <button onclick="closeCalEventDetailModal(); openRuanganModal(${r.id})" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs">Edit Jadwal</button>
+          `;
+        }
       } else {
         const k = kendaraanData.find(item => item.id === id);
         if (!k) return;
@@ -1227,13 +1226,17 @@
         status.innerHTML = getStatusBadge(k.status);
         keperluan.innerText = k.tujuan || '-';
 
-        const approveBtn = classifyStatus(k.status) === 'PROSES'
-          ? `<button onclick="closeCalEventDetailModal(); quickApproveService('KENDARAAN', ${k.id})" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs">Setujui</button>`
-          : '';
-        actions.innerHTML = `
-          ${approveBtn}
-          <button onclick="closeCalEventDetailModal(); openKendaraanModal(${k.id})" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs">Edit Jadwal</button>
-        `;
+        if (isViewer) {
+          actions.innerHTML = `<span class="text-[11px] text-slate-400 italic">Mode Pimpinan (Hanya Lihat)</span>`;
+        } else {
+          const approveBtn = classifyStatus(k.status) === 'PROSES'
+            ? `<button onclick="closeCalEventDetailModal(); quickApproveService('KENDARAAN', ${k.id})" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs">Setujui</button>`
+            : '';
+          actions.innerHTML = `
+            ${approveBtn}
+            <button onclick="closeCalEventDetailModal(); openKendaraanModal(${k.id})" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs">Edit Jadwal</button>
+          `;
+        }
       }
 
       document.getElementById('calEventDetailModal').classList.remove('hidden');
@@ -1243,9 +1246,6 @@
       document.getElementById('calEventDetailModal').classList.add('hidden');
     }
 
-    // =========================================================================
-    // KPI, GRAFIK, & TABEL RUMAH TANGGA
-    // =========================================================================
     function classifyStatus(statusStr) {
       const s = (statusStr || '').toUpperCase();
       if (s.includes('MAINTENANCE') || s.includes('TOLAK') || s.includes('RUSAK') || s.includes('KENDALA')) return 'MAINTENANCE';
@@ -1410,7 +1410,7 @@
         else if (item.kategoriStatus === 'MAINTENANCE') stColor = 'bg-rose-50 text-rose-700 border-rose-200';
 
         const approveBtn = item.kategoriStatus === 'PROSES'
-          ? `<button onclick="quickApproveService('${item.jenis}', ${item.rawId})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">Setujui</button>`
+          ? `<button onclick="quickApproveService('${item.jenis}', ${item.rawId})" class="role-operator-action bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">Setujui</button>`
           : `<span class="text-slate-400 text-[11px]">-</span>`;
 
         return `
@@ -1429,6 +1429,11 @@
     }
 
     async function quickApproveService(jenis, id) {
+      if (window.currentUserProfile && window.currentUserProfile.role === 'viewer') {
+        showToast("Akses ditolak: Mode Pimpinan (Hanya Lihat).", "error");
+        return;
+      }
+
       try {
         if (jenis === 'RUANGAN') {
           const item = ruanganData.find(r => r.id === id);
@@ -1439,6 +1444,13 @@
             body: JSON.stringify({ ...item, status: 'Disetujui' })
           });
           if (res.ok) {
+            if (window.catatLogAktivitas) {
+              await window.catatLogAktivitas({
+                modul: 'Rumah Tangga',
+                aksi: 'SETUJUI_RUANGAN',
+                targetData: `${item.ruangan} (${item.nama_peminjam} - ${item.tgl_pinjam})`
+              });
+            }
             showToast(`Peminjaman ${item.ruangan} oleh ${item.nama_peminjam} telah Disetujui!`, "success");
             await loadAllRtData();
           }
@@ -1451,6 +1463,13 @@
             body: JSON.stringify({ ...item, status: 'Disetujui' })
           });
           if (res.ok) {
+            if (window.catatLogAktivitas) {
+              await window.catatLogAktivitas({
+                modul: 'Rumah Tangga',
+                aksi: 'SETUJUI_KENDARAAN',
+                targetData: `${item.kendaraan} (${item.nama_driver} - ${item.tgl_pinjam})`
+              });
+            }
             showToast(`Peminjaman ${item.kendaraan} oleh ${item.nama_driver} telah Disetujui!`, "success");
             await loadAllRtData();
           }
@@ -1521,14 +1540,19 @@
           <td class="px-5 py-3.5 text-slate-600">${r.keperluan || '-'}</td>
           <td class="px-5 py-3.5">${getStatusBadge(r.status)}</td>
           <td class="px-5 py-3.5 text-center space-x-2 kiosk-hide">
-            <button onclick="openRuanganModal(${r.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
-            <button onclick="deleteRuangan(${r.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
+            <button onclick="openRuanganModal(${r.id})" class="role-operator-action text-blue-600 hover:underline font-bold text-xs">Edit</button>
+            <button onclick="deleteRuangan(${r.id})" class="role-admin-only text-rose-600 hover:underline font-bold text-xs">Hapus</button>
           </td>
         </tr>
       `).join('');
     }
 
     function openRuanganModal(id = null, prefillDate = null) {
+      if (window.currentUserProfile && window.currentUserProfile.role === 'viewer') {
+        showToast("Akses ditolak: Mode Pimpinan (Hanya Lihat).", "error");
+        return;
+      }
+
       const obj = id ? ruanganData.find(r => r.id === id) : null;
       const defaultDate = prefillDate || new Date().toISOString().split('T')[0];
 
@@ -1551,6 +1575,11 @@
 
     async function handleRuanganSubmit(e) {
       e.preventDefault();
+      if (window.currentUserProfile && window.currentUserProfile.role === 'viewer') {
+        showToast("Akses ditolak: Mode Pimpinan (Hanya Lihat).", "error");
+        return;
+      }
+
       const id = document.getElementById('editRuanganId').value;
       const payload = {
         nama_peminjam: document.getElementById('r_nama_peminjam').value,
@@ -1583,6 +1612,14 @@
         body: JSON.stringify(payload)
       });
       if (res.ok) {
+        if (window.catatLogAktivitas) {
+          await window.catatLogAktivitas({
+            modul: 'Rumah Tangga',
+            aksi: id ? 'EDIT_RUANGAN' : 'PINJAM_RUANGAN',
+            targetData: `${payload.ruangan} (${payload.nama_peminjam} - ${payload.tgl_pinjam})`,
+            detail: payload
+          });
+        }
         closeRuanganModal();
         showToast(id ? "Data ruangan diperbarui!" : "Peminjaman ruangan ditambahkan!", "success");
         await loadAllRtData();
@@ -1590,9 +1627,24 @@
     }
 
     async function deleteRuangan(id) {
-      if (confirm("Hapus data peminjaman ruangan ini?")) {
+      if (window.currentUserProfile && window.currentUserProfile.role !== 'super_admin') {
+        showToast("Akses ditolak: Hanya Super Admin yang dapat menghapus jadwal ruangan.", "error");
+        return;
+      }
+
+      const obj = ruanganData.find(r => r.id === id);
+      const label = obj ? `${obj.ruangan} (${obj.nama_peminjam} - ${obj.tgl_pinjam})` : `ID #${id}`;
+
+      if (confirm(`Hapus data peminjaman ruangan ${label}?`)) {
         const res = await fetch(`/api/peminjaman-ruangan/${id}`, { method: 'DELETE' });
         if (res.ok) {
+          if (window.catatLogAktivitas) {
+            await window.catatLogAktivitas({
+              modul: 'Rumah Tangga',
+              aksi: 'HAPUS_RUANGAN',
+              targetData: label
+            });
+          }
           showToast("Data ruangan dihapus!", "success");
           await loadAllRtData();
         }
@@ -1618,14 +1670,19 @@
           <td class="px-5 py-3.5 text-slate-600">${k.tujuan || '-'}</td>
           <td class="px-5 py-3.5">${getStatusBadge(k.status)}</td>
           <td class="px-5 py-3.5 text-center space-x-2 kiosk-hide">
-            <button onclick="openKendaraanModal(${k.id})" class="text-blue-600 hover:underline font-bold text-xs">Edit</button>
-            <button onclick="deleteKendaraan(${k.id})" class="text-rose-600 hover:underline font-bold text-xs">Hapus</button>
+            <button onclick="openKendaraanModal(${k.id})" class="role-operator-action text-blue-600 hover:underline font-bold text-xs">Edit</button>
+            <button onclick="deleteKendaraan(${k.id})" class="role-admin-only text-rose-600 hover:underline font-bold text-xs">Hapus</button>
           </td>
         </tr>
       `).join('');
     }
 
     function openKendaraanModal(id = null, prefillDate = null) {
+      if (window.currentUserProfile && window.currentUserProfile.role === 'viewer') {
+        showToast("Akses ditolak: Mode Pimpinan (Hanya Lihat).", "error");
+        return;
+      }
+
       const obj = id ? kendaraanData.find(k => k.id === id) : null;
       const defaultDate = prefillDate || new Date().toISOString().split('T')[0];
 
@@ -1646,6 +1703,11 @@
 
     async function handleKendaraanSubmit(e) {
       e.preventDefault();
+      if (window.currentUserProfile && window.currentUserProfile.role === 'viewer') {
+        showToast("Akses ditolak: Mode Pimpinan (Hanya Lihat).", "error");
+        return;
+      }
+
       const id = document.getElementById('editKendaraanId').value;
       const payload = {
         nama_driver: document.getElementById('k_nama_driver').value,
@@ -1674,6 +1736,14 @@
         body: JSON.stringify(payload)
       });
       if (res.ok) {
+        if (window.catatLogAktivitas) {
+          await window.catatLogAktivitas({
+            modul: 'Rumah Tangga',
+            aksi: id ? 'EDIT_KENDARAAN' : 'PINJAM_KENDARAAN',
+            targetData: `${payload.kendaraan} (${payload.nama_driver} - ${payload.tgl_pinjam})`,
+            detail: payload
+          });
+        }
         closeKendaraanModal();
         showToast(id ? "Data kendaraan diperbarui!" : "Peminjaman kendaraan ditambahkan!", "success");
         await loadAllRtData();
@@ -1681,9 +1751,24 @@
     }
 
     async function deleteKendaraan(id) {
-      if (confirm("Hapus data peminjaman kendaraan ini?")) {
+      if (window.currentUserProfile && window.currentUserProfile.role !== 'super_admin') {
+        showToast("Akses ditolak: Hanya Super Admin yang dapat menghapus jadwal kendaraan.", "error");
+        return;
+      }
+
+      const obj = kendaraanData.find(k => k.id === id);
+      const label = obj ? `${obj.kendaraan} (${obj.nama_driver} - ${obj.tgl_pinjam})` : `ID #${id}`;
+
+      if (confirm(`Hapus data peminjaman kendaraan ${label}?`)) {
         const res = await fetch(`/api/peminjaman-kendaraan/${id}`, { method: 'DELETE' });
         if (res.ok) {
+          if (window.catatLogAktivitas) {
+            await window.catatLogAktivitas({
+              modul: 'Rumah Tangga',
+              aksi: 'HAPUS_KENDARAAN',
+              targetData: label
+            });
+          }
           showToast("Data kendaraan dihapus!", "success");
           await loadAllRtData();
         }
@@ -1716,5 +1801,6 @@
       doc.save(`Laporan_Kendaraan_${new Date().toISOString().split('T')[0]}.pdf`);
     }
   </script>
+  <script src="auth-audit.js"></script>
 </body>
 </html>

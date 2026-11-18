@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @keyframes radarPulse {
       0% { transform: scale(0.9); opacity: 0.8; }
@@ -178,7 +179,7 @@
   <!-- SIDEBAR KIRI TERPADU (RESPONSIF DESKTOP & MOBILE)                         -->
   <!-- ========================================================================= -->
   <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
-    <div>
+    <div class="overflow-y-auto">
       <!-- BRANDING INSTANSI -->
       <div class="p-5 border-b border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -214,7 +215,7 @@
           <span>Maintenance AC</span>
         </a>
 
-        <a href="/executive" data-route="/executive" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+        <a href="/executive.html" data-route="/executive" class="sidebar-nav-item nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
           <i class="fa-solid fa-chart-line w-4 text-center text-amber-400"></i>
           <span>Executive Summary</span>
         </a>
@@ -686,7 +687,7 @@
           (route === '/rumah-tangga' && (currentPath.includes('rumah-tangga') || currentPath.includes('rumahtangga'))) ||
           (route === '/ac' && currentPath.includes('ac')) ||
           (route === '/executive' && currentPath.includes('executive')) ||
-          (route === '/' && (currentPath === '/' || currentPath.endsWith('index.html') || currentPath.endsWith('index_3.html')));
+          (route === '/' && (currentPath === '/' || currentPath.endsWith('index.html') || currentPath.endsWith('index_2.html') || currentPath.endsWith('index_3.html')));
 
         if (isMatch) {
           link.classList.remove('text-slate-300', 'hover:bg-slate-800/80');
@@ -1278,7 +1279,7 @@
       document.getElementById('warningModal').classList.add('hidden');
     }
 
-    function exportExecutivePDF() {
+    async function exportExecutivePDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p', 'mm', 'a4');
 
@@ -1318,7 +1319,16 @@
       });
 
       doc.save(`Executive_Summary_Sarpras_${new Date().toISOString().split('T')[0]}.pdf`);
+
+      if (window.catatLogAktivitas) {
+        await window.catatLogAktivitas({
+          modul: 'Executive Summary',
+          aksi: 'CETAK_LAPORAN_EKSEKUTIF',
+          targetData: `Laporan Ringkasan Eksekutif (${unifiedPriorities.length} item prioritas)`
+        });
+      }
     }
   </script>
+  <script src="auth-audit.js"></script>
 </body>
 </html>
