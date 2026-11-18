@@ -2,32 +2,58 @@
 const AUTH_SUPABASE_URL = 'https://xlompxgjdifbthgpkphv.supabase.co';
 const AUTH_SUPABASE_KEY = 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
 
-const authDb = window.supabase.createClient(AUTH_SUPABASE_URL, AUTH_SUPABASE_KEY);
+let authDb = null;
+if (window.supabase && typeof window.supabase.createClient === 'function') {
+  authDb = window.supabase.createClient(AUTH_SUPABASE_URL, AUTH_SUPABASE_KEY);
+}
 window.currentUserProfile = null;
 
-// Helper untuk menentukan URL halaman login yang valid
 function getLoginUrl() {
-  // Jika diakses lewat file lokal (file://), arahkan ke login.html
   if (window.location.protocol === 'file:') {
     return 'login.html';
   }
-  // Jika diakses lewat server web (http/https), arahkan ke /login (atau /login.html jika /login tidak ada)
-  return '/login';
+  return '/login.html';
 }
 
-// 1. Inisialisasi Sesi & Hak Akses
+// Fungsi Logout Utama (Dipanggil langsung saat tombol Keluar diklik)
+window.logoutMonsarpras = async function (event) {
+  if (event && typeof event.preventDefault === 'function') {
+    event.preventDefault();
+  }
+
+  // Hapus semua data sesi lokal terlebih dahulu
+  try {
+    localStorage.clear();
+    sessionStorage.clear();
+  } catch (e) {}
+
+  // Proses signOut Supabase dengan batas waktu maksimal 1,5 detik agar tidak macet
+  if (authDb && authDb.auth) {
+    try {
+      await Promise.race([
+        authDb.auth.signOut(),
+        new Promise(resolve => setTimeout(resolve, 1500))
+      ]);
+    } catch (err) {
+      console.warn('SignOut warning:', err);
+    }
+  }
+
+  // Paksa pindah langsung ke halaman login
+  window.location.replace(getLoginUrl());
+};
+
+// Inisialisasi Sesi & Hak Akses
 async function initRoleAccess() {
-  if (!window.supabase) {
-    console.error('Library @supabase/supabase-js belum dimuat sebelum auth-audit.js');
+  renderLogoutBelowKiosk();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('kiosk') === '1') {
     return;
   }
 
-  // Selalu pasang tombol Keluar di bawah Mode Monitor TV terlebih dahulu
-  renderLogoutBelowKiosk();
-
-  // Lewati cek login jika sedang membuka Mode Monitor TV (?kiosk=1)
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('kiosk') === '1') {
+  if (!authDb) {
+    console.error('Library @supabase/supabase-js belum dimuat sebelum auth-audit.js');
     return;
   }
 
@@ -55,21 +81,21 @@ async function initRoleAccess() {
   renderUserBadgeSidebar(profile, session.user.email);
   applyRolePermissions(profile.role);
 
-  // Pantau elemen dinamis (misalnya baris tabel yang baru dirender dari Supabase)
   const observer = new MutationObserver(() => applyRolePermissions(profile.role));
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
-// 2. Pasang Tombol Keluar Tepat di Bawah "Mode Monitor TV (Kiosk)"
 function renderLogoutBelowKiosk() {
-  if (document.getElementById('btn-sidebar-logout')) return;
+  if (document.getElementById('btn-sidebar-logout') || document.querySelector('aside button[onclick*="logoutMonsarpras"]')) {
+    return;
+  }
 
   const kioskBtn = document.querySelector('aside a[href*="kiosk=1"]');
   if (kioskBtn) {
     const logoutBtn = document.createElement('button');
     logoutBtn.id = 'btn-sidebar-logout';
     logoutBtn.type = 'button';
-    logoutBtn.onclick = () => window.logoutMonsarpras();
+    logoutBtn.onclick = (e) => window.logoutMonsarpras(e);
     logoutBtn.className = 'w-full py-2.5 px-3.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer';
     logoutBtn.innerHTML = `
       <i class="fa-solid fa-right-from-bracket"></i>
@@ -79,7 +105,6 @@ function renderLogoutBelowKiosk() {
   }
 }
 
-// 3. Terapkan Pembatasan Akses UI Berdasarkan Role
 function applyRolePermissions(role) {
   if (role !== 'super_admin') {
     document.querySelectorAll('.role-admin-only').forEach(el => {
@@ -96,7 +121,6 @@ function applyRolePermissions(role) {
   }
 }
 
-// 4. Render Kartu Profil & Jejak Audit di Sidebar (Tanpa Tombol Logout Ganda)
 function renderUserBadgeSidebar(profile, email) {
   const sidebar = document.querySelector('aside');
   if (!sidebar || document.getElementById('user-profile-box')) return;
@@ -138,30 +162,8 @@ function renderUserBadgeSidebar(profile, email) {
   }
 }
 
-// 5. Fungsi Logout Otomatis ke Halaman Login
-window.logoutMonsarpras = async function () {
-  try {
-    await authDb.auth.signOut();
-  } catch (err) {
-    console.error('Logout error:', err);
-  } finally {
-    localStorage.clear();
-    sessionStorage.clear();
-    // Cek apakah rute /login tersedia, jika tidak fallback ke login.html
-    try {
-      const check = await fetch('/login', { method: 'HEAD' });
-      if (check.ok) {
-        window.location.replace('/login');
-        return;
-      }
-    } catch (_) {}
-    window.location.replace('login.html');
-  }
-};
-
-// 6. Fungsi Global Pencatat Jejak Audit
 window.catatLogAktivitas = async function ({ modul, aksi, targetData, detail = {} }) {
-  if (!window.currentUserProfile) return;
+  if (!window.currentUserProfile || !authDb) return;
 
   const { error } = await authDb.from('activity_logs').insert([{
     user_id: window.currentUserProfile.id,
@@ -176,8 +178,8 @@ window.catatLogAktivitas = async function ({ modul, aksi, targetData, detail = {
   if (error) console.error('Gagal mencatat log aktivitas:', error.message);
 };
 
-// 7. Modal Penampil Jejak Audit (Activity Logs)
 window.bukaModalAuditLog = async function () {
+  if (!authDb) return;
   let modal = document.getElementById('modal-audit-log');
   if (!modal) {
     modal = document.createElement('div');
