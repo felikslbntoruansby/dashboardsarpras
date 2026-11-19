@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Kepegawaian - Bidang Umum Poltekbang</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen antialiased">
+
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden"></div>
+
+  <!-- SIDEBAR -->
+  <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+    <div class="overflow-y-auto flex-1">
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-gradient-to-tr from-cyan-600 to-blue-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
+            <i class="fa-solid fa-users-gear text-white text-lg"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-cyan-400 block">BIDANG UMUM</span>
+            <h2 class="text-sm font-extrabold text-white">Kepegawaian</h2>
+          </div>
+        </div>
+        <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="p-4 space-y-2">
+        <a href="/bidang-umum" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition">
+          <i class="fa-solid fa-arrow-left w-4 text-center text-amber-400"></i>
+          <span>Portal Bidang Umum</span>
+        </a>
+
+        <button type="button" onclick="document.getElementById('menu4Bidang').classList.toggle('hidden')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-slate-800 text-white hover:bg-slate-700 transition cursor-pointer">
+          <span class="flex items-center gap-2.5"><i class="fa-solid fa-sitemap w-4 text-center text-amber-400"></i><span>Menu Bidang Umum</span></span>
+          <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+        </button>
+
+        <div id="menu4Bidang" class="pl-3 space-y-1 border-l border-slate-700 ml-5">
+          <a href="/rumah-tangga" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white">
+            <i class="fa-solid fa-building-user text-blue-400 w-4 text-center"></i><span>1. Rumah Tangga</span>
+          </a>
+          <a href="/bmn" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white">
+            <i class="fa-solid fa-landmark text-emerald-400 w-4 text-center"></i><span>2. BMN</span>
+          </a>
+          <a href="/kepegawaian" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold bg-cyan-600 text-white shadow-sm">
+            <i class="fa-solid fa-users-gear text-white w-4 text-center"></i><span>3. Kepegawaian</span>
+          </a>
+          <a href="/tata-usaha" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white">
+            <i class="fa-solid fa-envelope-open-text text-purple-400 w-4 text-center"></i><span>4. Tata Usaha</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-2.5 shrink-0">
+      <a href="/executive?kiosk=1" class="w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2">
+        <i class="fa-solid fa-tv"></i><span>Mode Monitor TV (Kiosk)</span>
+      </a>
+      <button type="button" onclick="logoutMonsarpras()" class="w-full py-2.5 px-3.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+        <i class="fa-solid fa-right-from-bracket"></i><span>Keluar / Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- TOP BAR MOBILE -->
+  <div class="lg:hidden sticky top-0 z-30 bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+    <button onclick="toggleMobileSidebar(true)" class="p-2 bg-slate-800 rounded-xl"><i class="fa-solid fa-bars text-sm"></i></button>
+    <span class="font-extrabold text-xs">Kepegawaian • Bidang Umum</span>
+    <span class="w-8"></span>
+  </div>
+
+  <!-- KONTEN UTAMA -->
+  <div class="lg:pl-64 p-4 md:p-6">
+    <div class="max-w-7xl mx-auto space-y-6">
+
+      <!-- HEADER -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-4">
+          <div class="bg-cyan-600 p-3.5 rounded-xl text-white shadow-md"><i class="fa-solid fa-users-gear text-2xl"></i></div>
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-cyan-600">BIDANG UMUM • SDM & APARATUR</span>
+            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Dashboard Sub-Bagian Kepegawaian</h1>
+            <p class="text-xs text-slate-500">Politeknik Penerbangan Surabaya • Data Pegawai PNS, PPPK, PPNPN & Status Kehadiran</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="openModal()" class="role-admin-only px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5">
+            <i class="fa-solid fa-user-plus"></i> Tambah Pegawai
+          </button>
+          <button type="button" onclick="exportPDF()" class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl flex items-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI CARDS -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold text-slate-500 uppercase">Total Pegawai</p>
+          <h3 class="text-3xl font-black text-cyan-600 mt-2" id="kpi-total">0</h3>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold text-slate-500 uppercase">PNS / PPPK</p>
+          <h3 class="text-3xl font-black text-blue-600 mt-2" id="kpi-asn">0</h3>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold text-slate-500 uppercase">PPNPN / Kontrak</p>
+          <h3 class="text-3xl font-black text-indigo-600 mt-2" id="kpi-nonasn">0</h3>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold text-slate-500 uppercase">Cuti / Dinas Luar</p>
+          <h3 class="text-3xl font-black text-amber-600 mt-2" id="kpi-cuti">0</h3>
+        </div>
+      </div>
+
+      <!-- FILTER & TABEL -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between gap-3 bg-slate-50">
+          <div class="relative flex-1 max-w-md">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="searchInput" oninput="renderTable()" placeholder="Cari NIP/NIK, nama pegawai, jabatan, unit..." class="w-full bg-white border border-slate-300 text-xs rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+          </div>
+          <select id="filterStatus" onchange="renderTable()" class="bg-white border border-slate-300 text-xs font-semibold rounded-xl px-3.5 py-2.5">
+            <option value="ALL">Semua Status Kepegawaian</option>
+            <option value="PNS">PNS</option>
+            <option value="PPPK">PPPK</option>
+            <option value="PPNPN">PPNPN / Kontrak</option>
+          </select>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+            <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3.5 text-center">No</th>
+                <th class="px-4 py-3.5">NIP / NIK</th>
+                <th class="px-4 py-3.5">Nama Lengkap</th>
+                <th class="px-4 py-3.5">Pangkat / Gol</th>
+                <th class="px-4 py-3.5">Jabatan</th>
+                <th class="px-4 py-3.5">Unit Kerja</th>
+                <th class="px-4 py-3.5 text-center">Jenis</th>
+                <th class="px-4 py-3.5 text-center">Status</th>
+                <th class="px-4 py-3.5 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-data" class="divide-y divide-slate-200">
+              <tr><td colspan="9" class="text-center py-6 text-slate-400">Memuat data kepegawaian...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL FORM PEGAWAI -->
+  <div id="formModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg p-6">
+      <h3 id="modalTitle" class="text-lg font-extrabold text-slate-900 mb-4">Tambah Data Pegawai</h3>
+      <form onsubmit="handleSubmit(event)" class="space-y-3">
+        <input type="hidden" id="editId">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1">NIP / NIK</label>
+            <input type="text" id="nip_nik" required placeholder="199001012020121001" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Status Kepegawaian</label>
+            <select id="status_kepegawaian" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs">
+              <option value="PNS">PNS</option>
+              <option value="PPPK">PPPK</option>
+              <option value="PPNPN">PPNPN / Kontrak</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Nama Lengkap & Gelar</label>
+          <input type="text" id="nama_pegawai" required placeholder="Budi Santoso, S.T." class="w-full border border-slate-300 rounded-xl p-2.5 text-xs">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1">Pangkat / Golongan</label>
+            <input type="text" id="pangkat_golongan" placeholder="Penata Muda / III-a" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Status Kehadiran</label>
+            <select id="status_kehadiran" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs">
+              <option value="Aktif">Aktif</option>
+              <option value="Cuti">Cuti</option>
+              <option value="Dinas Luar">Dinas Luar</option>
+              <option value="Tugas Belajar">Tugas Belajar</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold mb-1">Jabatan</label>
+            <input type="text" id="jabatan" placeholder="Analis SDM Aparatur" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-bold mb-1">Unit Kerja</label>
+            <input type="text" id="unit_kerja" value="Bidang Umum" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-4 border-t">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
+          <button type="submit" class="role-admin-only px-4 py-2 bg-cyan-600 text-white font-bold rounded-xl text-xs">Simpan Data</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+  <script>
+    let pegawaiList = [];
+    const escHtml = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    function toggleMobileSidebar(show) {
+      document.getElementById('appSidebar').classList.toggle('-translate-x-full', !show);
+      document.getElementById('sidebarBackdrop').classList.toggle('hidden', !show);
+    }
+
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-lg text-xs font-bold';
+      t.innerText = msg;
+      document.getElementById('toastContainer').appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+
+    async function loadData() {
+      const res = await fetch('/api/kepegawaian');
+      pegawaiList = await res.json();
+      updateKpis();
+      renderTable();
+    }
+
+    function updateKpis() {
+      document.getElementById('kpi-total').innerText = pegawaiList.length;
+      document.getElementById('kpi-asn').innerText = pegawaiList.filter(i => ['PNS', 'PPPK'].includes(i.status_kepegawaian)).length;
+      document.getElementById('kpi-nonasn').innerText = pegawaiList.filter(i => i.status_kepegawaian === 'PPNPN').length;
+      document.getElementById('kpi-cuti').innerText = pegawaiList.filter(i => i.status_kehadiran !== 'Aktif').length;
+    }
+
+    function renderTable() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const fs = document.getElementById('filterStatus').value;
+      const filtered = pegawaiList.filter(i => {
+        if (fs !== 'ALL' && i.status_kepegawaian !== fs) return false;
+        const txt = `${i.nip_nik} ${i.nama_pegawai} ${i.jabatan} ${i.unit_kerja}`.toLowerCase();
+        return !q || txt.includes(q);
+      });
+
+      const tbody = document.getElementById('tbody-data');
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400">Belum ada data pegawai.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((item, idx) => {
+        const stBadge = item.status_kehadiran === 'Aktif'
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+          : 'bg-amber-50 text-amber-700 border-amber-200';
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3 text-center font-bold text-slate-500">${idx + 1}</td>
+            <td class="px-4 py-3 font-mono font-bold text-cyan-700">${escHtml(item.nip_nik)}</td>
+            <td class="px-4 py-3 font-bold text-slate-900">${escHtml(item.nama_pegawai)}</td>
+            <td class="px-4 py-3 text-slate-600">${escHtml(item.pangkat_golongan || '-')}</td>
+            <td class="px-4 py-3">${escHtml(item.jabatan || '-')}</td>
+            <td class="px-4 py-3 text-slate-600">${escHtml(item.unit_kerja || '-')}</td>
+            <td class="px-4 py-3 text-center font-bold">${escHtml(item.status_kepegawaian)}</td>
+            <td class="px-4 py-3 text-center"><span class="px-2.5 py-0.5 rounded-md border text-[10px] font-bold ${stBadge}">${escHtml(item.status_kehadiran)}</span></td>
+            <td class="px-4 py-3 text-center space-x-2">
+              <button type="button" onclick="editItem(${item.id})" class="role-admin-only text-blue-600 hover:underline font-bold">Edit</button>
+              <button type="button" onclick="deleteItem(${item.id})" class="role-admin-only text-rose-600 hover:underline font-bold">Hapus</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openModal(item = null) {
+      document.getElementById('editId').value = item ? item.id : '';
+      document.getElementById('modalTitle').innerText = item ? 'Edit Data Pegawai' : 'Tambah Data Pegawai';
+      document.getElementById('nip_nik').value = item ? item.nip_nik : '';
+      document.getElementById('nama_pegawai').value = item ? item.nama_pegawai : '';
+      document.getElementById('pangkat_golongan').value = item ? item.pangkat_golongan : '';
+      document.getElementById('jabatan').value = item ? item.jabatan : '';
+      document.getElementById('unit_kerja').value = item ? item.unit_kerja : 'Bidang Umum';
+      document.getElementById('status_kepegawaian').value = item ? item.status_kepegawaian : 'PNS';
+      document.getElementById('status_kehadiran').value = item ? item.status_kehadiran : 'Aktif';
+      document.getElementById('formModal').classList.remove('hidden');
+    }
+    function closeModal() { document.getElementById('formModal').classList.add('hidden'); }
+    function editItem(id) { const it = pegawaiList.find(x => x.id === id); if (it) openModal(it); }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const payload = {
+        nip_nik: document.getElementById('nip_nik').value,
+        nama_pegawai: document.getElementById('nama_pegawai').value,
+        pangkat_golongan: document.getElementById('pangkat_golongan').value,
+        jabatan: document.getElementById('jabatan').value,
+        unit_kerja: document.getElementById('unit_kerja').value,
+        status_kepegawaian: document.getElementById('status_kepegawaian').value,
+        status_kehadiran: document.getElementById('status_kehadiran').value
+      };
+      const res = await fetch(id ? `/api/kepegawaian/${id}` : '/api/kepegawaian', {
+        method: id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        if (window.catatLogAktivitas) {
+          await window.catatLogAktivitas({ modul: 'Kepegawaian', aksi: id ? 'EDIT_PEGAWAI' : 'TAMBAH_PEGAWAI', targetData: `${payload.nip_nik} - ${payload.nama_pegawai}` });
+        }
+        closeModal();
+        showToast('Data kepegawaian berhasil disimpan!');
+        loadData();
+      }
+    }
+
+    async function deleteItem(id) {
+      if (!confirm('Hapus data pegawai ini?')) return;
+      const it = pegawaiList.find(x => x.id === id);
+      const res = await fetch(`/api/kepegawaian/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        if (window.catatLogAktivitas && it) {
+          await window.catatLogAktivitas({ modul: 'Kepegawaian', aksi: 'HAPUS_PEGAWAI', targetData: `${it.nip_nik} - ${it.nama_pegawai}` });
+        }
+        showToast('Data pegawai dihapus!');
+        loadData();
+      }
+    }
+
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('l', 'mm', 'a4');
+      doc.setFontSize(13); doc.text('DAFTAR NOMINATIF PEGAWAI - POLTEKBANG SURABAYA', 14, 15);
+      doc.autoTable({
+        head: [['No', 'NIP/NIK', 'Nama Pegawai', 'Pangkat/Gol', 'Jabatan', 'Unit Kerja', 'Jenis', 'Status']],
+        body: pegawaiList.map((i, idx) => [idx + 1, i.nip_nik, i.nama_pegawai, i.pangkat_golongan, i.jabatan, i.unit_kerja, i.status_kepegawaian, i.status_kehadiran]),
+        startY: 22, styles: { fontSize: 8 }
+      });
+      doc.save('Daftar_Pegawai_Poltekbang.pdf');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadData);
+  </script>
+  <script src="auth-audit.js"></script>
+</body>
+</html>

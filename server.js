@@ -21,10 +21,18 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname)));
 
 // =============================================================
-// STATIC ROUTING HALAMAN DASHBOARD & QR SCAN
+// STATIC ROUTING HALAMAN DASHBOARD, BIDANG UMUM & QR SCAN
 // =============================================================
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/bidang-umum', (req, res) => res.sendFile(path.join(__dirname, 'bidang-umum.html')));
+app.get('/bidang-umum.html', (req, res) => res.sendFile(path.join(__dirname, 'bidang-umum.html')));
+app.get('/bmn', (req, res) => res.sendFile(path.join(__dirname, 'bmn.html')));
+app.get('/bmn.html', (req, res) => res.sendFile(path.join(__dirname, 'bmn.html')));
+app.get('/kepegawaian', (req, res) => res.sendFile(path.join(__dirname, 'kepegawaian.html')));
+app.get('/kepegawaian.html', (req, res) => res.sendFile(path.join(__dirname, 'kepegawaian.html')));
+app.get('/tata-usaha', (req, res) => res.sendFile(path.join(__dirname, 'tata-usaha.html')));
+app.get('/tata-usaha.html', (req, res) => res.sendFile(path.join(__dirname, 'tata-usaha.html')));
 app.get('/executive', (req, res) => res.sendFile(path.join(__dirname, 'executive.html')));
 app.get('/executive.html', (req, res) => res.sendFile(path.join(__dirname, 'executive.html')));
 app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
@@ -105,7 +113,7 @@ function formatToIsoDate(val) {
 }
 
 // =============================================================
-// API MAINTENANCE AC (SESUAI SKEMA SUPABASE & JADWAL 20X)
+// API MAINTENANCE AC
 // =============================================================
 app.get('/api/maintenance-ac', async (req, res) => {
     try {
@@ -134,23 +142,15 @@ app.get('/api/maintenance-ac', async (req, res) => {
     }
 });
 
-// BULK INSERT PER BATCH SESUAI KOLOM TABEL (SUPPORT REPLACE & APPEND)
 app.post('/api/maintenance-ac/bulk', async (req, res) => {
     try {
         const { items, append } = req.body;
-
         if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ error: "Data array 'items' kosong atau tidak valid!" });
         }
 
         if (!append) {
-            const { error: deleteError } = await supabase
-                .from('maintenance_k3_ac')
-                .delete()
-                .not('id', 'is', null);
-            if (deleteError) {
-                console.error("Gagal menghapus data lama:", deleteError.message);
-            }
+            await supabase.from('maintenance_k3_ac').delete().not('id', 'is', null);
         }
 
         const rowsToInsert = items.map(item => ({
@@ -178,19 +178,12 @@ app.post('/api/maintenance-ac/bulk', async (req, res) => {
         for (let i = 0; i < rowsToInsert.length; i += BATCH_SIZE) {
             const chunk = rowsToInsert.slice(i, i + BATCH_SIZE);
             const { error: insertErr } = await supabase.from('maintenance_k3_ac').insert(chunk);
-            if (insertErr) {
-                console.error(`Error pada batch ${i}:`, insertErr.message);
-                throw insertErr;
-            }
+            if (insertErr) throw insertErr;
             insertedTotal += chunk.length;
         }
 
-        res.json({ 
-            message: `Berhasil menyimpan ${insertedTotal} data AC ke Supabase secara permanen!`, 
-            total: insertedTotal 
-        });
+        res.json({ message: `Berhasil menyimpan ${insertedTotal} data AC!`, total: insertedTotal });
     } catch (err) {
-        console.error("Error pada Bulk Insert AC:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
@@ -210,21 +203,10 @@ app.post('/api/maintenance-ac', async (req, res) => {
             .from('maintenance_k3_ac')
             .insert([{
                 kategori_gedung: kategori_gedung || 'G. UMUM',
-                kode_unit,
-                gedung: gedung || '',
-                lantai: lantai || '',
-                ruang: ruang || '',
-                no_urut: no_urut || '',
-                merk_ac: merk_ac || '',
-                type_ac: type_ac || '',
-                kapasitas: kapasitas || '',
-                freon: freon || '',
-                tgl_servis: formatToIsoDate(tgl_servis),
-                status: status || 'BAIK',
-                catatan: catatan || '',
-                lokasi: computedLokasi,
-                jenis_pekerjaan: computedPekerjaan,
-                teknisi: teknisi || 'Tim K3 Sarpras'
+                kode_unit, gedung: gedung || '', lantai: lantai || '', ruang: ruang || '', no_urut: no_urut || '',
+                merk_ac: merk_ac || '', type_ac: type_ac || '', kapasitas: kapasitas || '', freon: freon || '',
+                tgl_servis: formatToIsoDate(tgl_servis), status: status || 'BAIK', catatan: catatan || '',
+                lokasi: computedLokasi, jenis_pekerjaan: computedPekerjaan, teknisi: teknisi || 'Tim K3 Sarpras'
             }])
             .select();
         if (error) throw error;
@@ -249,22 +231,9 @@ app.put('/api/maintenance-ac/:id', async (req, res) => {
         const { data, error } = await supabase
             .from('maintenance_k3_ac')
             .update({
-                kategori_gedung,
-                kode_unit,
-                gedung,
-                lantai,
-                ruang,
-                no_urut,
-                merk_ac,
-                type_ac,
-                kapasitas,
-                freon,
-                tgl_servis: formatToIsoDate(tgl_servis),
-                status,
-                catatan,
-                lokasi: computedLokasi,
-                jenis_pekerjaan: computedPekerjaan,
-                teknisi
+                kategori_gedung, kode_unit, gedung, lantai, ruang, no_urut,
+                merk_ac, type_ac, kapasitas, freon, tgl_servis: formatToIsoDate(tgl_servis),
+                status, catatan, lokasi: computedLokasi, jenis_pekerjaan: computedPekerjaan, teknisi
             })
             .eq('id', id)
             .select();
@@ -277,8 +246,7 @@ app.put('/api/maintenance-ac/:id', async (req, res) => {
 
 app.delete('/api/maintenance-ac/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const { error } = await supabase.from('maintenance_k3_ac').delete().eq('id', id);
+        const { error } = await supabase.from('maintenance_k3_ac').delete().eq('id', req.params.id);
         if (error) throw error;
         res.json({ message: "Berhasil dihapus!" });
     } catch (err) {
@@ -311,12 +279,11 @@ app.post('/api/peminjaman-ruangan', async (req, res) => {
 
 app.put('/api/peminjaman-ruangan/:id', async (req, res) => {
     try {
-        const { id } = req.params;
         const { nama_peminjam, ruangan, tgl_pinjam, tgl_selesai, jam_mulai, keperluan, status } = req.body;
         const { data, error } = await supabase
             .from('peminjaman_ruangan')
             .update({ nama_peminjam, ruangan, tgl_pinjam, tgl_selesai, jam_mulai, keperluan, status })
-            .eq('id', id)
+            .eq('id', req.params.id)
             .select();
         if (error) throw error;
         res.json({ message: "Berhasil diubah!", data });
@@ -325,8 +292,7 @@ app.put('/api/peminjaman-ruangan/:id', async (req, res) => {
 
 app.delete('/api/peminjaman-ruangan/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const { error } = await supabase.from('peminjaman_ruangan').delete().eq('id', id);
+        const { error } = await supabase.from('peminjaman_ruangan').delete().eq('id', req.params.id);
         if (error) throw error;
         res.json({ message: "Berhasil dihapus!" });
     } catch (err) { res.status(500).json({ error: err.message }); }
@@ -354,12 +320,11 @@ app.post('/api/peminjaman-kendaraan', async (req, res) => {
 
 app.put('/api/peminjaman-kendaraan/:id', async (req, res) => {
     try {
-        const { id } = req.params;
         const { nama_driver, kendaraan, tgl_pinjam, tujuan, status } = req.body;
         const { data, error } = await supabase
             .from('peminjaman_kendaraan')
             .update({ nama_driver, kendaraan, tgl_pinjam, tujuan, status })
-            .eq('id', id)
+            .eq('id', req.params.id)
             .select();
         if (error) throw error;
         res.json({ message: "Berhasil diubah!", data });
@@ -368,8 +333,7 @@ app.put('/api/peminjaman-kendaraan/:id', async (req, res) => {
 
 app.delete('/api/peminjaman-kendaraan/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const { error } = await supabase.from('peminjaman_kendaraan').delete().eq('id', id);
+        const { error } = await supabase.from('peminjaman_kendaraan').delete().eq('id', req.params.id);
         if (error) throw error;
         res.json({ message: "Berhasil dihapus!" });
     } catch (err) { res.status(500).json({ error: err.message }); }
@@ -383,12 +347,8 @@ app.get('/api/inventory', async (req, res) => {
         const { data, error } = await supabase.from('inventory').select('*').order('id', { ascending: true });
         if (error) return res.json([]);
         const formattedData = (data || []).map(item => ({
-            id: item.id,
-            code: item.code || '-',
-            name: item.name || 'Tanpa Nama',
-            initial: item.initial || 0,
-            inQty: item.in_qty || 0,
-            outQty: item.out_qty || 0
+            id: item.id, code: item.code || '-', name: item.name || 'Tanpa Nama',
+            initial: item.initial || 0, inQty: item.in_qty || 0, outQty: item.out_qty || 0
         }));
         res.json(formattedData);
     } catch (err) { res.json([]); }
@@ -408,12 +368,11 @@ app.post('/api/inventory', async (req, res) => {
 
 app.put('/api/inventory/:id', async (req, res) => {
     try {
-        const { id } = req.params;
         const { code, name, initial, inQty, outQty } = req.body;
         const { data, error } = await supabase
             .from('inventory')
             .update({ code, name, initial, in_qty: inQty, out_qty: outQty })
-            .eq('id', id)
+            .eq('id', req.params.id)
             .select();
         if (error) throw error;
         res.json({ message: "Berhasil!", data });
@@ -422,8 +381,7 @@ app.put('/api/inventory/:id', async (req, res) => {
 
 app.delete('/api/inventory/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const { error } = await supabase.from('inventory').delete().eq('id', id);
+        const { error } = await supabase.from('inventory').delete().eq('id', req.params.id);
         if (error) throw error;
         res.json({ message: "Dihapus!" });
     } catch (err) { res.status(500).json({ error: err.message }); }
@@ -464,7 +422,6 @@ app.get('/api/logs', async (req, res) => {
             .from('inventory_logs')
             .select('*, inventory!left(code, name)')
             .order('id', { ascending: false });
-            
         if (error) {
             const { data: fallbackLogs } = await supabase.from('inventory_logs').select('*').order('id', { ascending: false });
             return res.json(fallbackLogs || []);
@@ -475,10 +432,161 @@ app.get('/api/logs', async (req, res) => {
 
 app.delete('/api/logs/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const { error } = await supabase.from('inventory_logs').delete().eq('id', id);
+        const { error } = await supabase.from('inventory_logs').delete().eq('id', req.params.id);
         if (error) throw error;
         res.json({ message: "Dihapus!" });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// =============================================================
+// API SUB-BAGIAN BMN (BARANG MILIK NEGARA)
+// =============================================================
+app.get('/api/bmn', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('bmn_aset').select('*').order('id', { ascending: false });
+        if (error) return res.json([]);
+        res.json(data || []);
+    } catch (err) { res.json([]); }
+});
+
+app.post('/api/bmn', async (req, res) => {
+    try {
+        const { kode_barang, nup, nama_barang, merk_tipe, tahun_perolehan, nilai_perolehan, kondisi, lokasi_ruang, keterangan } = req.body;
+        const { data, error } = await supabase
+            .from('bmn_aset')
+            .insert([{
+                kode_barang, nup: nup || '1', nama_barang, merk_tipe: merk_tipe || '',
+                tahun_perolehan: tahun_perolehan || '', nilai_perolehan: Number(nilai_perolehan) || 0,
+                kondisi: kondisi || 'Baik', lokasi_ruang: lokasi_ruang || '', keterangan: keterangan || ''
+            }])
+            .select();
+        if (error) throw error;
+        res.json({ message: "Data BMN tersimpan!", data });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/bmn/:id', async (req, res) => {
+    try {
+        const { kode_barang, nup, nama_barang, merk_tipe, tahun_perolehan, nilai_perolehan, kondisi, lokasi_ruang, keterangan } = req.body;
+        const { data, error } = await supabase
+            .from('bmn_aset')
+            .update({
+                kode_barang, nup, nama_barang, merk_tipe, tahun_perolehan,
+                nilai_perolehan: Number(nilai_perolehan) || 0, kondisi, lokasi_ruang, keterangan
+            })
+            .eq('id', req.params.id)
+            .select();
+        if (error) throw error;
+        res.json({ message: "Data BMN diperbarui!", data });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/bmn/:id', async (req, res) => {
+    try {
+        const { error } = await supabase.from('bmn_aset').delete().eq('id', req.params.id);
+        if (error) throw error;
+        res.json({ message: "Data BMN dihapus!" });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// =============================================================
+// API SUB-BAGIAN KEPEGAWAIAN
+// =============================================================
+app.get('/api/kepegawaian', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('kepegawaian_data').select('*').order('id', { ascending: false });
+        if (error) return res.json([]);
+        res.json(data || []);
+    } catch (err) { res.json([]); }
+});
+
+app.post('/api/kepegawaian', async (req, res) => {
+    try {
+        const { nip_nik, nama_pegawai, pangkat_golongan, jabatan, unit_kerja, status_kepegawaian, status_kehadiran, keterangan } = req.body;
+        const { data, error } = await supabase
+            .from('kepegawaian_data')
+            .insert([{
+                nip_nik, nama_pegawai, pangkat_golongan: pangkat_golongan || '',
+                jabatan: jabatan || '', unit_kerja: unit_kerja || 'Bidang Umum',
+                status_kepegawaian: status_kepegawaian || 'PNS',
+                status_kehadiran: status_kehadiran || 'Aktif', keterangan: keterangan || ''
+            }])
+            .select();
+        if (error) throw error;
+        res.json({ message: "Data Kepegawaian tersimpan!", data });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/kepegawaian/:id', async (req, res) => {
+    try {
+        const { nip_nik, nama_pegawai, pangkat_golongan, jabatan, unit_kerja, status_kepegawaian, status_kehadiran, keterangan } = req.body;
+        const { data, error } = await supabase
+            .from('kepegawaian_data')
+            .update({ nip_nik, nama_pegawai, pangkat_golongan, jabatan, unit_kerja, status_kepegawaian, status_kehadiran, keterangan })
+            .eq('id', req.params.id)
+            .select();
+        if (error) throw error;
+        res.json({ message: "Data Kepegawaian diperbarui!", data });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/kepegawaian/:id', async (req, res) => {
+    try {
+        const { error } = await supabase.from('kepegawaian_data').delete().eq('id', req.params.id);
+        if (error) throw error;
+        res.json({ message: "Data Kepegawaian dihapus!" });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// =============================================================
+// API SUB-BAGIAN TATA USAHA (PERSURATAN & DISPOSISI)
+// =============================================================
+app.get('/api/tata-usaha', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('tata_usaha_surat').select('*').order('id', { ascending: false });
+        if (error) return res.json([]);
+        res.json(data || []);
+    } catch (err) { res.json([]); }
+});
+
+app.post('/api/tata-usaha', async (req, res) => {
+    try {
+        const { nomor_surat, jenis_surat, tanggal_surat, asal_tujuan, perihal, status_disposisi, keterangan } = req.body;
+        const { data, error } = await supabase
+            .from('tata_usaha_surat')
+            .insert([{
+                nomor_surat, jenis_surat: jenis_surat || 'Surat Masuk',
+                tanggal_surat: formatToIsoDate(tanggal_surat),
+                asal_tujuan, perihal, status_disposisi: status_disposisi || 'Menunggu Disposisi',
+                keterangan: keterangan || ''
+            }])
+            .select();
+        if (error) throw error;
+        res.json({ message: "Agenda surat tersimpan!", data });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/tata-usaha/:id', async (req, res) => {
+    try {
+        const { nomor_surat, jenis_surat, tanggal_surat, asal_tujuan, perihal, status_disposisi, keterangan } = req.body;
+        const { data, error } = await supabase
+            .from('tata_usaha_surat')
+            .update({
+                nomor_surat, jenis_surat, tanggal_surat: formatToIsoDate(tanggal_surat),
+                asal_tujuan, perihal, status_disposisi, keterangan
+            })
+            .eq('id', req.params.id)
+            .select();
+        if (error) throw error;
+        res.json({ message: "Agenda surat diperbarui!", data });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/tata-usaha/:id', async (req, res) => {
+    try {
+        const { error } = await supabase.from('tata_usaha_surat').delete().eq('id', req.params.id);
+        if (error) throw error;
+        res.json({ message: "Agenda surat dihapus!" });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -491,13 +599,19 @@ app.get('/api/backup', async (req, res) => {
         const { data: rgn } = await supabase.from('peminjaman_ruangan').select('*');
         const { data: kdr } = await supabase.from('peminjaman_kendaraan').select('*');
         const { data: ac } = await supabase.from('maintenance_k3_ac').select('*');
-        res.setHeader('Content-disposition', 'attachment; filename=backup_sarpras.json');
+        const { data: bmn } = await supabase.from('bmn_aset').select('*');
+        const { data: peg } = await supabase.from('kepegawaian_data').select('*');
+        const { data: tu } = await supabase.from('tata_usaha_surat').select('*');
+        res.setHeader('Content-disposition', 'attachment; filename=backup_bidang_umum.json');
         res.setHeader('Content-type', 'application/json');
         res.send(JSON.stringify({
             inventory: inv || [],
             peminjaman_ruangan: rgn || [],
             peminjaman_kendaraan: kdr || [],
-            maintenance_ac: ac || []
+            maintenance_ac: ac || [],
+            bmn_aset: bmn || [],
+            kepegawaian_data: peg || [],
+            tata_usaha_surat: tu || []
         }, null, 2));
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -508,5 +622,5 @@ app.use((req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 module.exports = app;
 
 if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => console.log(`Server AC & Sarpras berjalan di: http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`Server MONSARPRAS Bidang Umum berjalan di: http://localhost:${PORT}`));
 }

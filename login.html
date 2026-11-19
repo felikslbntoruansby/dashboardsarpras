@@ -21,8 +21,11 @@
         </svg>
       </div>
       <h1 class="text-2xl font-bold text-white tracking-tight">MONSARPRAS</h1>
-      <p class="text-sm text-slate-400 mt-1">Sistem Monitoring Sarana & Prasarana</p>
+      <p class="text-sm text-slate-400 mt-1">Sistem Monitoring Sarana & Prasarana — Bidang Umum</p>
     </div>
+
+    <!-- Alert Logout / Info -->
+    <div id="info-box" class="hidden mb-5 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs leading-relaxed"></div>
 
     <!-- Alert Error -->
     <div id="error-box" class="hidden mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs leading-relaxed"></div>
@@ -64,30 +67,63 @@
       <button
         type="submit"
         id="submit-btn"
-        class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2"
+        class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2 cursor-pointer"
       >
-        <span>Masuk ke Dashboard</span>
+        <span>Masuk ke Sistem</span>
       </button>
     </form>
 
-    <div class="mt-6 pt-5 border-t border-slate-800/80 text-center">
+    <div class="mt-6 pt-5 border-t border-slate-800/80 text-center space-y-2">
       <p class="text-[11px] text-slate-500">
         Peran Akses: <span class="text-slate-400">Super Admin</span> • <span class="text-slate-400">Teknisi</span> • <span class="text-slate-400">Pimpinan</span>
       </p>
+      <a href="/executive?kiosk=1" class="inline-block text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition">
+        📺 Buka Mode Monitor TV (Kiosk)
+      </a>
     </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://xlompxgjdifbthgpkphv.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
-
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Jika sudah login, langsung arahkan ke dashboard
+    // Ganti tujuan default setelah login di sini (misal: '/bidang-umum' atau '/executive.html')
+    function getDashboardUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const nextUrl = params.get('redirect');
+      if (nextUrl) return nextUrl;
+      return window.location.protocol === 'file:' ? 'bidang-umum.html' : '/bidang-umum';
+    }
+
     (async () => {
+      const params = new URLSearchParams(window.location.search);
+
+      // Jika datang dari klik tombol Logout, paksa hapus sesi lokal & tampilkan pesan
+      if (params.get('logout') === '1') {
+        await sb.auth.signOut();
+        localStorage.clear();
+        sessionStorage.clear();
+        const infoBox = document.getElementById('info-box');
+        infoBox.textContent = 'Anda telah berhasil keluar dari sistem. Silakan login kembali.';
+        infoBox.classList.remove('hidden');
+        // Bersihkan URL agar tidak berulang
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      // Cek apakah user sudah login dengan sesi valid
       const { data: { session } } = await sb.auth.getSession();
       if (session) {
-        window.location.href = 'index.html';
+        const { data: profile } = await sb
+          .from('user_profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile) {
+          window.location.replace(getDashboardUrl());
+        }
       }
     })();
 
@@ -113,11 +149,10 @@
         errBox.textContent = 'Login gagal: ' + (error.message === 'Invalid login credentials' ? 'Email atau kata sandi salah.' : error.message);
         errBox.classList.remove('hidden');
         btn.disabled = false;
-        btn.innerHTML = '<span>Masuk ke Dashboard</span>';
+        btn.innerHTML = '<span>Masuk ke Sistem</span>';
         return;
       }
 
-      // Validasi role di user_profiles
       const { data: profile, error: profErr } = await sb
         .from('user_profiles')
         .select('role')
@@ -129,11 +164,11 @@
         errBox.textContent = 'Akun berhasil terautentikasi, namun belum didaftarkan perannya di tabel user_profiles.';
         errBox.classList.remove('hidden');
         btn.disabled = false;
-        btn.innerHTML = '<span>Masuk ke Dashboard</span>';
+        btn.innerHTML = '<span>Masuk ke Sistem</span>';
         return;
       }
 
-      window.location.href = 'index.html';
+      window.location.replace(getDashboardUrl());
     });
   </script>
 </body>

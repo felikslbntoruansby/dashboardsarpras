@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Bidang Umum - Poltekbang Surabaya</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen antialiased">
+
+  <!-- BACKDROP MOBILE -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+  <!-- SIDEBAR TERPADU BIDANG UMUM -->
+  <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+    <div class="overflow-y-auto flex-1">
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0">
+            <i class="fa-solid fa-plane-departure text-white text-lg"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-blue-400 block">MONSARPRAS</span>
+            <h2 class="text-sm font-extrabold text-white leading-tight">Bidang Umum</h2>
+          </div>
+        </div>
+        <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <!-- MENU DROPDOWN BIDANG UMUM (4 SUB-BAGIAN) -->
+      <div class="p-4 space-y-2">
+        <a href="/bidang-umum" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-md shadow-blue-600/25 transition">
+          <i class="fa-solid fa-grid-2 w-4 text-center"></i>
+          <span>Portal Bidang Umum</span>
+        </a>
+
+        <div class="pt-2">
+          <button type="button" onclick="document.getElementById('menu4Bidang').classList.toggle('hidden')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-slate-800 text-amber-400 hover:bg-slate-700 transition cursor-pointer">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-sitemap w-4 text-center"></i>
+              <span>4 Sub-Bagian Umum</span>
+            </span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+          </button>
+
+          <div id="menu4Bidang" class="pl-3 space-y-1.5 border-l border-slate-700 ml-5 mt-2">
+            <!-- 1. Rumah Tangga -->
+            <div>
+              <button type="button" onclick="document.getElementById('subRT').classList.toggle('hidden')" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-200 hover:bg-slate-800 transition">
+                <span class="flex items-center gap-2">
+                  <i class="fa-solid fa-building-user text-blue-400 w-4 text-center"></i>
+                  <span>1. Rumah Tangga</span>
+                </span>
+                <i class="fa-solid fa-angle-down text-[10px]"></i>
+              </button>
+              <div id="subRT" class="pl-5 space-y-1 mt-1">
+                <a href="/" class="block px-3 py-1.5 rounded-lg text-[11px] text-slate-400 hover:text-white hover:bg-slate-800/70">• Inventaris & Aset</a>
+                <a href="/rumah-tangga" class="block px-3 py-1.5 rounded-lg text-[11px] text-slate-400 hover:text-white hover:bg-slate-800/70">• Layanan Rumah Tangga</a>
+                <a href="/ac" class="block px-3 py-1.5 rounded-lg text-[11px] text-slate-400 hover:text-white hover:bg-slate-800/70">• Maintenance AC</a>
+                <a href="/executive" class="block px-3 py-1.5 rounded-lg text-[11px] text-emerald-400 hover:text-white hover:bg-slate-800/70">• Executive Summary</a>
+              </div>
+            </div>
+
+            <!-- 2. BMN -->
+            <a href="/bmn" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-slate-200 hover:bg-slate-800 transition">
+              <i class="fa-solid fa-landmark text-emerald-400 w-4 text-center"></i>
+              <span>2. BMN</span>
+            </a>
+
+            <!-- 3. Kepegawaian -->
+            <a href="/kepegawaian" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-slate-200 hover:bg-slate-800 transition">
+              <i class="fa-solid fa-users-gear text-cyan-400 w-4 text-center"></i>
+              <span>3. Kepegawaian</span>
+            </a>
+
+            <!-- 4. Tata Usaha -->
+            <a href="/tata-usaha" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-slate-200 hover:bg-slate-800 transition">
+              <i class="fa-solid fa-envelope-open-text text-purple-400 w-4 text-center"></i>
+              <span>4. Tata Usaha</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER SIDEBAR -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-2.5 shrink-0">
+      <a href="/executive?kiosk=1" class="w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 transition">
+        <i class="fa-solid fa-tv"></i>
+        <span>Mode Monitor TV (Kiosk)</span>
+      </a>
+      <button type="button" onclick="logoutMonsarpras()" class="w-full py-2.5 px-3.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Keluar / Logout</span>
+      </button>
+      <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 pt-1">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Supabase Live
+        </span>
+        <span id="sidebarClock" class="font-mono font-bold text-slate-300">--:--</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOP BAR MOBILE -->
+  <div class="lg:hidden sticky top-0 z-30 bg-slate-900 text-white px-4 py-3 flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleMobileSidebar(true)" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200">
+        <i class="fa-solid fa-bars text-sm"></i>
+      </button>
+      <span class="font-extrabold text-xs tracking-wide">Portal Bidang Umum • Poltekbang</span>
+    </div>
+  </div>
+
+  <!-- KONTEN UTAMA 4 MENU BIDANG UMUM -->
+  <div class="lg:pl-64 p-5 md:p-8">
+    <div class="max-w-6xl mx-auto space-y-6">
+
+      <!-- HEADER -->
+      <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-6 md:p-8 rounded-3xl shadow-xl relative overflow-hidden">
+        <div class="absolute right-0 top-0 -mr-12 -mt-12 w-56 h-56 bg-blue-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <span class="text-[11px] font-extrabold uppercase tracking-widest text-cyan-400">SISTEM INFORMASI TERPADU</span>
+        <h1 class="text-2xl md:text-3xl font-black mt-1">Sub-Bagian Bidang Umum</h1>
+        <p class="text-xs md:text-sm text-slate-300 mt-1 max-w-2xl">Politeknik Penerbangan Surabaya • Pilih salah satu dari 4 layanan sub-bagian di bawah ini untuk mengelola data operasional secara terpusat.</p>
+      </div>
+
+      <!-- GRID 4 MENU UTAMA BIDANG UMUM -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- KARTU 1: RUMAH TANGGA -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-blue-400 transition group flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between">
+              <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition">
+                <i class="fa-solid fa-building-user"></i>
+              </div>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200" id="stat-rt">Memuat...</span>
+            </div>
+            <h2 class="text-xl font-black text-slate-900 mt-4">1. Rumah Tangga</h2>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Pengelolaan inventaris stok barang, peminjaman ruangan & kendaraan dinas, serta jadwal maintenance AC gedung.</p>
+
+            <!-- Shortcut langsung ke 3 sub-modul Rumah Tangga -->
+            <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-100">
+              <a href="/" class="p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 text-center transition">
+                <i class="fa-solid fa-boxes-stacked text-indigo-600 text-sm block mb-1"></i>
+                <span class="text-[11px] font-bold text-slate-700 block">Inventaris</span>
+              </a>
+              <a href="/rumah-tangga" class="p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-center transition">
+                <i class="fa-solid fa-car-side text-blue-600 text-sm block mb-1"></i>
+                <span class="text-[11px] font-bold text-slate-700 block">Pinjam Ruang/Mobil</span>
+              </a>
+              <a href="/ac" class="p-2.5 rounded-xl bg-slate-50 hover:bg-cyan-50 border border-slate-200 hover:border-cyan-300 text-center transition">
+                <i class="fa-solid fa-snowflake text-cyan-600 text-sm block mb-1"></i>
+                <span class="text-[11px] font-bold text-slate-700 block">Maint. AC</span>
+              </a>
+            </div>
+          </div>
+
+          <a href="/rumah-tangga" class="mt-5 w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition shadow-sm">
+            <span>Buka Dashboard Rumah Tangga</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- KARTU 2: BMN -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-emerald-400 transition group flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between">
+              <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center text-2xl group-hover:bg-emerald-600 group-hover:text-white transition">
+                <i class="fa-solid fa-landmark"></i>
+              </div>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200" id="stat-bmn">0 Aset BMN</span>
+            </div>
+            <h2 class="text-xl font-black text-slate-900 mt-4">2. BMN (Barang Milik Negara)</h2>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Pencatatan Kartu Inventaris Barang (KIB), kode barang & NUP, nilai perolehan, penempatan ruangan, serta kondisi aset negara.</p>
+          </div>
+
+          <a href="/bmn" class="mt-6 w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition shadow-sm">
+            <span>Buka Dashboard BMN</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- KARTU 3: KEPEGAWAIAN -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-cyan-400 transition group flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between">
+              <div class="w-14 h-14 rounded-2xl bg-cyan-50 text-cyan-600 border border-cyan-200 flex items-center justify-center text-2xl group-hover:bg-cyan-600 group-hover:text-white transition">
+                <i class="fa-solid fa-users-gear"></i>
+              </div>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200" id="stat-pegawai">0 Pegawai</span>
+            </div>
+            <h2 class="text-xl font-black text-slate-900 mt-4">3. Kepegawaian</h2>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Database profil pegawai (PNS, PPPK, PPNPN), pangkat/golongan, jabatan struktural maupun fungsional, serta status kehadiran/cuti.</p>
+          </div>
+
+          <a href="/kepegawaian" class="mt-6 w-full py-3 px-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition shadow-sm">
+            <span>Buka Dashboard Kepegawaian</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- KARTU 4: TATA USAHA -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-purple-400 transition group flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between">
+              <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 border border-purple-200 flex items-center justify-center text-2xl group-hover:bg-purple-600 group-hover:text-white transition">
+                <i class="fa-solid fa-envelope-open-text"></i>
+              </div>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200" id="stat-tu">0 Agenda Surat</span>
+            </div>
+            <h2 class="text-xl font-black text-slate-900 mt-4">4. Tata Usaha</h2>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Buku agenda surat masuk & surat keluar, nota dinas, SK, serta pemantauan status disposisi pimpinan secara real-time.</p>
+          </div>
+
+          <a href="/tata-usaha" class="mt-6 w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition shadow-sm">
+            <span>Buka Dashboard Tata Usaha</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleMobileSidebar(show) {
+      document.getElementById('appSidebar').classList.toggle('-translate-x-full', !show);
+      document.getElementById('sidebarBackdrop').classList.toggle('hidden', !show);
+    }
+
+    setInterval(() => {
+      const el = document.getElementById('sidebarClock');
+      if (el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }, 1000);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const [inv, bmn, peg, tu] = await Promise.all([
+          fetch('/api/inventory').then(r => r.json()).catch(() => []),
+          fetch('/api/bmn').then(r => r.json()).catch(() => []),
+          fetch('/api/kepegawaian').then(r => r.json()).catch(() => []),
+          fetch('/api/tata-usaha').then(r => r.json()).catch(() => [])
+        ]);
+        document.getElementById('stat-rt').innerText = `${inv.length} Item Inventaris`;
+        document.getElementById('stat-bmn').innerText = `${bmn.length} Aset BMN`;
+        document.getElementById('stat-pegawai').innerText = `${peg.length} Pegawai`;
+        document.getElementById('stat-tu').innerText = `${tu.length} Agenda Surat`;
+      } catch (e) {}
+    });
+  </script>
+  <script src="auth-audit.js"></script>
+</body>
+</html>
