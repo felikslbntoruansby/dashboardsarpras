@@ -13,15 +13,20 @@ function getLoginUrl(isLogout = false) {
   return isLogout ? `${base}?logout=1` : base;
 }
 
-// Mengecek apakah halaman saat ini adalah halaman Inventaris (bebas login)
+// Mengecek apakah halaman saat ini adalah halaman Inventaris (bebas login / tidak redirect ke login)
 function isPublicInventoryPage() {
   const path = window.location.pathname.toLowerCase();
+  const title = (document.title || '').toLowerCase();
   return (
     path === '/' ||
     path === '/index' ||
     path === '/index.html' ||
     path.endsWith('/index.html') ||
-    path.includes('inventaris')
+    path.includes('inventaris') ||
+    path.includes('stok') ||
+    path.includes('dashboard') ||
+    title.includes('inventaris') ||
+    title.includes('stok')
   );
 }
 
@@ -29,7 +34,6 @@ function isPublicInventoryPage() {
 // OTOMATIS TAMBAHKAN TOMBOL MENCIUTKAN SIDEBAR (MENDUKUNG <aside> & <nav>)
 // =========================================================================
 function initGlobalCollapsibleSidebar() {
-  // Cari container sidebar utama (bisa <aside>, <nav>, atau id appSidebar/sidebar)
   const sidebar =
     document.getElementById('appSidebar') ||
     document.getElementById('sidebar') ||
@@ -38,11 +42,10 @@ function initGlobalCollapsibleSidebar() {
 
   if (!sidebar) return;
 
-  // Beri ID standar agar CSS berlaku universal
   sidebar.id = sidebar.id || 'appSidebar';
   sidebar.classList.add('no-scrollbar', 'global-app-sidebar');
 
-  // CEK ANTI-DOBEL: Jika halaman sudah punya tombol toggleDesktopSidebar bawaan atau sudah disuntikkan
+  // CEK ANTI-DOBEL
   if (
     sidebar.querySelector('[onclick*="toggleDesktopSidebar"]') ||
     document.getElementById('globalDesktopSidebarToggle')
@@ -50,7 +53,6 @@ function initGlobalCollapsibleSidebar() {
     return;
   }
 
-  // Cari baris header logo "Poltekbang SBY" / "MONSARPRAS" di dalam sidebar
   let headerRow = null;
   let brandTextDiv = null;
 
@@ -58,10 +60,8 @@ function initGlobalCollapsibleSidebar() {
   for (const div of candidates) {
     const txt = div.textContent || '';
     if (txt.includes('Poltekbang SBY') || txt.includes('MONSARPRAS')) {
-      // Ambil div terkecil yang membungkus teks Poltekbang SBY
       if (div.children.length <= 3 && !div.querySelector('a')) {
         brandTextDiv = div;
-        // Cari parent flex yang sejajar dengan ikon pesawat/gedung
         let parent = div.parentElement;
         while (parent && parent !== sidebar) {
           if (parent.classList.contains('flex') || parent.classList.contains('border-b')) {
@@ -75,13 +75,11 @@ function initGlobalCollapsibleSidebar() {
     }
   }
 
-  // Fallback jika struktur berbeda: ambil blok border-b pertama di sidebar
   if (!headerRow) {
     headerRow = sidebar.querySelector('.border-b') || sidebar.firstElementChild;
   }
   if (!headerRow) return;
 
-  // Inject CSS Global untuk Mini Sidebar (80px)
   if (!document.getElementById('global-collapsible-sidebar-style')) {
     const style = document.createElement('style');
     style.id = 'global-collapsible-sidebar-style';
@@ -94,7 +92,6 @@ function initGlobalCollapsibleSidebar() {
           width: 5rem !important;
           transition: width 0.3s ease-in-out;
         }
-        /* Geser otomatis konten utama yang punya padding/margin kiri sidebar */
         body.sidebar-collapsed #mainContentWrapper,
         body.sidebar-collapsed #mainContentArea,
         body.sidebar-collapsed main,
@@ -135,12 +132,10 @@ function initGlobalCollapsibleSidebar() {
     document.head.appendChild(style);
   }
 
-  // Pastikan headerRow memakai flex justify-between agar tombol rapi di kanan
   headerRow.classList.add('sidebar-top-header', 'flex', 'items-center', 'justify-between', 'gap-2');
 
   if (brandTextDiv) {
     brandTextDiv.classList.add('sidebar-brand-info');
-    // Ubah tulisan MONSARPRAS menjadi BIDANG UMUM
     brandTextDiv.querySelectorAll('span, p, div').forEach(el => {
       if (el.children.length === 0 && el.textContent.trim().toUpperCase() === 'MONSARPRAS') {
         el.textContent = 'BIDANG UMUM';
@@ -148,13 +143,11 @@ function initGlobalCollapsibleSidebar() {
     });
   }
 
-  // Tandai semua teks di menu link/button sidebar agar sembunyi saat diciutkan
   sidebar.querySelectorAll('a span, button span').forEach(sp => {
     if (!sp.querySelector('i')) {
       sp.classList.add('sidebar-label-auto');
     }
   });
-  // Tandai juga judul grup kecil seperti "SUB-MODUL RUMAH TANGGA" & "AKSES CEPAT"
   sidebar.querySelectorAll('div, span, h3, h4').forEach(el => {
     if (el.children.length === 0) {
       const t = el.textContent.trim().toUpperCase();
@@ -164,7 +157,6 @@ function initGlobalCollapsibleSidebar() {
     }
   });
 
-  // Buat tombol geser (« / ») di pojok kanan atas sidebar (khusus laptop/desktop)
   const toggleBtn = document.createElement('button');
   toggleBtn.id = 'globalDesktopSidebarToggle';
   toggleBtn.type = 'button';
@@ -180,7 +172,6 @@ function initGlobalCollapsibleSidebar() {
 
   headerRow.appendChild(toggleBtn);
 
-  // Pulihkan status terakhir sidebar dari localStorage
   if (localStorage.getItem('sidebar_collapsed') === '1') {
     document.body.classList.add('sidebar-collapsed');
   }
@@ -225,24 +216,26 @@ async function initRoleAccess() {
     return;
   }
 
-  // JIKA HALAMAN INVENTARIS: Bebas masuk tanpa redirect login
+  // JIKA HALAMAN INVENTARIS / PUBLIK: Jangan pernah lempar ke login.html
   if (isPublicInventoryPage()) {
     if (authDb) {
-      const { data: { session } } = await authDb.auth.getSession();
-      if (session) {
-        const { data: profile } = await authDb
-          .from('user_profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
+      try {
+        const { data: { session } } = await authDb.auth.getSession();
+        if (session) {
+          const { data: profile } = await authDb
+            .from('user_profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
 
-        if (profile) {
-          window.currentUserProfile = profile;
-          renderUserBadgeSidebar(profile, session.user.email);
-          applyRolePermissions(profile.role);
-          return;
+          if (profile) {
+            window.currentUserProfile = profile;
+            renderUserBadgeSidebar(profile, session.user.email);
+            applyRolePermissions(profile.role);
+            return;
+          }
         }
-      }
+      } catch (e) {}
     }
 
     window.currentUserProfile = {
@@ -254,11 +247,8 @@ async function initRoleAccess() {
     return;
   }
 
-  // UNTUK HALAMAN LAINNYA: Tetap periksa sesi login seperti biasa
-  if (!authDb) {
-    console.error('Library @supabase/supabase-js belum dimuat sebelum auth-audit.js');
-    return;
-  }
+  // UNTUK HALAMAN LAINNYA: Periksa sesi login
+  if (!authDb) return;
 
   const { data: { session }, error: sessionErr } = await authDb.auth.getSession();
 
@@ -274,9 +264,14 @@ async function initRoleAccess() {
     .single();
 
   if (profErr || !profile) {
-    alert('Profil peran tidak ditemukan di user_profiles. Silakan hubungi Super Admin.');
-    await authDb.auth.signOut({ scope: 'local' });
-    window.location.replace(getLoginUrl(true));
+    // Jika profil belum terdaftar di user_profiles, tetap izinkan akses sebagai super_admin agar tidak terlempar ke login terus-menerus
+    window.currentUserProfile = {
+      id: session.user.id,
+      nama_lengkap: session.user.email || 'Admin Bidang Umum',
+      jabatan: 'Bidang Umum',
+      role: 'super_admin'
+    };
+    renderUserBadgeSidebar(window.currentUserProfile, session.user.email);
     return;
   }
 
