@@ -13,32 +13,36 @@ function getLoginUrl(isLogout = false) {
   return isLogout ? `${base}?logout=1` : base;
 }
 
-// Fungsi Logout Utama (Dipanggil langsung saat tombol Keluar diklik)
+// Fungsi Logout Utama (Bisa dipanggil dari tombol mana saja)
 window.logoutMonsarpras = window.logoutSistem = async function (event) {
   if (event && typeof event.preventDefault === 'function') {
     event.preventDefault();
+    event.stopPropagation();
   }
 
-  // Hapus semua data sesi lokal terlebih dahulu
-  try {
-    localStorage.clear();
-    sessionStorage.clear();
-  } catch (e) {}
-
-  // Proses signOut Supabase dengan batas waktu maksimal 1 detik agar tidak macet
+  // 1. Panggil signOut Supabase (scope local agar instan tanpa macet jaringan)
   if (authDb && authDb.auth) {
     try {
       await Promise.race([
-        authDb.auth.signOut(),
-        new Promise(resolve => setTimeout(resolve, 1000))
+        authDb.auth.signOut({ scope: 'local' }),
+        new Promise(resolve => setTimeout(resolve, 600))
       ]);
     } catch (err) {
       console.warn('SignOut warning:', err);
     }
   }
 
-  // Paksa pindah langsung ke halaman login
-  window.location.replace(getLoginUrl(true));
+  // 2. Bersihkan seluruh token sesi Supabase di localStorage & sessionStorage
+  try {
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith('sb-') || k.includes('supabase')) localStorage.removeItem(k);
+    });
+    localStorage.clear();
+    sessionStorage.clear();
+  } catch (e) {}
+
+  // 3. Paksa pindah langsung ke halaman login
+  window.location.href = getLoginUrl(true);
 };
 
 // Inisialisasi Sesi & Hak Akses
@@ -70,7 +74,7 @@ async function initRoleAccess() {
 
   if (profErr || !profile) {
     alert('Profil peran tidak ditemukan di user_profiles. Silakan hubungi Super Admin.');
-    await authDb.auth.signOut();
+    await authDb.auth.signOut({ scope: 'local' });
     window.location.replace(getLoginUrl(true));
     return;
   }
@@ -88,13 +92,16 @@ function renderLogoutBelowKiosk() {
     return;
   }
 
-  // Mendukung baik link <a href*="kiosk=1"> maupun tombol <button onclick*="enterKioskMode">
-  const kioskBtn = document.querySelector('aside a[href*="kiosk=1"], aside button[onclick*="enterKioskMode"]');
+  // Mendukung link kiosk=1, tombol enterKioskMode, maupun tombol toggleKioskMode
+  const kioskBtn = document.querySelector(
+    'aside a[href*="kiosk=1"], aside button[onclick*="enterKioskMode"], aside button[onclick*="toggleKioskMode"]'
+  );
+
   if (kioskBtn) {
     const logoutBtn = document.createElement('button');
     logoutBtn.id = 'btn-sidebar-logout';
     logoutBtn.type = 'button';
-    logoutBtn.onclick = (e) => window.logoutMonsarpras(e);
+    logoutBtn.addEventListener('click', (e) => window.logoutMonsarpras(e));
     logoutBtn.className = 'w-full py-2.5 px-3.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer mt-2';
     logoutBtn.innerHTML = `
       <i class="fa-solid fa-right-from-bracket"></i>
@@ -264,4 +271,8 @@ window.bukaModalAuditLog = async function () {
   `;
 };
 
-document.addEventListener('DOMContentLoaded', initRoleAccess);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initRoleAccess);
+} else {
+  initRoleAccess();
+}
