@@ -24,7 +24,7 @@
       <p class="text-sm text-slate-400 mt-1">Sistem Monitoring Sarana & Prasarana — Bidang Umum</p>
     </div>
 
-    <!-- Alert Logout / Info -->
+    <!-- Alert Logout Berhasil -->
     <div id="info-box" class="hidden mb-5 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs leading-relaxed"></div>
 
     <!-- Alert Error -->
@@ -69,7 +69,7 @@
         id="submit-btn"
         class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2 cursor-pointer"
       >
-        <span>Masuk ke Sistem</span>
+        <span>Masuk ke Portal Bidang Umum</span>
       </button>
     </form>
 
@@ -88,31 +88,31 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_1Qpe36iF1lwCDmfOBHJmlg_hxJUSjJ4';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Ganti tujuan default setelah login di sini (misal: '/bidang-umum' atau '/executive.html')
-    function getDashboardUrl() {
+    function getPortalUrl() {
       const params = new URLSearchParams(window.location.search);
-      const nextUrl = params.get('redirect');
-      if (nextUrl) return nextUrl;
+      const redirectTarget = params.get('redirect');
+      if (redirectTarget && !redirectTarget.includes('login')) {
+        return redirectTarget;
+      }
       return window.location.protocol === 'file:' ? 'bidang-umum.html' : '/bidang-umum';
     }
 
     (async () => {
       const params = new URLSearchParams(window.location.search);
 
-      // Jika datang dari klik tombol Logout, paksa hapus sesi lokal & tampilkan pesan
+      // Tangani pengalihan dari tombol Logout
       if (params.get('logout') === '1') {
-        await sb.auth.signOut();
         localStorage.clear();
         sessionStorage.clear();
+        await sb.auth.signOut().catch(() => {});
         const infoBox = document.getElementById('info-box');
-        infoBox.textContent = 'Anda telah berhasil keluar dari sistem. Silakan login kembali.';
+        infoBox.textContent = 'Anda telah berhasil keluar dari sistem.';
         infoBox.classList.remove('hidden');
-        // Bersihkan URL agar tidak berulang
         window.history.replaceState({}, document.title, window.location.pathname);
         return;
       }
 
-      // Cek apakah user sudah login dengan sesi valid
+      // Jika sesi sudah aktif & role valid, langsung masuk ke portal
       const { data: { session } } = await sb.auth.getSession();
       if (session) {
         const { data: profile } = await sb
@@ -122,7 +122,7 @@
           .single();
 
         if (profile) {
-          window.location.replace(getDashboardUrl());
+          window.location.replace(getPortalUrl());
         }
       }
     })();
@@ -138,8 +138,10 @@
       const password = document.getElementById('password').value;
       const btn = document.getElementById('submit-btn');
       const errBox = document.getElementById('error-box');
+      const infoBox = document.getElementById('info-box');
 
       errBox.classList.add('hidden');
+      infoBox.classList.add('hidden');
       btn.disabled = true;
       btn.innerHTML = '<span>Memverifikasi akun...</span>';
 
@@ -149,7 +151,7 @@
         errBox.textContent = 'Login gagal: ' + (error.message === 'Invalid login credentials' ? 'Email atau kata sandi salah.' : error.message);
         errBox.classList.remove('hidden');
         btn.disabled = false;
-        btn.innerHTML = '<span>Masuk ke Sistem</span>';
+        btn.innerHTML = '<span>Masuk ke Portal Bidang Umum</span>';
         return;
       }
 
@@ -164,11 +166,11 @@
         errBox.textContent = 'Akun berhasil terautentikasi, namun belum didaftarkan perannya di tabel user_profiles.';
         errBox.classList.remove('hidden');
         btn.disabled = false;
-        btn.innerHTML = '<span>Masuk ke Sistem</span>';
+        btn.innerHTML = '<span>Masuk ke Portal Bidang Umum</span>';
         return;
       }
 
-      window.location.replace(getDashboardUrl());
+      window.location.replace(getPortalUrl());
     });
   </script>
 </body>

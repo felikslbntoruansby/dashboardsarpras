@@ -8,15 +8,13 @@ if (window.supabase && typeof window.supabase.createClient === 'function') {
 }
 window.currentUserProfile = null;
 
-function getLoginUrl() {
-  if (window.location.protocol === 'file:') {
-    return 'login.html';
-  }
-  return '/login.html';
+function getLoginUrl(isLogout = false) {
+  const base = window.location.protocol === 'file:' ? 'login.html' : '/login.html';
+  return isLogout ? `${base}?logout=1` : base;
 }
 
 // Fungsi Logout Utama (Dipanggil langsung saat tombol Keluar diklik)
-window.logoutMonsarpras = async function (event) {
+window.logoutMonsarpras = window.logoutSistem = async function (event) {
   if (event && typeof event.preventDefault === 'function') {
     event.preventDefault();
   }
@@ -27,12 +25,12 @@ window.logoutMonsarpras = async function (event) {
     sessionStorage.clear();
   } catch (e) {}
 
-  // Proses signOut Supabase dengan batas waktu maksimal 1,5 detik agar tidak macet
+  // Proses signOut Supabase dengan batas waktu maksimal 1 detik agar tidak macet
   if (authDb && authDb.auth) {
     try {
       await Promise.race([
         authDb.auth.signOut(),
-        new Promise(resolve => setTimeout(resolve, 1500))
+        new Promise(resolve => setTimeout(resolve, 1000))
       ]);
     } catch (err) {
       console.warn('SignOut warning:', err);
@@ -40,7 +38,7 @@ window.logoutMonsarpras = async function (event) {
   }
 
   // Paksa pindah langsung ke halaman login
-  window.location.replace(getLoginUrl());
+  window.location.replace(getLoginUrl(true));
 };
 
 // Inisialisasi Sesi & Hak Akses
@@ -60,7 +58,7 @@ async function initRoleAccess() {
   const { data: { session }, error: sessionErr } = await authDb.auth.getSession();
 
   if (sessionErr || !session) {
-    window.location.replace(getLoginUrl());
+    window.location.replace(getLoginUrl(false));
     return;
   }
 
@@ -73,7 +71,7 @@ async function initRoleAccess() {
   if (profErr || !profile) {
     alert('Profil peran tidak ditemukan di user_profiles. Silakan hubungi Super Admin.');
     await authDb.auth.signOut();
-    window.location.replace(getLoginUrl());
+    window.location.replace(getLoginUrl(true));
     return;
   }
 
@@ -90,13 +88,14 @@ function renderLogoutBelowKiosk() {
     return;
   }
 
-  const kioskBtn = document.querySelector('aside a[href*="kiosk=1"]');
+  // Mendukung baik link <a href*="kiosk=1"> maupun tombol <button onclick*="enterKioskMode">
+  const kioskBtn = document.querySelector('aside a[href*="kiosk=1"], aside button[onclick*="enterKioskMode"]');
   if (kioskBtn) {
     const logoutBtn = document.createElement('button');
     logoutBtn.id = 'btn-sidebar-logout';
     logoutBtn.type = 'button';
     logoutBtn.onclick = (e) => window.logoutMonsarpras(e);
-    logoutBtn.className = 'w-full py-2.5 px-3.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer';
+    logoutBtn.className = 'w-full py-2.5 px-3.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer mt-2';
     logoutBtn.innerHTML = `
       <i class="fa-solid fa-right-from-bracket"></i>
       <span>Keluar / Logout</span>

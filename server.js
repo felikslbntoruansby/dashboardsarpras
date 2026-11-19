@@ -18,31 +18,44 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static(path.join(__dirname)));
 
 // =============================================================
-// STATIC ROUTING HALAMAN DASHBOARD, BIDANG UMUM & QR SCAN
+// STATIC ROUTING HALAMAN LOGIN, DASHBOARD & BIDANG UMUM
+// (Diletakkan sebelum express.static agar '/' langsung membuka login.html)
 // =============================================================
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-app.get('/bidang-umum', (req, res) => res.sendFile(path.join(__dirname, 'bidang-umum.html')));
-app.get('/bidang-umum.html', (req, res) => res.sendFile(path.join(__dirname, 'bidang-umum.html')));
-app.get('/bmn', (req, res) => res.sendFile(path.join(__dirname, 'bmn.html')));
-app.get('/bmn.html', (req, res) => res.sendFile(path.join(__dirname, 'bmn.html')));
-app.get('/kepegawaian', (req, res) => res.sendFile(path.join(__dirname, 'kepegawaian.html')));
-app.get('/kepegawaian.html', (req, res) => res.sendFile(path.join(__dirname, 'kepegawaian.html')));
-app.get('/tata-usaha', (req, res) => res.sendFile(path.join(__dirname, 'tata-usaha.html')));
-app.get('/tata-usaha.html', (req, res) => res.sendFile(path.join(__dirname, 'tata-usaha.html')));
-app.get('/executive', (req, res) => res.sendFile(path.join(__dirname, 'executive.html')));
-app.get('/executive.html', (req, res) => res.sendFile(path.join(__dirname, 'executive.html')));
-app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
-app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
-app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
-app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
-app.get('/unit-ac', (req, res) => res.sendFile(path.join(__dirname, 'unit-ac.html')));
-app.get('/unit-ac.html', (req, res) => res.sendFile(path.join(__dirname, 'unit-ac.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
+
+app.get('/index', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+
+app.get('/bidang-umum', (req, res) => res.sendFile(path.join(__dirname, 'bidang-umum.html')));
+app.get('/bidang-umum.html', (req, res) => res.sendFile(path.join(__dirname, 'bidang-umum.html')));
+
+app.get('/bmn', (req, res) => res.sendFile(path.join(__dirname, 'bmn.html')));
+app.get('/bmn.html', (req, res) => res.sendFile(path.join(__dirname, 'bmn.html')));
+
+app.get('/kepegawaian', (req, res) => res.sendFile(path.join(__dirname, 'kepegawaian.html')));
+app.get('/kepegawaian.html', (req, res) => res.sendFile(path.join(__dirname, 'kepegawaian.html')));
+
+app.get('/tata-usaha', (req, res) => res.sendFile(path.join(__dirname, 'tata-usaha.html')));
+app.get('/tata-usaha.html', (req, res) => res.sendFile(path.join(__dirname, 'tata-usaha.html')));
+
+app.get('/executive', (req, res) => res.sendFile(path.join(__dirname, 'executive.html')));
+app.get('/executive.html', (req, res) => res.sendFile(path.join(__dirname, 'executive.html')));
+
+app.get('/rumah-tangga', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
+app.get('/rumahtangga.html', (req, res) => res.sendFile(path.join(__dirname, 'rumahtangga.html')));
+
+app.get('/ac', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
+app.get('/ac.html', (req, res) => res.sendFile(path.join(__dirname, 'ac.html')));
+
+app.get('/unit-ac', (req, res) => res.sendFile(path.join(__dirname, 'unit-ac.html')));
+app.get('/unit-ac.html', (req, res) => res.sendFile(path.join(__dirname, 'unit-ac.html')));
+
+// Sajikan file statis seperti auth-audit.js, gambar, dan aset lainnya
+app.use(express.static(path.join(__dirname), { index: false }));
 
 // =============================================================
 // API PREFERENSI FILTER BULAN (PERMANEN DI SUPABASE)
@@ -616,8 +629,8 @@ app.get('/api/backup', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Fallback ke index.html jika rute tidak ditemukan
-app.use((req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+// Fallback ke login.html jika rute tidak ditemukan
+app.use((req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 
 module.exports = app;
 
