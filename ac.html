@@ -13,6 +13,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
     @keyframes radarPulse {
       0% { transform: scale(0.9); opacity: 0.8; }
       50% { transform: scale(1.15); opacity: 0.3; }
@@ -24,6 +27,40 @@
     thead .sticky-col-1, thead .sticky-col-2 { background-color: #f1f5f9; }
     tbody tr:hover .sticky-col-1, tbody tr:hover .sticky-col-2 { background-color: #f8fafc; }
     html { scroll-behavior: smooth; }
+
+    /* Mode Sidebar Diciutkan (Mini Sidebar) di Desktop/Laptop */
+    @media (min-width: 1024px) {
+      body.sidebar-collapsed #appSidebar {
+        width: 5rem; /* 80px */
+      }
+      body.sidebar-collapsed #mainContentWrapper {
+        padding-left: 5rem;
+      }
+      body.sidebar-collapsed .sidebar-label,
+      body.sidebar-collapsed .sidebar-section-title,
+      body.sidebar-collapsed #dropdownBidangUmum,
+      body.sidebar-collapsed .sidebar-chevron,
+      body.sidebar-collapsed #sidebarStatusText,
+      body.sidebar-collapsed #user-profile-box {
+        display: none !important;
+      }
+      body.sidebar-collapsed .sidebar-header-wrap {
+        justify-content: center;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+      body.sidebar-collapsed .sidebar-brand-group {
+        display: none;
+      }
+      body.sidebar-collapsed .sidebar-nav-btn {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      body.sidebar-collapsed #desktopToggleIcon {
+        transform: rotate(180deg);
+      }
+    }
   </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 min-h-screen antialiased">
@@ -49,21 +86,28 @@
   <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden"></div>
 
   <!-- ========================================================================= -->
-  <!-- SIDEBAR KIRI TERPADU (MAINTENANCE AC)                                     -->
+  <!-- SIDEBAR KIRI TERPADU (MAINTENANCE AC - COLLAPSIBLE)                       -->
   <!-- ========================================================================= -->
-  <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
-    <div class="overflow-y-auto flex-1">
-      <!-- BRANDING INSTANSI -->
-      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0">
-            <i class="fa-solid fa-plane-departure text-white text-lg"></i>
+  <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800/80 transform -translate-x-full lg:translate-x-0 transition-all duration-300 ease-in-out shadow-2xl lg:shadow-none">
+    <div class="overflow-y-auto no-scrollbar flex-1">
+      <!-- BRANDING INSTANSI + TOMBOL GESER SIDEBAR -->
+      <div class="sidebar-header-wrap p-5 border-b border-slate-800/80 flex items-center justify-between gap-2">
+        <div class="sidebar-brand-group flex items-center gap-3 min-w-0">
+          <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 ring-1 ring-white/15 shrink-0">
+            <i class="fa-solid fa-plane-departure text-white text-base"></i>
           </div>
-          <div>
-            <span class="text-[10px] font-extrabold uppercase tracking-widest text-blue-400 block">MONSARPRAS</span>
-            <h2 class="text-sm font-extrabold text-white leading-tight">Poltekbang SBY</h2>
+          <div class="min-w-0">
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-blue-400 block truncate">BIDANG UMUM</span>
+            <h2 class="text-sm font-extrabold text-white leading-tight truncate">Poltekbang SBY</h2>
           </div>
         </div>
+
+        <!-- Tombol Geser / Perkecil Sidebar di Laptop (Desktop) -->
+        <button type="button" onclick="toggleDesktopSidebar()" title="Perkecil / Perlebar Menu Samping" class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/90 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-700/80 transition cursor-pointer shrink-0">
+          <i id="desktopToggleIcon" class="fa-solid fa-angles-left text-xs transition-transform duration-300"></i>
+        </button>
+
+        <!-- Tombol Tutup di HP -->
         <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg">
           <i class="fa-solid fa-xmark text-base"></i>
         </button>
@@ -72,18 +116,18 @@
       <!-- MENU MODUL LAYANAN -->
       <div class="p-4 space-y-1.5">
         <!-- TOMBOL PORTAL & 4 MENU BIDANG UMUM -->
-        <div class="pb-3 mb-2 border-b border-slate-800 space-y-1.5">
-          <a href="/bidang-umum" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition">
-            <i class="fa-solid fa-table-cells-large w-4 text-center"></i>
-            <span>Portal Bidang Umum</span>
+        <div class="pb-3 mb-2 border-b border-slate-800/80 space-y-1.5">
+          <a href="/bidang-umum" title="Portal Bidang Umum" class="sidebar-nav-btn nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition">
+            <i class="fa-solid fa-table-cells-large w-4 text-center shrink-0"></i>
+            <span class="sidebar-label truncate">Portal Bidang Umum</span>
           </a>
 
-          <button type="button" onclick="document.getElementById('dropdownBidangUmum').classList.toggle('hidden')" class="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-200 hover:bg-slate-800 transition cursor-pointer">
+          <button type="button" onclick="handleDropdownBidangClick()" title="Bidang Umum (4 Menu)" class="sidebar-nav-btn w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-200 hover:bg-slate-800 transition cursor-pointer">
             <span class="flex items-center gap-3">
-              <i class="fa-solid fa-sitemap w-4 text-center text-amber-400"></i>
-              <span>Bidang Umum (4 Menu)</span>
+              <i class="fa-solid fa-sitemap w-4 text-center text-amber-400 shrink-0"></i>
+              <span class="sidebar-label truncate">Bidang Umum (4 Menu)</span>
             </span>
-            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+            <i class="sidebar-chevron fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
           </button>
 
           <div id="dropdownBidangUmum" class="hidden pl-3 space-y-1 border-l border-slate-700 ml-5 pt-1">
@@ -102,76 +146,77 @@
           </div>
         </div>
 
-        <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">SUB-MODUL RUMAH TANGGA</p>
+        <p class="sidebar-section-title px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Modul Rumah Tangga</p>
 
-        <a href="/" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
-          <i class="fa-solid fa-boxes-stacked w-4 text-center text-indigo-400"></i>
-          <span>Inventaris & Aset</span>
+        <a href="/index.html" title="Inventaris & Aset" class="sidebar-nav-btn nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-boxes-stacked w-4 text-center text-indigo-400 shrink-0"></i>
+          <span class="sidebar-label truncate">Inventaris & Aset</span>
         </a>
 
-        <a href="/rumah-tangga" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
-          <i class="fa-solid fa-building-user w-4 text-center text-blue-400"></i>
-          <span>Layanan Rumah Tangga</span>
+        <a href="/rumah-tangga" title="Layanan Rumah Tangga" class="sidebar-nav-btn nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-building-user w-4 text-center text-blue-400 shrink-0"></i>
+          <span class="sidebar-label truncate">Layanan Rumah Tangga</span>
         </a>
 
         <!-- MENU AKTIF: MAINTENANCE AC -->
-        <a href="/ac" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-600/25 transition">
-          <i class="fa-solid fa-snowflake w-4 text-center text-cyan-300"></i>
-          <span>Maintenance AC</span>
+        <a href="/ac" title="Maintenance AC" class="sidebar-nav-btn nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-extrabold bg-blue-600 text-white shadow-md shadow-blue-600/25 transition">
+          <i class="fa-solid fa-snowflake w-4 text-center text-white shrink-0"></i>
+          <span class="sidebar-label truncate">Maintenance AC</span>
         </a>
 
-        <a href="/executive" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
-          <i class="fa-solid fa-chart-line w-4 text-center text-emerald-400"></i>
-          <span>Executive Summary</span>
+        <a href="/executive.html" title="Executive Summary" class="sidebar-nav-btn nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+          <i class="fa-solid fa-chart-line w-4 text-center text-emerald-400 shrink-0"></i>
+          <span class="sidebar-label truncate">Executive Summary</span>
         </a>
       </div>
 
       <!-- MENU AKSES CEPAT KHUSUS MAINTENANCE AC -->
       <div class="px-4 pt-2 pb-4 border-t border-slate-800/80 space-y-1.5">
-        <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">AKSES CEPAT</p>
+        <p class="sidebar-section-title px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Akses Cepat</p>
 
-        <button type="button" onclick="toggleMobileSidebar(false); switchMainView('MATRIX'); document.getElementById('section-MATRIX').scrollIntoView();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
-          <i class="fa-solid fa-table-columns w-4 text-center text-blue-400"></i>
-          <span>Data Unit & Matriks 20x</span>
+        <button type="button" title="Data Unit & Matriks 20x" onclick="toggleMobileSidebar(false); switchMainView('MATRIX'); document.getElementById('section-MATRIX').scrollIntoView();" class="sidebar-nav-btn w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-table-columns w-4 text-center text-blue-400 shrink-0"></i>
+          <span class="sidebar-label truncate">Data Unit & Matriks 20x</span>
         </button>
 
-        <button type="button" onclick="toggleMobileSidebar(false); switchMainView('MONTHLY'); document.getElementById('section-MONTHLY').scrollIntoView();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
-          <i class="fa-solid fa-calendar-days w-4 text-center text-emerald-400"></i>
-          <span>Jadwal Cuci Per-Bulan</span>
+        <button type="button" title="Jadwal Cuci Per-Bulan" onclick="toggleMobileSidebar(false); switchMainView('MONTHLY'); document.getElementById('section-MONTHLY').scrollIntoView();" class="sidebar-nav-btn w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-calendar-days w-4 text-center text-emerald-400 shrink-0"></i>
+          <span class="sidebar-label truncate">Jadwal Cuci Per-Bulan</span>
         </button>
 
-        <button type="button" onclick="toggleMobileSidebar(false); openScheduleModal();" class="role-admin-only w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
-          <i class="fa-solid fa-calendar-check w-4 text-center text-indigo-400"></i>
-          <span>Generate Jadwal 20x</span>
+        <button type="button" title="Generate Jadwal 20x" onclick="toggleMobileSidebar(false); openScheduleModal();" class="sidebar-nav-btn role-admin-only w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-calendar-check w-4 text-center text-indigo-400 shrink-0"></i>
+          <span class="sidebar-label truncate">Generate Jadwal 20x</span>
         </button>
 
-        <button type="button" onclick="toggleMobileSidebar(false); openModal();" class="role-admin-only w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
-          <i class="fa-solid fa-plus-circle w-4 text-center text-cyan-400"></i>
-          <span>Tambah Unit AC Baru</span>
+        <button type="button" title="Tambah Unit AC Baru" onclick="toggleMobileSidebar(false); openModal();" class="sidebar-nav-btn role-admin-only w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-plus-circle w-4 text-center text-cyan-400 shrink-0"></i>
+          <span class="sidebar-label truncate">Tambah Unit AC Baru</span>
         </button>
 
-        <button type="button" onclick="toggleMobileSidebar(false); openQrSheetModal();" class="w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
-          <i class="fa-solid fa-qrcode w-4 text-center text-amber-400"></i>
-          <span>Cetak Stiker QR Unit</span>
+        <button type="button" title="Cetak Stiker QR Unit" onclick="toggleMobileSidebar(false); openQrSheetModal();" class="sidebar-nav-btn w-full text-left flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-qrcode w-4 text-center text-amber-400 shrink-0"></i>
+          <span class="sidebar-label truncate">Cetak Stiker QR Unit</span>
         </button>
       </div>
     </div>
 
     <!-- FOOTER SIDEBAR -->
-    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-2.5 shrink-0">
-      <a href="/executive?kiosk=1" class="nav-link w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 transition">
-        <i class="fa-solid fa-tv"></i>
-        <span>Mode Monitor TV (Kiosk)</span>
+    <div class="p-4 border-t border-slate-800/80 bg-slate-950/80 space-y-2.5 shrink-0">
+      <a href="/executive.html?kiosk=1" title="Mode Monitor TV (Kiosk)" class="sidebar-nav-btn nav-link w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 transition">
+        <i class="fa-solid fa-tv shrink-0"></i>
+        <span class="sidebar-label truncate">Mode Monitor TV (Kiosk)</span>
       </a>
-      <button type="button" onclick="logoutMonsarpras()" class="w-full py-2.5 px-3.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        <span>Keluar / Logout</span>
+      <button type="button" title="Keluar / Logout" onclick="logoutMonsarpras(event)" class="sidebar-nav-btn w-full py-2.5 px-3.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+        <i class="fa-solid fa-right-from-bracket shrink-0"></i>
+        <span class="sidebar-label truncate">Keluar / Logout</span>
       </button>
       <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 pt-1">
-        <span class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Supabase Live
+        <span class="flex items-center gap-1.5 mx-auto lg:mx-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+          <span id="sidebarStatusText">Supabase Live</span>
         </span>
-        <span id="sidebarClock" class="font-mono font-bold text-slate-300">--:--</span>
+        <span id="sidebarClock" class="sidebar-label font-mono font-bold text-slate-300">--:--</span>
       </div>
     </div>
   </aside>
@@ -197,7 +242,7 @@
   <!-- ========================================================================= -->
   <!-- KONTEN UTAMA DASHBOARD MAINTENANCE AC (DENGAN OFFSET SIDEBAR DESKTOP)      -->
   <!-- ========================================================================= -->
-  <div class="lg:pl-64 p-4 md:p-6 transition-all duration-300">
+  <div id="mainContentWrapper" class="lg:pl-64 p-4 md:p-6 transition-all duration-300 ease-in-out">
     <div class="max-w-7xl mx-auto space-y-6">
       
       <!-- HEADER UTAMA -->
@@ -762,6 +807,28 @@
 
     let locationChartInstance = null;
     let statusPieChartInstance = null;
+
+    // Pulihkan status terakhir sidebar saat halaman dimuat
+    if (localStorage.getItem('sidebar_collapsed') === '1') {
+      document.body.classList.add('sidebar-collapsed');
+    }
+
+    // Fungsi Geser / Perkecil Sidebar di Laptop
+    function toggleDesktopSidebar() {
+      const collapsed = document.body.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('sidebar_collapsed', collapsed ? '1' : '0');
+    }
+
+    // Buka sidebar penuh jika user klik dropdown Bidang Umum saat mode mini
+    function handleDropdownBidangClick() {
+      if (document.body.classList.contains('sidebar-collapsed')) {
+        document.body.classList.remove('sidebar-collapsed');
+        localStorage.setItem('sidebar_collapsed', '0');
+        document.getElementById('dropdownBidangUmum').classList.remove('hidden');
+      } else {
+        document.getElementById('dropdownBidangUmum').classList.toggle('hidden');
+      }
+    }
 
     const namaBulanIndo = [
       "Januari", "Februari", "Maret", "April", "Mei", "Juni",
