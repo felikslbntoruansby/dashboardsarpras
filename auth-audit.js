@@ -26,26 +26,62 @@ function isPublicInventoryPage() {
 }
 
 // =========================================================================
-// OTOMATIS TAMBAHKAN TOMBOL MENCIUTKAN SIDEBAR (ANTI-DOBEL)
+// OTOMATIS TAMBAHKAN TOMBOL MENCIUTKAN SIDEBAR (MENDUKUNG <aside> & <nav>)
 // =========================================================================
 function initGlobalCollapsibleSidebar() {
-  const sidebar = document.getElementById('appSidebar') || document.querySelector('aside');
+  // Cari container sidebar utama (bisa <aside>, <nav>, atau id appSidebar/sidebar)
+  const sidebar =
+    document.getElementById('appSidebar') ||
+    document.getElementById('sidebar') ||
+    document.querySelector('aside') ||
+    document.querySelector('nav.fixed');
+
   if (!sidebar) return;
 
-  sidebar.classList.add('no-scrollbar');
+  // Beri ID standar agar CSS berlaku universal
+  sidebar.id = sidebar.id || 'appSidebar';
+  sidebar.classList.add('no-scrollbar', 'global-app-sidebar');
 
-  const topHeader = sidebar.querySelector('div > div:first-child');
-  if (!topHeader) return;
-
-  // CEK ANTI-DOBEL: Jika halaman sudah punya tombol toggleDesktopSidebar bawaan, hentikan proses inject
+  // CEK ANTI-DOBEL: Jika halaman sudah punya tombol toggleDesktopSidebar bawaan atau sudah disuntikkan
   if (
-    topHeader.querySelector('[onclick*="toggleDesktopSidebar"]') ||
+    sidebar.querySelector('[onclick*="toggleDesktopSidebar"]') ||
     document.getElementById('globalDesktopSidebarToggle')
   ) {
     return;
   }
 
-  // Inject CSS Global untuk Mini Sidebar (80px) khusus halaman yang belum punya
+  // Cari baris header logo "Poltekbang SBY" / "MONSARPRAS" di dalam sidebar
+  let headerRow = null;
+  let brandTextDiv = null;
+
+  const candidates = sidebar.querySelectorAll('div');
+  for (const div of candidates) {
+    const txt = div.textContent || '';
+    if (txt.includes('Poltekbang SBY') || txt.includes('MONSARPRAS')) {
+      // Ambil div terkecil yang membungkus teks Poltekbang SBY
+      if (div.children.length <= 3 && !div.querySelector('a')) {
+        brandTextDiv = div;
+        // Cari parent flex yang sejajar dengan ikon pesawat/gedung
+        let parent = div.parentElement;
+        while (parent && parent !== sidebar) {
+          if (parent.classList.contains('flex') || parent.classList.contains('border-b')) {
+            headerRow = parent;
+            break;
+          }
+          parent = parent.parentElement;
+        }
+        if (headerRow) break;
+      }
+    }
+  }
+
+  // Fallback jika struktur berbeda: ambil blok border-b pertama di sidebar
+  if (!headerRow) {
+    headerRow = sidebar.querySelector('.border-b') || sidebar.firstElementChild;
+  }
+  if (!headerRow) return;
+
+  // Inject CSS Global untuk Mini Sidebar (80px)
   if (!document.getElementById('global-collapsible-sidebar-style')) {
     const style = document.createElement('style');
     style.id = 'global-collapsible-sidebar-style';
@@ -54,34 +90,39 @@ function initGlobalCollapsibleSidebar() {
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
       @media (min-width: 1024px) {
-        body.sidebar-collapsed #appSidebar,
-        body.sidebar-collapsed aside {
+        body.sidebar-collapsed .global-app-sidebar {
           width: 5rem !important;
           transition: width 0.3s ease-in-out;
         }
+        /* Geser otomatis konten utama yang punya padding/margin kiri sidebar */
         body.sidebar-collapsed #mainContentWrapper,
         body.sidebar-collapsed #mainContentArea,
-        body.sidebar-collapsed div.lg\\:pl-64 {
+        body.sidebar-collapsed main,
+        body.sidebar-collapsed div.lg\\:pl-64,
+        body.sidebar-collapsed div.lg\\:pl-72,
+        body.sidebar-collapsed div.md\\:pl-64,
+        body.sidebar-collapsed div.lg\\:ml-64 {
           padding-left: 5rem !important;
-          transition: padding-left 0.3s ease-in-out;
+          margin-left: 0 !important;
+          transition: all 0.3s ease-in-out;
         }
-        body.sidebar-collapsed #appSidebar .sidebar-brand-info,
-        body.sidebar-collapsed #appSidebar .sidebar-label-auto,
-        body.sidebar-collapsed #appSidebar p,
-        body.sidebar-collapsed #appSidebar #dropdownBidangUmum,
-        body.sidebar-collapsed #appSidebar #menu4Bidang,
-        body.sidebar-collapsed #appSidebar .fa-chevron-down,
-        body.sidebar-collapsed #appSidebar #sidebarClock,
-        body.sidebar-collapsed #appSidebar #user-profile-box {
+        body.sidebar-collapsed .global-app-sidebar .sidebar-brand-info,
+        body.sidebar-collapsed .global-app-sidebar .sidebar-label-auto,
+        body.sidebar-collapsed .global-app-sidebar p,
+        body.sidebar-collapsed .global-app-sidebar #dropdownBidangUmum,
+        body.sidebar-collapsed .global-app-sidebar #menu4Bidang,
+        body.sidebar-collapsed .global-app-sidebar .fa-chevron-down,
+        body.sidebar-collapsed .global-app-sidebar #sidebarClock,
+        body.sidebar-collapsed .global-app-sidebar #user-profile-box {
           display: none !important;
         }
-        body.sidebar-collapsed #appSidebar .sidebar-top-header {
+        body.sidebar-collapsed .global-app-sidebar .sidebar-top-header {
           justify-content: center !important;
           padding-left: 0.75rem !important;
           padding-right: 0.75rem !important;
         }
-        body.sidebar-collapsed #appSidebar a,
-        body.sidebar-collapsed #appSidebar button:not(#globalDesktopSidebarToggle) {
+        body.sidebar-collapsed .global-app-sidebar a,
+        body.sidebar-collapsed .global-app-sidebar button:not(#globalDesktopSidebarToggle) {
           justify-content: center !important;
           padding-left: 0.5rem !important;
           padding-right: 0.5rem !important;
@@ -94,42 +135,50 @@ function initGlobalCollapsibleSidebar() {
     document.head.appendChild(style);
   }
 
-  topHeader.classList.add('sidebar-top-header');
+  // Pastikan headerRow memakai flex justify-between agar tombol rapi di kanan
+  headerRow.classList.add('sidebar-top-header', 'flex', 'items-center', 'justify-between', 'gap-2');
 
-  // Tandai blok teks judul di sebelah ikon pesawat/gedung
-  const brandContainer = topHeader.querySelector('div.flex.items-center');
-  if (brandContainer) {
-    const textWrap = brandContainer.querySelector('div:last-child');
-    if (textWrap && !textWrap.querySelector('i')) {
-      textWrap.classList.add('sidebar-brand-info');
-    }
-    brandContainer.querySelectorAll('span').forEach(sp => {
-      if (sp.textContent.trim().toUpperCase() === 'MONSARPRAS') {
-        sp.textContent = 'BIDANG UMUM';
+  if (brandTextDiv) {
+    brandTextDiv.classList.add('sidebar-brand-info');
+    // Ubah tulisan MONSARPRAS menjadi BIDANG UMUM
+    brandTextDiv.querySelectorAll('span, p, div').forEach(el => {
+      if (el.children.length === 0 && el.textContent.trim().toUpperCase() === 'MONSARPRAS') {
+        el.textContent = 'BIDANG UMUM';
       }
     });
   }
 
-  // Tandai semua <span> teks di tombol/link navigasi sidebar
+  // Tandai semua teks di menu link/button sidebar agar sembunyi saat diciutkan
   sidebar.querySelectorAll('a span, button span').forEach(sp => {
     if (!sp.querySelector('i')) {
       sp.classList.add('sidebar-label-auto');
     }
   });
+  // Tandai juga judul grup kecil seperti "SUB-MODUL RUMAH TANGGA" & "AKSES CEPAT"
+  sidebar.querySelectorAll('div, span, h3, h4').forEach(el => {
+    if (el.children.length === 0) {
+      const t = el.textContent.trim().toUpperCase();
+      if (t.includes('SUB-MODUL') || t.includes('AKSES CEPAT') || t.includes('NAVIGASI')) {
+        el.classList.add('sidebar-label-auto');
+      }
+    }
+  });
 
-  // Tambahkan tombol geser (« / ») di pojok kanan atas sidebar (khusus desktop/laptop)
+  // Buat tombol geser (« / ») di pojok kanan atas sidebar (khusus laptop/desktop)
   const toggleBtn = document.createElement('button');
   toggleBtn.id = 'globalDesktopSidebarToggle';
   toggleBtn.type = 'button';
   toggleBtn.title = 'Perkecil / Perlebar Menu Samping';
-  toggleBtn.className = 'hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer shrink-0';
+  toggleBtn.className = 'hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer shrink-0 ml-auto';
   toggleBtn.innerHTML = '<i id="globalDesktopSidebarIcon" class="fa-solid fa-angles-left text-xs transition-transform duration-300"></i>';
-  toggleBtn.addEventListener('click', () => {
+  toggleBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     const collapsed = document.body.classList.toggle('sidebar-collapsed');
     localStorage.setItem('sidebar_collapsed', collapsed ? '1' : '0');
   });
 
-  topHeader.appendChild(toggleBtn);
+  headerRow.appendChild(toggleBtn);
 
   // Pulihkan status terakhir sidebar dari localStorage
   if (localStorage.getItem('sidebar_collapsed') === '1') {
@@ -137,7 +186,7 @@ function initGlobalCollapsibleSidebar() {
   }
 }
 
-// Fungsi Logout Utama (Bisa dipanggil dari tombol mana saja)
+// Fungsi Logout Utama
 window.logoutMonsarpras = window.logoutSistem = async function (event) {
   if (event && typeof event.preventDefault === 'function') {
     event.preventDefault();
@@ -240,12 +289,15 @@ async function initRoleAccess() {
 }
 
 function renderLogoutBelowKiosk() {
-  if (document.getElementById('btn-sidebar-logout') || document.querySelector('aside button[onclick*="logoutMonsarpras"]')) {
+  const sidebar = document.querySelector('.global-app-sidebar') || document.querySelector('aside') || document.querySelector('nav.fixed');
+  if (!sidebar) return;
+
+  if (document.getElementById('btn-sidebar-logout') || sidebar.querySelector('button[onclick*="logoutMonsarpras"]')) {
     return;
   }
 
-  const kioskBtn = document.querySelector(
-    'aside a[href*="kiosk=1"], aside button[onclick*="enterKioskMode"], aside button[onclick*="toggleKioskMode"]'
+  const kioskBtn = sidebar.querySelector(
+    'a[href*="kiosk=1"], button[onclick*="enterKioskMode"], button[onclick*="toggleKioskMode"]'
   );
 
   if (kioskBtn) {
@@ -279,7 +331,7 @@ function applyRolePermissions(role) {
 }
 
 function renderUserBadgeSidebar(profile, email) {
-  const sidebar = document.querySelector('aside');
+  const sidebar = document.querySelector('.global-app-sidebar') || document.querySelector('aside') || document.querySelector('nav.fixed');
   if (!sidebar || document.getElementById('user-profile-box')) return;
 
   const roleLabels = {
