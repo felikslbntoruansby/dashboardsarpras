@@ -25,6 +25,118 @@ function isPublicInventoryPage() {
   );
 }
 
+// =========================================================================
+// OTOMATIS TAMBAHKAN TOMBOL MENCIUTKAN SIDEBAR (ANTI-DOBEL)
+// =========================================================================
+function initGlobalCollapsibleSidebar() {
+  const sidebar = document.getElementById('appSidebar') || document.querySelector('aside');
+  if (!sidebar) return;
+
+  sidebar.classList.add('no-scrollbar');
+
+  const topHeader = sidebar.querySelector('div > div:first-child');
+  if (!topHeader) return;
+
+  // CEK ANTI-DOBEL: Jika halaman sudah punya tombol toggleDesktopSidebar bawaan, hentikan proses inject
+  if (
+    topHeader.querySelector('[onclick*="toggleDesktopSidebar"]') ||
+    document.getElementById('globalDesktopSidebarToggle')
+  ) {
+    return;
+  }
+
+  // Inject CSS Global untuk Mini Sidebar (80px) khusus halaman yang belum punya
+  if (!document.getElementById('global-collapsible-sidebar-style')) {
+    const style = document.createElement('style');
+    style.id = 'global-collapsible-sidebar-style';
+    style.textContent = `
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+      @media (min-width: 1024px) {
+        body.sidebar-collapsed #appSidebar,
+        body.sidebar-collapsed aside {
+          width: 5rem !important;
+          transition: width 0.3s ease-in-out;
+        }
+        body.sidebar-collapsed #mainContentWrapper,
+        body.sidebar-collapsed #mainContentArea,
+        body.sidebar-collapsed div.lg\\:pl-64 {
+          padding-left: 5rem !important;
+          transition: padding-left 0.3s ease-in-out;
+        }
+        body.sidebar-collapsed #appSidebar .sidebar-brand-info,
+        body.sidebar-collapsed #appSidebar .sidebar-label-auto,
+        body.sidebar-collapsed #appSidebar p,
+        body.sidebar-collapsed #appSidebar #dropdownBidangUmum,
+        body.sidebar-collapsed #appSidebar #menu4Bidang,
+        body.sidebar-collapsed #appSidebar .fa-chevron-down,
+        body.sidebar-collapsed #appSidebar #sidebarClock,
+        body.sidebar-collapsed #appSidebar #user-profile-box {
+          display: none !important;
+        }
+        body.sidebar-collapsed #appSidebar .sidebar-top-header {
+          justify-content: center !important;
+          padding-left: 0.75rem !important;
+          padding-right: 0.75rem !important;
+        }
+        body.sidebar-collapsed #appSidebar a,
+        body.sidebar-collapsed #appSidebar button:not(#globalDesktopSidebarToggle) {
+          justify-content: center !important;
+          padding-left: 0.5rem !important;
+          padding-right: 0.5rem !important;
+        }
+        body.sidebar-collapsed #globalDesktopSidebarIcon {
+          transform: rotate(180deg);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  topHeader.classList.add('sidebar-top-header');
+
+  // Tandai blok teks judul di sebelah ikon pesawat/gedung
+  const brandContainer = topHeader.querySelector('div.flex.items-center');
+  if (brandContainer) {
+    const textWrap = brandContainer.querySelector('div:last-child');
+    if (textWrap && !textWrap.querySelector('i')) {
+      textWrap.classList.add('sidebar-brand-info');
+    }
+    brandContainer.querySelectorAll('span').forEach(sp => {
+      if (sp.textContent.trim().toUpperCase() === 'MONSARPRAS') {
+        sp.textContent = 'BIDANG UMUM';
+      }
+    });
+  }
+
+  // Tandai semua <span> teks di tombol/link navigasi sidebar
+  sidebar.querySelectorAll('a span, button span').forEach(sp => {
+    if (!sp.querySelector('i')) {
+      sp.classList.add('sidebar-label-auto');
+    }
+  });
+
+  // Tambahkan tombol geser (« / ») di pojok kanan atas sidebar (khusus desktop/laptop)
+  const toggleBtn = document.createElement('button');
+  toggleBtn.id = 'globalDesktopSidebarToggle';
+  toggleBtn.type = 'button';
+  toggleBtn.title = 'Perkecil / Perlebar Menu Samping';
+  toggleBtn.className = 'hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer shrink-0';
+  toggleBtn.innerHTML = '<i id="globalDesktopSidebarIcon" class="fa-solid fa-angles-left text-xs transition-transform duration-300"></i>';
+  toggleBtn.addEventListener('click', () => {
+    const collapsed = document.body.classList.toggle('sidebar-collapsed');
+    localStorage.setItem('sidebar_collapsed', collapsed ? '1' : '0');
+  });
+
+  topHeader.appendChild(toggleBtn);
+
+  // Pulihkan status terakhir sidebar dari localStorage
+  if (localStorage.getItem('sidebar_collapsed') === '1') {
+    document.body.classList.add('sidebar-collapsed');
+  }
+}
+
 // Fungsi Logout Utama (Bisa dipanggil dari tombol mana saja)
 window.logoutMonsarpras = window.logoutSistem = async function (event) {
   if (event && typeof event.preventDefault === 'function') {
@@ -32,7 +144,6 @@ window.logoutMonsarpras = window.logoutSistem = async function (event) {
     event.stopPropagation();
   }
 
-  // 1. Panggil signOut Supabase (scope local agar instan tanpa macet jaringan)
   if (authDb && authDb.auth) {
     try {
       await Promise.race([
@@ -44,7 +155,6 @@ window.logoutMonsarpras = window.logoutSistem = async function (event) {
     }
   }
 
-  // 2. Bersihkan seluruh token sesi Supabase di localStorage & sessionStorage
   try {
     Object.keys(localStorage).forEach(k => {
       if (k.startsWith('sb-') || k.includes('supabase')) localStorage.removeItem(k);
@@ -53,12 +163,12 @@ window.logoutMonsarpras = window.logoutSistem = async function (event) {
     sessionStorage.clear();
   } catch (e) {}
 
-  // 3. Paksa pindah langsung ke halaman login
   window.location.href = getLoginUrl(true);
 };
 
 // Inisialisasi Sesi & Hak Akses
 async function initRoleAccess() {
+  initGlobalCollapsibleSidebar();
   renderLogoutBelowKiosk();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -86,7 +196,6 @@ async function initRoleAccess() {
       }
     }
 
-    // Jika belum login, tetap izinkan akses penuh ke Inventaris sebagai Petugas Sarpras
     window.currentUserProfile = {
       id: null,
       nama_lengkap: 'Petugas Sarpras',
@@ -135,7 +244,6 @@ function renderLogoutBelowKiosk() {
     return;
   }
 
-  // Mendukung link kiosk=1, tombol enterKioskMode, maupun tombol toggleKioskMode
   const kioskBtn = document.querySelector(
     'aside a[href*="kiosk=1"], aside button[onclick*="enterKioskMode"], aside button[onclick*="toggleKioskMode"]'
   );
@@ -147,8 +255,8 @@ function renderLogoutBelowKiosk() {
     logoutBtn.addEventListener('click', (e) => window.logoutMonsarpras(e));
     logoutBtn.className = 'w-full py-2.5 px-3.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition cursor-pointer mt-2';
     logoutBtn.innerHTML = `
-      <i class="fa-solid fa-right-from-bracket"></i>
-      <span>Keluar / Logout</span>
+      <i class="fa-solid fa-right-from-bracket shrink-0"></i>
+      <span class="sidebar-label-auto">Keluar / Logout</span>
     `;
     kioskBtn.insertAdjacentElement('afterend', logoutBtn);
   }
