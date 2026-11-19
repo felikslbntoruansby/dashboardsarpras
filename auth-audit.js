@@ -13,6 +13,18 @@ function getLoginUrl(isLogout = false) {
   return isLogout ? `${base}?logout=1` : base;
 }
 
+// Mengecek apakah halaman saat ini adalah halaman Inventaris (bebas login)
+function isPublicInventoryPage() {
+  const path = window.location.pathname.toLowerCase();
+  return (
+    path === '/' ||
+    path === '/index' ||
+    path === '/index.html' ||
+    path.endsWith('/index.html') ||
+    path.includes('inventaris')
+  );
+}
+
 // Fungsi Logout Utama (Bisa dipanggil dari tombol mana saja)
 window.logoutMonsarpras = window.logoutSistem = async function (event) {
   if (event && typeof event.preventDefault === 'function') {
@@ -54,6 +66,37 @@ async function initRoleAccess() {
     return;
   }
 
+  // JIKA HALAMAN INVENTARIS: Bebas masuk tanpa redirect login
+  if (isPublicInventoryPage()) {
+    if (authDb) {
+      const { data: { session } } = await authDb.auth.getSession();
+      if (session) {
+        const { data: profile } = await authDb
+          .from('user_profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile) {
+          window.currentUserProfile = profile;
+          renderUserBadgeSidebar(profile, session.user.email);
+          applyRolePermissions(profile.role);
+          return;
+        }
+      }
+    }
+
+    // Jika belum login, tetap izinkan akses penuh ke Inventaris sebagai Petugas Sarpras
+    window.currentUserProfile = {
+      id: null,
+      nama_lengkap: 'Petugas Sarpras',
+      jabatan: 'Akses Langsung Inventaris',
+      role: 'super_admin'
+    };
+    return;
+  }
+
+  // UNTUK HALAMAN LAINNYA: Tetap periksa sesi login seperti biasa
   if (!authDb) {
     console.error('Library @supabase/supabase-js belum dimuat sebelum auth-audit.js');
     return;
@@ -169,7 +212,7 @@ function renderUserBadgeSidebar(profile, email) {
 }
 
 window.catatLogAktivitas = async function ({ modul, aksi, targetData, detail = {} }) {
-  if (!window.currentUserProfile || !authDb) return;
+  if (!window.currentUserProfile || !window.currentUserProfile.id || !authDb) return;
 
   const { error } = await authDb.from('activity_logs').insert([{
     user_id: window.currentUserProfile.id,
@@ -196,7 +239,7 @@ window.bukaModalAuditLog = async function () {
         <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div>
             <h3 class="text-base font-bold text-slate-800">Jejak Audit & Riwayat Aktivitas Sistem</h3>
-            <p class="text-xs text-slate-500">Menampilkan 50 aktivitas perubahan data terbaru di MONSARPRAS</p>
+            <p class="text-xs text-slate-500">Menampilkan 50 aktivitas perubahan data terbaru di Sarpras</p>
           </div>
           <button type="button" onclick="document.getElementById('modal-audit-log').classList.add('hidden')" class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold">
             Tutup ✕
