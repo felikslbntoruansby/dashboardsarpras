@@ -8,9 +8,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* Default sembunyikan tombol Admin jika dibuka oleh pegawai umum */
     body:not(.is-admin) .role-admin-only {
       display: none !important;
     }
@@ -85,7 +85,6 @@
               <span>2. BMN</span>
             </a>
 
-            <!-- 3. KEPEGAWAIAN DENGAN 2 SUB-MENU TERPISAH -->
             <div class="space-y-1">
               <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-cyan-300">
                 <i class="fa-solid fa-users-gear w-4 text-center"></i>
@@ -160,8 +159,12 @@
             <i class="fa-solid fa-circle-info"></i> Layanan Informasi
           </a>
           <button type="button" onclick="openModal()" class="role-admin-only px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-700 hover:to-sky-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition cursor-pointer">
-            <i class="fa-solid fa-user-plus"></i> Tambah Pegawai
+            <i class="fa-solid fa-user-plus"></i> Tambah Data
           </button>
+          <label class="role-admin-only px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl flex items-center gap-1.5 transition cursor-pointer">
+            <i class="fa-solid fa-file-excel"></i> Impor Excel
+            <input type="file" accept=".xlsx,.xls,.csv" onchange="handleExcelImport(event)" class="hidden">
+          </label>
           <button type="button" onclick="exportPDF()" class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl flex items-center gap-1.5 transition cursor-pointer">
             <i class="fa-solid fa-file-pdf"></i> Cetak Rekap PDF
           </button>
@@ -173,7 +176,6 @@
 
       <!-- 4 KPI CARDS UTAMA: TOTAL PEGAWAI, PNS / PPPK, LAKI-LAKI, PEREMPUAN -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <!-- 1. TOTAL PEGAWAI -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between">
           <div>
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Total Pegawai</p>
@@ -185,7 +187,6 @@
           </div>
         </div>
 
-        <!-- 2. PNS / PPPK -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between">
           <div>
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">PNS / PPPK</p>
@@ -197,7 +198,6 @@
           </div>
         </div>
 
-        <!-- 3. LAKI-LAKI -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between">
           <div>
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Laki-Laki</p>
@@ -209,7 +209,6 @@
           </div>
         </div>
 
-        <!-- 4. PEREMPUAN -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between">
           <div>
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Perempuan</p>
@@ -241,7 +240,7 @@
             </div>
             <div>
               <div class="flex justify-between text-xs font-bold mb-1">
-                <span class="text-slate-600">PPPK</span>
+                <span class="text-slate-600">PPPK (Penuh Waktu & Paruh Waktu)</span>
                 <span class="text-cyan-700" id="bar-pppk-label">0 (0%)</span>
               </div>
               <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
@@ -282,21 +281,18 @@
     </div>
   </div>
 
-  <!-- MODAL FORM TAMBAH PEGAWAI (TANPA INPUT NIP) -->
+  <!-- MODAL FORM TAMBAH DATA PEGAWAI (TANPA NAMA & NIP, LANGSUNG STATUS & JUMLAH) -->
   <div id="formModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6">
       <h3 class="text-lg font-extrabold text-slate-900 mb-4">Tambah Data Pegawai</h3>
-      <form onsubmit="handleSubmit(event)" class="space-y-3">
-        <div>
-          <label class="block text-xs font-bold mb-1">Nama Lengkap & Gelar</label>
-          <input type="text" id="nama_pegawai" required placeholder="Budi Santoso, S.T." class="w-full border border-slate-300 rounded-xl p-2.5 text-xs">
-        </div>
+      <form onsubmit="handleSubmit(event)" class="space-y-4">
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold mb-1">Status Kepegawaian</label>
             <select id="status_kepegawaian" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs">
               <option value="PNS">PNS</option>
               <option value="PPPK">PPPK</option>
+              <option value="PPPK_PARUH WAKTU">PPPK_PARUH WAKTU</option>
             </select>
           </div>
           <div>
@@ -306,6 +302,11 @@
               <option value="Perempuan">Perempuan</option>
             </select>
           </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1">Jumlah Pegawai yang Ditambahkan</label>
+          <input type="number" id="jumlah_pegawai" min="1" max="500" value="1" required class="w-full border border-slate-300 rounded-xl p-2.5 text-xs font-bold">
+          <span class="text-[11px] text-slate-400 mt-1 block">Isi 1 untuk satuan, atau masukkan angka banyak sekaligus.</span>
         </div>
         <div class="flex justify-end gap-2 pt-4 border-t">
           <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
@@ -407,7 +408,10 @@
     function updateKpis() {
       const total = pegawaiList.length;
       const pnsCount = pegawaiList.filter(i => String(i.status_kepegawaian || '').toUpperCase() === 'PNS').length;
-      const pppkCount = pegawaiList.filter(i => ['PPPK', 'P3K'].includes(String(i.status_kepegawaian || '').toUpperCase())).length;
+      const pppkCount = pegawaiList.filter(i => {
+        const st = String(i.status_kepegawaian || '').toUpperCase();
+        return st.includes('PPPK') || st.includes('P3K');
+      }).length;
       const asnTotal = pnsCount + pppkCount;
 
       const lakiCount = pegawaiList.filter(i => deteksiJenisKelamin(i) === 'L').length;
@@ -439,34 +443,123 @@
     }
 
     function openModal() {
-      document.getElementById('nama_pegawai').value = '';
       document.getElementById('status_kepegawaian').value = 'PNS';
       document.getElementById('jenis_kelamin').value = 'Laki-laki';
+      document.getElementById('jumlah_pegawai').value = '1';
       document.getElementById('formModal').classList.remove('hidden');
     }
     function closeModal() { document.getElementById('formModal').classList.add('hidden'); }
 
     async function handleSubmit(e) {
       e.preventDefault();
-      const payload = {
-        nama_pegawai: document.getElementById('nama_pegawai').value,
-        status_kepegawaian: document.getElementById('status_kepegawaian').value,
-        jenis_kelamin: document.getElementById('jenis_kelamin').value,
+      const status_kepegawaian = document.getElementById('status_kepegawaian').value;
+      const jenis_kelamin = document.getElementById('jenis_kelamin').value;
+      const jumlah = Math.max(1, parseInt(document.getElementById('jumlah_pegawai').value || '1', 10));
+
+      const items = Array.from({ length: jumlah }, () => ({
+        status_kepegawaian,
+        jenis_kelamin,
         status_kehadiran: 'Aktif'
-      };
-      const res = await fetch('/api/kepegawaian', {
+      }));
+
+      const res = await fetch('/api/kepegawaian/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-key': ADMIN_PIN },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ items, append: true })
       });
+
       if (res.ok) {
         if (window.catatLogAktivitas) {
-          await window.catatLogAktivitas({ modul: 'Kepegawaian', aksi: 'TAMBAH_PEGAWAI', targetData: `${payload.nama_pegawai} (${payload.status_kepegawaian} - ${payload.jenis_kelamin})` });
+          await window.catatLogAktivitas({ modul: 'Kepegawaian', aksi: 'TAMBAH_PEGAWAI', targetData: `+${jumlah} Pegawai (${status_kepegawaian} - ${jenis_kelamin})` });
         }
         closeModal();
-        showToast('Data pegawai berhasil ditambahkan!');
+        showToast(`Berhasil menambahkan ${jumlah} data pegawai!`);
         loadData();
+      } else {
+        showToast('Gagal menyimpan data ke server', true);
       }
+    }
+
+    // Impor file Excel (.xlsx / .csv) langsung dari tombol Impor Excel
+    function handleExcelImport(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const wb = XLSX.read(evt.target.result, { type: 'binary' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+          const items = [];
+          let lastStatus = 'PNS';
+
+          rows.forEach(r => {
+            const vals = Object.values(r).map(v => String(v).trim());
+            const keys = Object.keys(r);
+
+            // Mendukung format tabel daftar pegawai maupun format pivot rekap
+            let status = '';
+            let gender = '';
+            let count = 1;
+
+            keys.forEach(k => {
+              const kl = k.toLowerCase();
+              const val = String(r[k]).trim();
+              if (kl.includes('status') || kl.includes('jenis_pegawai') || kl.includes('asn')) status = val;
+              if (kl.includes('kelamin') || kl.includes('gender') || kl === 'jk') gender = val;
+              if (kl.includes('jumlah') || kl.includes('total') || kl.includes('count')) count = parseInt(val, 10) || 1;
+            });
+
+            if (!status && !gender) {
+              // Deteksi otomatis dari isi sel (untuk file pivot tanpa header standar)
+              vals.forEach(v => {
+                const vu = v.toUpperCase();
+                if (vu === 'PNS' || vu === 'PPPK' || vu.includes('PARUH WAKTU')) status = vu;
+                if (vu.includes('LAKI') || vu === 'L') gender = 'Laki-laki';
+                if (vu.includes('PEREMPUAN') || vu === 'P') gender = 'Perempuan';
+                if (/^\d+$/.test(vu)) count = parseInt(vu, 10);
+              });
+            }
+
+            if (status && !status.toUpperCase().includes('TOTAL')) lastStatus = status;
+            if (vals.some(v => v.toUpperCase().includes('TOTAL'))) return;
+
+            if (gender) {
+              const normGender = gender.toLowerCase().includes('perempuan') || gender.toUpperCase() === 'P' ? 'Perempuan' : 'Laki-laki';
+              for (let i = 0; i < count; i++) {
+                items.push({ status_kepegawaian: lastStatus || 'PNS', jenis_kelamin: normGender, status_kehadiran: 'Aktif' });
+              }
+            }
+          });
+
+          if (!items.length) {
+            showToast('Format Excel tidak terbaca. Pastikan ada kolom Status & Jenis Kelamin.', true);
+            return;
+          }
+
+          const replaceAll = confirm(`Ditemukan ${items.length} data pegawai dari Excel.\n\nKlik OK untuk MENGGANTI seluruh data lama dengan data Excel ini.\nKlik Cancel untuk MENAMBAHKAN ke data yang sudah ada.`);
+
+          const res = await fetch('/api/kepegawaian/bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': ADMIN_PIN },
+            body: JSON.stringify({ items, append: !replaceAll })
+          });
+
+          if (res.ok) {
+            showToast(`Berhasil mengimpor ${items.length} data pegawai dari Excel!`);
+            loadData();
+          } else {
+            showToast('Gagal menyimpan hasil impor Excel!', true);
+          }
+        } catch (err) {
+          showToast('File Excel tidak valid!', true);
+        } finally {
+          e.target.value = '';
+        }
+      };
+      reader.readAsBinaryString(file);
     }
 
     function exportPDF() {

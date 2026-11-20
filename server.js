@@ -506,7 +506,7 @@ app.delete('/api/bmn/:id', async (req, res) => {
 });
 
 // =============================================================
-// API SUB-BAGIAN KEPEGAWAIAN (TANPA NIP, MENDUKUNG JENIS KELAMIN)
+// API SUB-BAGIAN KEPEGAWAIAN (TANPA NIP/NAMA, MENDUKUNG BULK & EXCEL)
 // =============================================================
 app.get('/api/kepegawaian', async (req, res) => {
     try {
@@ -514,6 +514,35 @@ app.get('/api/kepegawaian', async (req, res) => {
         if (error) return res.json([]);
         res.json(data || []);
     } catch (err) { res.json([]); }
+});
+
+app.post('/api/kepegawaian/bulk', async (req, res) => {
+    try {
+        const { items, append } = req.body;
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ error: "Data array 'items' kosong!" });
+        }
+
+        if (!append) {
+            await supabase.from('kepegawaian_data').delete().not('id', 'is', null);
+        }
+
+        const rows = items.map(i => ({
+            nip_nik: i.nip_nik || '-',
+            nama_pegawai: i.nama_pegawai || '',
+            status_kepegawaian: i.status_kepegawaian || 'PNS',
+            jenis_kelamin: i.jenis_kelamin || '',
+            status_kehadiran: i.status_kehadiran || 'Aktif',
+            unit_kerja: i.unit_kerja || 'Bidang Umum'
+        }));
+
+        const { error } = await supabase.from('kepegawaian_data').insert(rows);
+        if (error) throw error;
+
+        res.json({ message: `Berhasil menyimpan ${rows.length} data kepegawaian!`, total: rows.length });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.post('/api/kepegawaian', async (req, res) => {
@@ -534,7 +563,7 @@ app.post('/api/kepegawaian', async (req, res) => {
             .from('kepegawaian_data')
             .insert([{
                 nip_nik: nip_nik || '-',
-                nama_pegawai,
+                nama_pegawai: nama_pegawai || '',
                 pangkat_golongan: pangkat_golongan || '',
                 jabatan: jabatan || '',
                 unit_kerja: unit_kerja || 'Bidang Umum',
@@ -567,7 +596,7 @@ app.put('/api/kepegawaian/:id', async (req, res) => {
             .from('kepegawaian_data')
             .update({
                 nip_nik: nip_nik || '-',
-                nama_pegawai,
+                nama_pegawai: nama_pegawai || '',
                 pangkat_golongan,
                 jabatan,
                 unit_kerja,
