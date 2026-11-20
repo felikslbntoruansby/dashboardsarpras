@@ -45,6 +45,26 @@
         transform: rotate(180deg);
       }
     }
+
+    /* Gaya Donut Pie Chart Portal Layanan */
+    .pie-donut {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      background: #eaf4fc;
+      position: relative;
+      flex: none;
+    }
+    .pie-donut::after {
+      content: "";
+      position: absolute;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: #ffffff;
+      top: 57px;
+      left: 57px;
+    }
   </style>
 </head>
 <body class="bg-slate-100/80 font-sans text-slate-800 min-h-screen antialiased">
@@ -67,12 +87,10 @@
           </div>
         </div>
 
-        <!-- Tombol Geser / Perkecil Sidebar di Laptop (Desktop) -->
         <button type="button" onclick="toggleDesktopSidebar()" title="Perkecil / Perlebar Menu Samping" class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/90 hover:bg-cyan-600 text-slate-300 hover:text-white border border-slate-700/80 transition cursor-pointer shrink-0">
           <i id="desktopToggleIcon" class="fa-solid fa-angles-left text-xs transition-transform duration-300"></i>
         </button>
 
-        <!-- Tombol Tutup di HP -->
         <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg">
           <i class="fa-solid fa-xmark text-base"></i>
         </button>
@@ -145,7 +163,7 @@
     <span class="w-8"></span>
   </div>
 
-  <!-- KONTEN UTAMA (OTOMATIS MELEBAR FULL SAAT SIDEBAR DIGESER) -->
+  <!-- KONTEN UTAMA -->
   <div id="mainContentArea" class="lg:pl-64 transition-all duration-300 ease-in-out">
     <div class="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
 
@@ -158,7 +176,7 @@
           <div>
             <span class="text-[10px] font-bold uppercase tracking-widest text-cyan-600">BIDANG UMUM • SDM & APARATUR</span>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Dashboard Kepegawaian</h1>
-            <p class="text-xs text-slate-500">Politeknik Penerbangan Surabaya • Data Pegawai PNS, PPPK, PPNPN & Layanan Informasi Kepegawaian</p>
+            <p class="text-xs text-slate-500">Politeknik Penerbangan Surabaya • Data Pegawai PNS, PPPK, PPNPN & Portal Layanan Kepegawaian</p>
           </div>
         </div>
         <div id="headerPegawaiActions" class="flex flex-wrap gap-2">
@@ -171,7 +189,7 @@
         </div>
       </div>
 
-      <!-- TAB MENU KEPEGAWAIAN (DATA PEGAWAI & LAYANAN INFORMASI DARI GOOGLE SHEETS) -->
+      <!-- TAB MENU KEPEGAWAIAN -->
       <div class="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/90 shadow-sm">
         <button type="button" onclick="switchKepegTab('PEGAWAI')" id="tabBtn-PEGAWAI" class="px-4 py-2.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-cyan-600 to-sky-600 text-white shadow-sm transition cursor-pointer flex items-center gap-2">
           <i class="fa-solid fa-users"></i> Data Pegawai & Kehadiran
@@ -186,7 +204,6 @@
       <!-- BAGIAN 1: DATA PEGAWAI & KEHADIRAN (TAMPILAN ASLI)                        -->
       <!-- ========================================================================= -->
       <div id="panel-PEGAWAI" class="space-y-6">
-        <!-- KPI CARDS -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
             <p class="text-xs font-bold text-slate-500 uppercase">Total Pegawai</p>
@@ -206,7 +223,6 @@
           </div>
         </div>
 
-        <!-- FILTER & TABEL -->
         <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
           <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between gap-3 bg-slate-50/70">
             <div class="relative flex-1 max-w-md">
@@ -245,65 +261,102 @@
       </div>
 
       <!-- ========================================================================= -->
-      <!-- BAGIAN 2: LAYANAN INFORMASI KEPEGAWAIAN (OTOMATIS DARI GOOGLE SHEETS)     -->
+      <!-- BAGIAN 2: PORTAL LAYANAN INFORMASI KEPEGAWAIAN (MANDIRI + GOOGLE SHEETS)  -->
       <!-- ========================================================================= -->
-      <div id="panel-LAYANAN" class="hidden space-y-5">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div class="flex items-center gap-2.5">
-            <h2 class="text-lg font-extrabold text-slate-900">Daftar Layanan</h2>
-            <span id="infoJumlahLayanan" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-100 text-sky-700">Memuat...</span>
-          </div>
+      <div id="panel-LAYANAN" class="hidden space-y-6">
 
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <div class="relative flex-1 sm:w-72">
-              <input type="text" id="searchLayananInput" oninput="renderLayananCards()" placeholder="Cari nama layanan..." class="w-full bg-white border border-slate-200 text-slate-800 text-xs rounded-xl px-4 py-2.5 shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500">
+        <!-- BANNER PORTAL INFORMASI (DESAIN DARI TEMPLATE APPS SCRIPT) -->
+        <div class="bg-gradient-to-r from-[#123456] to-[#216da5] text-white rounded-2xl p-6 md:p-7 shadow-md">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">✦</div>
+                <div class="text-[11px] tracking-wider uppercase text-sky-100">
+                  POLITEKNIK PENERBANGAN SURABAYA<br>
+                  <strong class="text-white">PORTAL INFORMASI KEPEGAWAIAN</strong>
+                </div>
+              </div>
+              <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight pt-1">Portal Informasi Kepegawaian</h2>
+              <p class="text-xs md:text-sm text-sky-100/90 max-w-2xl">
+                Temukan informasi layanan, regulasi, persyaratan berkas, kontak PIC pengelola, serta pengajuan layanan kepegawaian dalam satu tempat.
+              </p>
             </div>
-            <button type="button" onclick="loadLayananFromSheets(true)" title="Sinkronisasi Ulang dari Google Sheets" class="px-3.5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer flex items-center gap-1.5">
-              <i class="fa-solid fa-rotate text-sky-600"></i>
-              <span class="hidden sm:inline">Sync</span>
+            <button type="button" onclick="loadPortalSheets(true)" class="self-start md:self-center px-4 py-2.5 bg-white/15 hover:bg-white/25 text-white border border-white/25 rounded-xl text-xs font-bold transition cursor-pointer inline-flex items-center gap-2 shrink-0">
+              <i class="fa-solid fa-rotate"></i> Sync Spreadsheet
             </button>
           </div>
         </div>
 
-        <!-- GRID KARTU LAYANAN OTOMATIS DARI SPREADSHEET -->
-        <div id="gridLayananCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- INFO NOTICE -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl px-4 py-3.5 text-xs text-slate-600 shadow-2xs">
+          ℹ️ Informasi pada portal ini terhubung langsung dengan database layanan kepegawaian (otomatis diperbarui saat spreadsheet diubah).
+        </div>
+
+        <!-- RINGKASAN PENGAJUAN & PIE CHART (DARI LOG_CEK) -->
+        <section class="space-y-4">
+          <div>
+            <h3 class="text-lg font-extrabold text-[#153b62]">Ringkasan Pengajuan</h3>
+            <p id="portalDashboardSubtitle" class="text-xs text-slate-500">Tahun berjalan</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="grid grid-cols-2 lg:grid-cols-1 gap-4">
+              <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Pengajuan Bulan Ini</div>
+                <div id="portalTotalBulan" class="text-3xl font-extrabold text-[#153b62] mt-2">0</div>
+                <div id="portalBulanLabel" class="text-xs text-slate-500 mt-1.5">-</div>
+              </div>
+              <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Pengajuan Tahun Ini</div>
+                <div id="portalTotalTahun" class="text-3xl font-extrabold text-[#153b62] mt-2">0</div>
+                <div id="portalTahunLabel" class="text-xs text-slate-500 mt-1.5">-</div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+              <h4 class="text-base font-extrabold text-[#153b62]">Pengajuan per Layanan</h4>
+              <p id="portalChartSubtitle" class="text-xs text-slate-500 mb-4">Tahun berjalan</p>
+              <div id="portalChartArea" class="flex flex-col sm:flex-row items-center justify-center gap-8 py-2">
+                <p class="text-xs text-slate-400">Memuat grafik pengajuan...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TOOLBAR DAFTAR LAYANAN -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-1">
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-xl font-extrabold text-[#153b62]">Daftar Layanan</h2>
+            <span id="infoJumlahLayanan" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#eaf4fc] text-[#2474b5]">Memuat...</span>
+          </div>
+          <input type="search" id="searchLayananInput" oninput="renderPortalCards()" placeholder="Cari nama layanan..." class="w-full sm:w-80 bg-white border border-slate-200 text-slate-800 text-xs rounded-xl px-4 py-3 shadow-2xs focus:outline-none focus:ring-2 focus:ring-[#2474b5]">
+        </div>
+
+        <!-- GRID KARTU LAYANAN (3 KOLOM SEPERTI TEMPLATE) -->
+        <div id="gridLayananCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="col-span-full bg-white rounded-2xl border border-slate-200 p-10 text-center text-xs text-slate-400">
-            <i class="fa-solid fa-spinner animate-spin text-sky-600 text-lg mb-2 block"></i>
-            Memuat daftar layanan dari Google Sheets...
+            <i class="fa-solid fa-spinner animate-spin text-[#2474b5] text-lg mb-2 block"></i>
+            Memuat informasi layanan dari Google Sheets...
           </div>
         </div>
+
       </div>
 
     </div>
   </div>
 
-  <!-- MODAL DETAIL LAYANAN INFORMASI (OTOMATIS DARI KOLOM SPREADSHEET) -->
-  <div id="detailLayananModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
-    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden">
-      <div class="p-5 border-b border-slate-200/80 flex items-start justify-between gap-3 bg-slate-50/80">
-        <div class="flex items-center gap-3.5">
-          <span id="detailNomorBadge" class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 font-extrabold text-sm flex items-center justify-center shrink-0">01</span>
-          <div>
-            <h3 id="detailJudulLayanan" class="text-base font-extrabold text-slate-900 leading-snug">Nama Layanan</h3>
-            <p id="detailPeriodeLayanan" class="text-xs font-semibold text-sky-700 mt-0.5">Periode: -</p>
-          </div>
-        </div>
-        <button type="button" onclick="closeDetailLayananModal()" class="w-8 h-8 rounded-lg bg-slate-200/70 hover:bg-slate-300 text-slate-600 flex items-center justify-center cursor-pointer shrink-0">
-          <i class="fa-solid fa-xmark"></i>
+  <!-- MODAL DETAIL LAYANAN & AJUKAN (TEMPLATE LENGKAP: JADWAL, DASAR HUKUM, PERSYARATAN, PIC, AJUKAN WA) -->
+  <div id="portalDetailBackdrop" onclick="if(event.target===this) closePortalDetail()" class="fixed inset-0 bg-[#0b2036]/65 backdrop-blur-xs hidden flex justify-center items-start z-50 p-4 overflow-y-auto">
+    <section class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl my-6 overflow-hidden">
+      <div class="bg-gradient-to-r from-[#153b62] to-[#2474b5] text-white p-6 relative">
+        <button type="button" onclick="closePortalDetail()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 text-white text-xl flex items-center justify-center cursor-pointer">
+          &times;
         </button>
+        <h2 id="portalModalTitle" class="text-xl md:text-2xl font-extrabold pr-10 leading-snug">Judul Layanan</h2>
+        <p id="portalModalDesc" class="text-xs md:text-sm text-[#e0edf8] mt-2 leading-relaxed"></p>
       </div>
-
-      <div id="detailBodyLayanan" class="p-5 overflow-y-auto space-y-3.5 text-xs text-slate-700 leading-relaxed">
-        <!-- Otomatis terisi dari kolom spreadsheet -->
-      </div>
-
-      <div class="p-4 border-t border-slate-200/80 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
-        <div id="detailLinkActions" class="flex flex-wrap items-center gap-2"></div>
-        <button type="button" onclick="closeDetailLayananModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl cursor-pointer ml-auto">
-          Tutup
-        </button>
-      </div>
-    </div>
+      <div id="portalModalBody" class="p-6 text-xs text-slate-700 space-y-5"></div>
+    </section>
   </div>
 
   <!-- MODAL FORM PEGAWAI (TAMPILAN ASLI) -->
@@ -366,25 +419,33 @@
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
   <script>
-    let pegawaiList = [];
-    let layananSheetsList = [];
+    // ID Google Sheets Anda (Tanpa Apps Script - Langsung Baca 5 Tab)
     const SPREADSHEET_ID = "1Fl3Hm538x7hdtl83_lTetU9P-NRGZ0wszGPBDOyJjYc";
-    const SHEET_GID_LAYANAN = "1599911655";
 
-    const escHtml = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    let pegawaiList = [];
+    let portal = {
+      services: [],
+      requirements: [],
+      pic: [],
+      info: [],
+      dashboard: null
+    };
+
+    const escHtml = (s) => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const pVal = (obj, key) => (obj && obj[key] != null ? String(obj[key]).trim() : '');
 
     function toggleMobileSidebar(show) {
       document.getElementById('appSidebar').classList.toggle('-translate-x-full', !show);
       document.getElementById('sidebarBackdrop').classList.toggle('hidden', !show);
     }
 
-    // Fungsi Geser / Perkecil Sidebar di Laptop
     function toggleDesktopSidebar() {
       const collapsed = document.body.classList.toggle('sidebar-collapsed');
       localStorage.setItem('sidebar_collapsed', collapsed ? '1' : '0');
     }
 
-    // Jika sidebar sedang mode kecil dan user klik ikon Menu Bidang Umum, otomatis buka sidebar penuh
     function handle4MenuClick() {
       if (document.body.classList.contains('sidebar-collapsed')) {
         document.body.classList.remove('sidebar-collapsed');
@@ -395,26 +456,23 @@
       }
     }
 
-    // Pulihkan status terakhir sidebar saat halaman dimuat
     if (localStorage.getItem('sidebar_collapsed') === '1') {
       document.body.classList.add('sidebar-collapsed');
     }
 
-    // Jam real-time di footer sidebar
     setInterval(() => {
       const el = document.getElementById('sidebarClock');
       if (el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }, 1000);
 
-    function showToast(msg) {
+    function showToast(msg, isErr = false) {
       const t = document.createElement('div');
-      t.className = 'bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-lg text-xs font-bold';
+      t.className = `${isErr ? 'bg-rose-600' : 'bg-emerald-600'} text-white px-4 py-3 rounded-xl shadow-lg text-xs font-bold`;
       t.innerText = msg;
       document.getElementById('toastContainer').appendChild(t);
       setTimeout(() => t.remove(), 3500);
     }
 
-    // Switch antara Tab Data Pegawai dan Tab Layanan Informasi
     function switchKepegTab(tabName) {
       const panelPegawai = document.getElementById('panel-PEGAWAI');
       const panelLayanan = document.getElementById('panel-LAYANAN');
@@ -428,7 +486,7 @@
         if (headerActions) headerActions.classList.add('hidden');
         btnLayanan.className = "px-4 py-2.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-cyan-600 to-sky-600 text-white shadow-sm transition cursor-pointer flex items-center gap-2";
         btnPegawai.className = "px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer flex items-center gap-2";
-        if (!layananSheetsList.length) loadLayananFromSheets(false);
+        if (!portal.services.length) loadPortalSheets(false);
       } else {
         panelLayanan.classList.add('hidden');
         panelPegawai.classList.remove('hidden');
@@ -439,143 +497,377 @@
     }
 
     // =========================================================================
-    // SINKRONISASI OTOMATIS DARI GOOGLE SHEETS (gid=1599911655)
+    // PEMBACAAN LANGSUNG 5 TAB GOOGLE SHEETS (MANDIRI TANPA APPS SCRIPT)
     // =========================================================================
-    async function loadLayananFromSheets(notify = false) {
-      const grid = document.getElementById('gridLayananCards');
+    async function fetchSheetTab(sheetName) {
+      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&_=${Date.now()}`;
+      const res = await fetch(url);
+      const raw = await res.text();
+      const jsonStr = raw.substring(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
+      const parsed = JSON.parse(jsonStr);
+      const cols = parsed.table.cols.map((c, idx) => (c.label || `COL_${idx}`).trim());
+
+      return (parsed.table.rows || [])
+        .map(r => {
+          const obj = {};
+          cols.forEach((col, i) => {
+            const cell = r.c[i];
+            const val = cell ? (cell.f != null ? String(cell.f) : (cell.v != null ? String(cell.v) : '')) : '';
+            obj[col] = val.trim();
+          });
+          return obj;
+        })
+        .filter(row => Object.values(row).some(v => v !== ''));
+    }
+
+    async function loadPortalSheets(notify = false) {
       const infoBadge = document.getElementById('infoJumlahLayanan');
-      const tabBadge = document.getElementById('tabBadgeLayanan');
-      infoBadge.innerText = 'Sinkronisasi...';
+      infoBadge.innerText = 'Menyinkronkan...';
 
       try {
-        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID_LAYANAN}&_=${Date.now()}`;
-        const res = await fetch(url);
-        const text = await res.text();
+        const [services, requirements, pic, info, logs] = await Promise.all([
+          fetchSheetTab('MASTER_LAYANAN'),
+          fetchSheetTab('MASTER_PERSYARATAN').catch(() => []),
+          fetchSheetTab('MASTER_PIC').catch(() => []),
+          fetchSheetTab('MASTER_INFO').catch(() => []),
+          fetchSheetTab('LOG_CEK').catch(() => [])
+        ]);
 
-        const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-        const parsed = JSON.parse(jsonText);
-        const cols = parsed.table.cols.map((c, idx) => (c.label || `Kolom_${idx + 1}`).trim());
-        const rows = parsed.table.rows || [];
+        // Hitung statistik dashboard dari tab LOG_CEK
+        const now = new Date();
+        const tahunSekarang = String(now.getFullYear());
+        const bulanAngka = String(now.getMonth() + 1);
+        const bulanPad = bulanAngka.padStart(2, '0');
+        const bulanNamaId = now.toLocaleDateString('id-ID', { month: 'long' }).toLowerCase();
+        const bulanNamaEn = now.toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
 
-        layananSheetsList = rows.map((r, rowIndex) => {
-          const record = {};
-          const fields = [];
-          cols.forEach((colName, colIdx) => {
-            const cell = r.c[colIdx];
-            const val = cell ? (cell.f !== undefined && cell.f !== null ? String(cell.f) : (cell.v !== null && cell.v !== undefined ? String(cell.v) : '')) : '';
-            const cleanVal = val.trim();
-            record[colName] = cleanVal;
-            if (colName && cleanVal) {
-              fields.push({ label: colName, value: cleanVal });
-            }
-          });
+        let totalBulan = 0;
+        let totalTahun = 0;
+        const perLayanan = {};
 
-          const getByKeywords = (keywords) => {
-            const matchedCol = cols.find(c => keywords.some(k => c.toLowerCase().includes(k)));
-            return matchedCol ? record[matchedCol] : '';
-          };
+        logs.forEach(row => {
+          const tahun = pVal(row, 'TAHUN');
+          if (tahun !== tahunSekarang) return;
 
-          const rawNo = getByKeywords(['no', 'nomor', 'kode', 'id']) || String(rowIndex + 1);
-          const nomorFormatted = /^\d+$/.test(rawNo) ? rawNo.padStart(2, '0') : rawNo;
+          totalTahun++;
+          const b = pVal(row, 'BULAN').toLowerCase();
+          if (b === bulanNamaId || b === bulanNamaEn || b === bulanAngka || b === bulanPad) {
+            totalBulan++;
+          }
 
-          return {
-            nomor: nomorFormatted,
-            judul: getByKeywords(['nama layanan', 'layanan', 'judul', 'jenis', 'menu']) || record[cols[1]] || record[cols[0]] || `Layanan #${rowIndex + 1}`,
-            deskripsi: getByKeywords(['deskripsi', 'keterangan', 'uraian', 'ringkasan', 'penjelasan', 'informasi']) || '',
-            periode: getByKeywords(['periode', 'jadwal', 'waktu', 'batas']) || 'Periode: lihat detail',
-            fields: fields
-          };
-        }).filter(item => item.judul && item.judul.toLowerCase() !== 'nama layanan');
+          const namaLayanan = pVal(row, 'NAMA_LAYANAN');
+          if (namaLayanan) {
+            perLayanan[namaLayanan] = (perLayanan[namaLayanan] || 0) + 1;
+          }
+        });
 
-        infoBadge.innerText = `${layananSheetsList.length} Layanan`;
-        if (tabBadge) tabBadge.innerText = `${layananSheetsList.length} Layanan`;
-        renderLayananCards();
-        if (notify) showToast('Daftar Layanan berhasil disinkronkan dari Google Sheets!');
+        const hasilPerLayanan = Object.keys(perLayanan)
+          .map(nama => ({ nama, jumlah: perLayanan[nama] }))
+          .sort((a, b) => b.jumlah - a.jumlah);
+
+        portal = {
+          services: services.map((s, idx) => ({ ...s, __ROW_INDEX: idx })),
+          requirements,
+          pic,
+          info,
+          dashboard: {
+            tahun: tahunSekarang,
+            bulan: now.toLocaleDateString('id-ID', { month: 'long' }),
+            totalBulan,
+            totalTahun,
+            perLayanan: hasilPerLayanan
+          }
+        };
+
+        renderPortalDashboard();
+        renderPortalCards();
+        if (notify) showToast('Data layanan berhasil disinkronkan dari Google Sheets!');
       } catch (err) {
-        console.error('Gagal baca Google Sheets:', err);
+        console.error('Gagal memuat Google Sheets:', err);
         infoBadge.innerText = 'Gagal Sync';
-        grid.innerHTML = `
+        document.getElementById('gridLayananCards').innerHTML = `
           <div class="col-span-full bg-amber-50 border border-amber-200 rounded-2xl p-6 text-xs text-amber-900 space-y-2">
-            <p class="font-extrabold text-amber-800"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Spreadsheet Belum Dibuka Akses Lihat (Viewer)</p>
-            <p>Pastikan di Google Sheets Anda klik <strong>Bagikan (Share) &rarr; Akses Umum: Siapa saja yang memiliki link (Pelihat / Viewer)</strong>, lalu klik tombol <strong>Sync</strong>.</p>
+            <p class="font-extrabold text-amber-800"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Google Sheets Belum Dibuka Akses Lihat (Viewer)</p>
+            <p>Pastikan pada Google Sheets Anda klik <strong>Bagikan (Share) &rarr; Akses Umum: Siapa saja yang memiliki link (Pelihat / Viewer)</strong>, lalu klik tombol <strong>Sync Spreadsheet</strong>.</p>
           </div>`;
       }
     }
 
-    function renderLayananCards() {
-      const grid = document.getElementById('gridLayananCards');
-      const keyword = (document.getElementById('searchLayananInput')?.value || '').toLowerCase();
+    function renderPortalDashboard() {
+      const d = portal.dashboard;
+      if (!d) return;
 
-      const filtered = layananSheetsList.filter(item =>
-        item.judul.toLowerCase().includes(keyword) ||
-        item.deskripsi.toLowerCase().includes(keyword) ||
-        item.periode.toLowerCase().includes(keyword)
-      );
+      document.getElementById('portalTotalBulan').textContent = d.totalBulan || 0;
+      document.getElementById('portalTotalTahun').textContent = d.totalTahun || 0;
+      document.getElementById('portalBulanLabel').textContent = d.bulan || '-';
+      document.getElementById('portalTahunLabel').textContent = 'Tahun ' + d.tahun;
+      document.getElementById('portalDashboardSubtitle').textContent = 'Ringkasan pengajuan tahun ' + d.tahun;
+      document.getElementById('portalChartSubtitle').textContent = 'Distribusi pengajuan per layanan tahun ' + d.tahun;
 
-      if (!filtered.length) {
-        grid.innerHTML = `<div class="col-span-full bg-white rounded-2xl border border-slate-200 p-8 text-center text-xs text-slate-400">Tidak ada layanan yang cocok dengan pencarian "${escHtml(keyword)}".</div>`;
+      const data = d.perLayanan || [];
+      const area = document.getElementById('portalChartArea');
+
+      if (!data.length) {
+        area.innerHTML = `<div class="text-center py-8 text-xs text-slate-400">Belum ada pengajuan pada tahun ${escHtml(d.tahun)}.</div>`;
         return;
       }
 
-      grid.innerHTML = filtered.map(item => {
-        const realIdx = layananSheetsList.indexOf(item);
-        return `
-          <div onclick="openDetailLayananModal(${realIdx})" class="bg-white rounded-2xl border border-slate-200/90 hover:border-sky-300 shadow-2xs hover:shadow-md transition-all p-6 flex flex-col justify-between cursor-pointer group">
-            <div>
-              <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-sky-50 text-sky-600 font-extrabold text-xs mb-4 group-hover:bg-sky-600 group-hover:text-white transition">
-                ${escHtml(item.nomor)}
-              </span>
-              <h3 class="text-base font-extrabold text-slate-900 leading-snug mb-2 group-hover:text-sky-700 transition">
-                ${escHtml(item.judul)}
-              </h3>
-              <p class="text-xs text-slate-500 leading-relaxed">
-                ${escHtml(item.deskripsi || 'Informasi layanan dan persyaratan pengusulan.')}
-              </p>
-            </div>
+      const total = data.reduce((sum, item) => sum + Number(item.jumlah || 0), 0);
+      const colors = ['#2474b5', '#42a5f5', '#153b62', '#5c8db8', '#73b7d8', '#8faec5', '#2f6f95', '#6b9fbd', '#4c83a8', '#a3c5d9'];
 
-            <div class="pt-4 mt-5 border-t border-slate-100 flex items-center justify-between gap-3 text-[11px]">
-              <span class="text-slate-500 leading-tight">${escHtml(item.periode)}</span>
-              <span class="text-sky-600 font-bold whitespace-nowrap group-hover:translate-x-0.5 transition-transform">
-                Lihat detail &rarr;
-              </span>
-            </div>
+      let current = 0;
+      const segments = data.map((item, idx) => {
+        const start = current;
+        const percent = (Number(item.jumlah) / total) * 100;
+        current += percent;
+        return `${colors[idx % colors.length]} ${start}% ${current}%`;
+      }).join(',');
+
+      area.innerHTML = `
+        <div class="pie-donut" style="background: conic-gradient(${segments});"></div>
+        <div class="flex flex-col gap-2 min-w-[230px] max-w-md w-full">
+          ${data.map((item, idx) => {
+            const percent = total ? ((Number(item.jumlah) / total) * 100).toFixed(1) : 0;
+            return `
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${colors[idx % colors.length]};"></span>
+                <span class="flex-1 text-slate-700 truncate">${escHtml(item.nama)}</span>
+                <span class="font-extrabold text-[#153b62]">${item.jumlah}</span>
+                <span class="text-slate-400">(${percent}%)</span>
+              </div>`;
+          }).join('')}
+        </div>`;
+    }
+
+    function renderPortalCards() {
+      const q = (document.getElementById('searchLayananInput')?.value || '').toLowerCase().trim();
+
+      const list = (portal.services || [])
+        .filter(s => {
+          const active = !pVal(s, 'STATUS') || /aktif|ya|true/i.test(pVal(s, 'STATUS'));
+          const nama = pVal(s, 'NAMA_LAYANAN').toLowerCase();
+          const desk = pVal(s, 'DESKRIPSI_SINGKAT').toLowerCase();
+          return active && (!q || nama.includes(q) || desk.includes(q));
+        })
+        .sort((a, b) => (Number(pVal(a, 'URUTAN')) || 999) - (Number(pVal(b, 'URUTAN')) || 999));
+
+      document.getElementById('infoJumlahLayanan').textContent = `${list.length} Layanan`;
+      document.getElementById('tabBadgeLayanan').textContent = `${list.length} Layanan`;
+
+      const grid = document.getElementById('gridLayananCards');
+      if (!list.length) {
+        grid.innerHTML = `<div class="col-span-full bg-white rounded-2xl border border-slate-200 p-8 text-center text-xs text-slate-400">Belum ada data layanan yang dapat ditampilkan.</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map((s, i) => `
+        <article onclick="openPortalDetail(${s.__ROW_INDEX})" class="bg-white border border-[#e1e9f0] hover:border-[#2474b5]/50 rounded-2xl p-5 flex flex-col min-h-[220px] shadow-2xs hover:shadow-lg transition-all cursor-pointer group">
+          <div class="w-9 h-9 grid place-items-center rounded-xl bg-[#eaf4fc] text-[#2474b5] font-bold text-sm mb-4 group-hover:bg-[#2474b5] group-hover:text-white transition">
+            ${String(i + 1).padStart(2, '0')}
           </div>
-        `;
-      }).join('');
+          <h3 class="text-base font-bold text-[#203246] leading-snug mb-2 group-hover:text-[#153b62] transition">
+            ${escHtml(pVal(s, 'NAMA_LAYANAN') || 'Layanan')}
+          </h3>
+          <p class="text-xs text-[#687b8e] leading-relaxed mb-4">
+            ${escHtml(pVal(s, 'DESKRIPSI_SINGKAT') || 'Informasi layanan dan persyaratan pengusulan.')}
+          </p>
+          <div class="mt-auto border-t border-[#eef2f6] pt-3 flex justify-between items-center gap-2 text-xs text-[#687b8e]">
+            <span>${escHtml(pVal(s, 'PERIODE_PENGUSULAN') || 'Periode: lihat detail')}</span>
+            <span class="text-[#2474b5] font-bold whitespace-nowrap group-hover:translate-x-0.5 transition-transform">Lihat detail &rarr;</span>
+          </div>
+        </article>
+      `).join('');
     }
 
-    function openDetailLayananModal(idx) {
-      const item = layananSheetsList[idx];
-      if (!item) return;
+    function portalLinkHtml(url, label) {
+      if (!url || !/^https?:\/\//i.test(url)) return '';
+      return `
+        <a href="${escHtml(url)}" target="_blank" rel="noopener" class="inline-block no-underline bg-[#eaf4fc] hover:bg-[#d8ecfa] text-[#2474b5] rounded-lg px-2.5 py-1.5 text-xs font-bold mt-2 transition">
+          &#8599; ${escHtml(label || 'Buka tautan')}
+        </a>`;
+    }
 
-      document.getElementById('detailNomorBadge').innerText = item.nomor;
-      document.getElementById('detailJudulLayanan').innerText = item.judul;
-      document.getElementById('detailPeriodeLayanan').innerText = item.periode;
+    function openPortalDetail(rowIndex) {
+      const s = (portal.services || [])[Number(rowIndex)];
+      if (!s) return;
 
-      const bodyEl = document.getElementById('detailBodyLayanan');
-      const linkActionsEl = document.getElementById('detailLinkActions');
-      linkActionsEl.innerHTML = '';
+      const id = pVal(s, 'ID_LAYANAN');
+      document.getElementById('portalModalTitle').textContent = pVal(s, 'NAMA_LAYANAN') || 'Layanan';
+      document.getElementById('portalModalDesc').textContent = pVal(s, 'DESKRIPSI_SINGKAT');
 
-      bodyEl.innerHTML = item.fields.map(f => {
-        if (/^https?:\/\//i.test(f.value)) {
-          linkActionsEl.innerHTML += `
-            <a href="${escHtml(f.value)}" target="_blank" rel="noopener" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl inline-flex items-center gap-1.5 transition">
-              <i class="fa-solid fa-up-right-from-square"></i> ${escHtml(f.label)}
-            </a>`;
-          return '';
-        }
-        return `
-          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">${escHtml(f.label)}</span>
-            <div class="text-slate-800 whitespace-pre-line">${escHtml(f.value)}</div>
+      const fields = [
+        ['Periode Pengusulan', pVal(s, 'PERIODE_PENGUSULAN')],
+        ['Batas Pengusulan', pVal(s, 'BATAS_PENGUSULAN')],
+        ['Waktu Proses', pVal(s, 'WAKTU_PROSES')],
+        ['Status Layanan', pVal(s, 'STATUS')]
+      ].filter(x => x[1]);
+
+      let html = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">`;
+      html += fields.length
+        ? fields.map(f => `
+            <div class="border border-[#e1e9f0] rounded-xl p-3.5">
+              <div class="text-[#687b8e] text-[10px] font-bold uppercase tracking-wider mb-1">${escHtml(f[0])}</div>
+              <div class="text-sm text-[#203246] whitespace-pre-line">${escHtml(f[1])}</div>
+            </div>`).join('')
+        : `<div class="text-[#687b8e] col-span-full">Informasi jadwal belum diisi.</div>`;
+      html += `</div>`;
+
+      // DASAR HUKUM
+      const law = pVal(s, 'DASAR_HUKUM');
+      const lawLink = pVal(s, 'LINK_DASAR_HUKUM');
+      html += `<div><h3 class="text-base font-bold text-[#153b62] mb-2">Dasar Hukum</h3>`;
+      html += (law || lawLink)
+        ? `<div class="border border-[#e1e9f0] rounded-xl p-3.5"><div class="text-sm whitespace-pre-line">${escHtml(law || 'Dokumen dasar hukum')}</div>${portalLinkHtml(lawLink, 'Lihat dasar hukum')}</div>`
+        : `<p class="text-[#687b8e]">Informasi dasar hukum dan tautan dokumen akan ditambahkan.</p>`;
+      html += `</div>`;
+
+      // PERSYARATAN
+      const reqs = (portal.requirements || [])
+        .filter(r => pVal(r, 'ID_LAYANAN') === id && (!pVal(r, 'STATUS') || /aktif|ya|true/i.test(pVal(r, 'STATUS'))))
+        .sort((a, b) => (Number(pVal(a, 'URUTAN_TAMPIL')) || 999) - (Number(pVal(b, 'URUTAN_TAMPIL')) || 999));
+
+      html += `<div><h3 class="text-base font-bold text-[#153b62] mb-2">Persyaratan</h3>`;
+      if (reqs.length) {
+        html += `<ul class="divide-y divide-[#edf1f5]">` + reqs.map(r => `
+          <li class="py-3 flex gap-2.5 items-start text-sm">
+            <span class="w-4 h-4 border-2 border-[#a8bbc9] rounded-sm shrink-0 mt-1"></span>
+            <div>
+              <strong class="text-[#203246]">${escHtml(pVal(r, 'PERSYARATAN') || 'Persyaratan')}</strong>
+              ${pVal(r, 'FORMAT_FILE') ? `<span class="block text-xs text-[#687b8e] mt-1">Jenis File : ${escHtml(pVal(r, 'FORMAT_FILE'))}</span>` : ''}
+              ${pVal(r, 'BATAS_FILE') ? `<span class="block text-xs text-[#687b8e]">Ukuran File : ${escHtml(pVal(r, 'BATAS_FILE'))}</span>` : ''}
+              ${pVal(r, 'KETERANGAN') ? `<span class="block text-xs text-[#687b8e] mt-1">${escHtml(pVal(r, 'KETERANGAN'))}</span>` : ''}
+              ${portalLinkHtml(pVal(r, 'LINK_TEMPLATE'), pVal(r, 'LABEL_LINK') || 'Lihat format dokumen')}
+            </div>
+          </li>`).join('') + `</ul>`;
+      } else {
+        html += `<p class="text-[#687b8e]">Daftar persyaratan akan ditampilkan di sini.</p>`;
+      }
+      html += `</div>`;
+
+      // PIC PENGELOLA
+      const pics = (portal.pic || [])
+        .filter(p => pVal(p, 'ID_LAYANAN') === id && (!pVal(p, 'STATUS') || /aktif|ya|true/i.test(pVal(p, 'STATUS'))))
+        .sort((a, b) => (Number(pVal(a, 'URUTAN')) || 999) - (Number(pVal(b, 'URUTAN')) || 999));
+
+      html += `<div><h3 class="text-base font-bold text-[#153b62] mb-2">Kontak Pengelola</h3>`;
+      if (pics.length) {
+        html += pics.map(p => `
+          <div class="bg-[#f7fafc] border border-[#e1e9f0] rounded-xl p-3.5 mt-2 text-xs leading-relaxed">
+            <strong class="text-sm text-[#203246]">${escHtml(pVal(p, 'NAMA_PIC'))}</strong>
+            ${pVal(p, 'JABATAN') ? `<br>${escHtml(pVal(p, 'JABATAN'))}` : ''}
+            ${pVal(p, 'UNIT') ? `<br>${escHtml(pVal(p, 'UNIT'))}` : ''}
+            ${pVal(p, 'NO_HP') ? `<br>Telepon/WA: <strong class="text-emerald-700">${escHtml(pVal(p, 'NO_HP'))}</strong>` : ''}
+            ${pVal(p, 'EMAIL') ? `<br>Email: ${escHtml(pVal(p, 'EMAIL'))}` : ''}
+          </div>`).join('');
+      } else {
+        html += `<p class="text-[#687b8e]">Informasi kontak pengelola akan ditambahkan.</p>`;
+      }
+      html += `</div>`;
+
+      if (pVal(s, 'CATATAN')) {
+        html += `<div><h3 class="text-base font-bold text-[#153b62] mb-1">Catatan</h3><p class="text-[#687b8e] whitespace-pre-line">${escHtml(pVal(s, 'CATATAN'))}</p></div>`;
+      }
+
+      // KOTAK AJUKAN LAYANAN MANDIRI (LANGSUNG BUKA FOLDER DRIVE & KIRIM WA PIC)
+      const folderUrl = pVal(s, 'LINK_FOLDER_PENGAJUAN_AKTIF');
+      if (folderUrl) {
+        html += `
+          <div class="mt-4 p-4 bg-[#f4f9fd] border border-[#d9eaf6] rounded-2xl space-y-3">
+            <div>
+              <div class="font-bold text-sm text-[#153b62]">📁 Ajukan Layanan</div>
+              <div class="text-xs text-[#687b8e] mt-1">
+                Isi nama pegawai untuk membuka folder pengunggahan berkas dan menyampaikan pengajuan kepada PIC melalui WhatsApp.
+              </div>
+            </div>
+            <button type="button" onclick="document.getElementById('applyFormSelf').classList.remove('hidden'); this.classList.add('hidden'); document.getElementById('namaPegawaiSelf').focus();" class="w-full py-3 bg-[#2474b5] hover:bg-[#153b62] text-white text-sm font-bold rounded-xl transition cursor-pointer">
+              Ajukan Layanan
+            </button>
+            <div id="applyFormSelf" class="hidden space-y-2.5">
+              <input id="namaPegawaiSelf" type="text" placeholder="Masukkan nama pegawai" class="w-full bg-white border border-[#d4e0ea] rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2474b5]">
+              <div class="flex flex-col sm:flex-row gap-2">
+                <a href="${escHtml(folderUrl)}" target="_blank" rel="noopener" class="flex-1 py-2.5 px-3 bg-white hover:bg-sky-50 text-[#153b62] border border-[#2474b5]/40 font-bold text-xs rounded-xl text-center transition">
+                  <i class="fa-brands fa-google-drive mr-1"></i> 1. Buka Folder Upload Berkas
+                </a>
+                <button type="button" onclick="kirimPengajuanWaMandiri(${rowIndex})" class="flex-1 py-2.5 px-3 bg-[#1c8b5c] hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition cursor-pointer">
+                  <i class="fa-brands fa-whatsapp mr-1"></i> 2. Ajukan & Buka WhatsApp PIC
+                </button>
+              </div>
+              <div id="applyErrorSelf" class="text-[#b42318] text-xs font-bold"></div>
+            </div>
           </div>`;
-      }).join('');
+      }
 
-      document.getElementById('detailLayananModal').classList.remove('hidden');
+      document.getElementById('portalModalBody').innerHTML = html;
+      document.getElementById('portalDetailBackdrop').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
     }
 
-    function closeDetailLayananModal() {
-      document.getElementById('detailLayananModal').classList.add('hidden');
+    function closePortalDetail() {
+      document.getElementById('portalDetailBackdrop').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function normalizePhoneId(phone) {
+      let nomor = String(phone || '').replace(/\D/g, '');
+      if (nomor.startsWith('0')) nomor = '62' + nomor.substring(1);
+      if (nomor.startsWith('620')) nomor = '62' + nomor.substring(3);
+      return nomor;
+    }
+
+    async function kirimPengajuanWaMandiri(rowIndex) {
+      const s = (portal.services || [])[Number(rowIndex)];
+      const input = document.getElementById('namaPegawaiSelf');
+      const errBox = document.getElementById('applyErrorSelf');
+      const nama = (input?.value || '').trim();
+
+      if (!nama) {
+        errBox.textContent = 'Nama pegawai wajib diisi.';
+        input?.focus();
+        return;
+      }
+      errBox.textContent = '';
+
+      const idLayanan = pVal(s, 'ID_LAYANAN');
+      const namaLayanan = pVal(s, 'NAMA_LAYANAN');
+      const folderUrl = pVal(s, 'LINK_FOLDER_PENGAJUAN_AKTIF');
+
+      const pics = (portal.pic || [])
+        .filter(p => pVal(p, 'ID_LAYANAN') === idLayanan && (!pVal(p, 'STATUS') || /aktif|ya|true/i.test(pVal(p, 'STATUS'))))
+        .sort((a, b) => (Number(pVal(a, 'URUTAN')) || 999) - (Number(pVal(b, 'URUTAN')) || 999));
+
+      const pic = pics.length ? pics[0] : null;
+      if (!pic || !pVal(pic, 'NO_HP')) {
+        errBox.textContent = 'Nomor WhatsApp PIC belum tersedia pada tab MASTER_PIC.';
+        return;
+      }
+
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const tanggal = `${dd}-${mm}-${yyyy}`;
+
+      const nomorHp = normalizePhoneId(pVal(pic, 'NO_HP'));
+      const pesan =
+`Halo, Bapak/Ibu PIC ${namaLayanan}.
+
+Berikut kami sampaikan pengajuan layanan:
+
+> Layanan: ${namaLayanan}
+> Nama Pegawai: ${nama}
+> Tanggal Pengajuan: ${tanggal}
+> Berkas Pendukung: ${folderUrl}
+
+Mohon dapat ditindaklanjuti sesuai ketentuan yang berlaku.
+
+Terima kasih atas perhatian dan bantuannya. 🙏`;
+
+      if (window.catatLogAktivitas) {
+        await window.catatLogAktivitas({ modul: 'Kepegawaian', aksi: 'AJUKAN_LAYANAN', targetData: `${nama} - ${namaLayanan}` });
+      }
+
+      const waUrl = `https://wa.me/${nomorHp}?text=${encodeURIComponent(pesan)}`;
+      window.open(waUrl, '_blank', 'noopener');
     }
 
     // =========================================================================
@@ -702,7 +994,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       loadData();
-      loadLayananFromSheets(false);
+      loadPortalSheets(false);
     });
   </script>
   <script src="auth-audit.js"></script>
