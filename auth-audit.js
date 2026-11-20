@@ -13,7 +13,7 @@ function getLoginUrl(isLogout = false) {
   return isLogout ? `${base}?logout=1` : base;
 }
 
-// Mengecek apakah halaman saat ini adalah halaman Inventaris (bebas login / tidak redirect ke login)
+// Mengecek apakah halaman saat ini adalah halaman Publik / Bebas Login
 function isPublicInventoryPage() {
   const path = window.location.pathname.toLowerCase();
   const title = (document.title || '').toLowerCase();
@@ -25,8 +25,10 @@ function isPublicInventoryPage() {
     path.includes('inventaris') ||
     path.includes('stok') ||
     path.includes('dashboard') ||
+    path.includes('kepegawaian') ||
     title.includes('inventaris') ||
-    title.includes('stok')
+    title.includes('stok') ||
+    title.includes('kepegawaian')
   );
 }
 
@@ -216,7 +218,7 @@ async function initRoleAccess() {
     return;
   }
 
-  // JIKA HALAMAN INVENTARIS / PUBLIK: Jangan pernah lempar ke login.html
+  // JIKA HALAMAN PUBLIK (INVENTARIS / KEPEGAWAIAN): Jangan lempar ke login.html
   if (isPublicInventoryPage()) {
     if (authDb) {
       try {
@@ -240,8 +242,8 @@ async function initRoleAccess() {
 
     window.currentUserProfile = {
       id: null,
-      nama_lengkap: 'Petugas Sarpras',
-      jabatan: 'Akses Langsung Inventaris',
+      nama_lengkap: 'Petugas Bidang Umum',
+      jabatan: 'Akses Langsung',
       role: 'super_admin'
     };
     return;
@@ -264,7 +266,6 @@ async function initRoleAccess() {
     .single();
 
   if (profErr || !profile) {
-    // Jika profil belum terdaftar di user_profiles, tetap izinkan akses sebagai super_admin agar tidak terlempar ke login terus-menerus
     window.currentUserProfile = {
       id: session.user.id,
       nama_lengkap: session.user.email || 'Admin Bidang Umum',

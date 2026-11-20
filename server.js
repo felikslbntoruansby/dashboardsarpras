@@ -39,6 +39,9 @@ app.get('/bmn.html', (req, res) => res.sendFile(path.join(__dirname, 'bmn.html')
 app.get('/kepegawaian', (req, res) => res.sendFile(path.join(__dirname, 'kepegawaian.html')));
 app.get('/kepegawaian.html', (req, res) => res.sendFile(path.join(__dirname, 'kepegawaian.html')));
 
+app.get('/layanan-kepegawaian', (req, res) => res.sendFile(path.join(__dirname, 'layanan-kepegawaian.html')));
+app.get('/layanan-kepegawaian.html', (req, res) => res.sendFile(path.join(__dirname, 'layanan-kepegawaian.html')));
+
 app.get('/tata-usaha', (req, res) => res.sendFile(path.join(__dirname, 'tata-usaha.html')));
 app.get('/tata-usaha.html', (req, res) => res.sendFile(path.join(__dirname, 'tata-usaha.html')));
 
@@ -503,7 +506,7 @@ app.delete('/api/bmn/:id', async (req, res) => {
 });
 
 // =============================================================
-// API SUB-BAGIAN KEPEGAWAIAN
+// API SUB-BAGIAN KEPEGAWAIAN (TANPA NIP, MENDUKUNG JENIS KELAMIN)
 // =============================================================
 app.get('/api/kepegawaian', async (req, res) => {
     try {
@@ -515,14 +518,30 @@ app.get('/api/kepegawaian', async (req, res) => {
 
 app.post('/api/kepegawaian', async (req, res) => {
     try {
-        const { nip_nik, nama_pegawai, pangkat_golongan, jabatan, unit_kerja, status_kepegawaian, status_kehadiran, keterangan } = req.body;
+        const {
+            nip_nik,
+            nama_pegawai,
+            pangkat_golongan,
+            jabatan,
+            unit_kerja,
+            status_kepegawaian,
+            jenis_kelamin,
+            status_kehadiran,
+            keterangan
+        } = req.body;
+
         const { data, error } = await supabase
             .from('kepegawaian_data')
             .insert([{
-                nip_nik, nama_pegawai, pangkat_golongan: pangkat_golongan || '',
-                jabatan: jabatan || '', unit_kerja: unit_kerja || 'Bidang Umum',
+                nip_nik: nip_nik || '-',
+                nama_pegawai,
+                pangkat_golongan: pangkat_golongan || '',
+                jabatan: jabatan || '',
+                unit_kerja: unit_kerja || 'Bidang Umum',
                 status_kepegawaian: status_kepegawaian || 'PNS',
-                status_kehadiran: status_kehadiran || 'Aktif', keterangan: keterangan || ''
+                jenis_kelamin: jenis_kelamin || '',
+                status_kehadiran: status_kehadiran || 'Aktif',
+                keterangan: keterangan || ''
             }])
             .select();
         if (error) throw error;
@@ -532,10 +551,31 @@ app.post('/api/kepegawaian', async (req, res) => {
 
 app.put('/api/kepegawaian/:id', async (req, res) => {
     try {
-        const { nip_nik, nama_pegawai, pangkat_golongan, jabatan, unit_kerja, status_kepegawaian, status_kehadiran, keterangan } = req.body;
+        const {
+            nip_nik,
+            nama_pegawai,
+            pangkat_golongan,
+            jabatan,
+            unit_kerja,
+            status_kepegawaian,
+            jenis_kelamin,
+            status_kehadiran,
+            keterangan
+        } = req.body;
+
         const { data, error } = await supabase
             .from('kepegawaian_data')
-            .update({ nip_nik, nama_pegawai, pangkat_golongan, jabatan, unit_kerja, status_kepegawaian, status_kehadiran, keterangan })
+            .update({
+                nip_nik: nip_nik || '-',
+                nama_pegawai,
+                pangkat_golongan,
+                jabatan,
+                unit_kerja,
+                status_kepegawaian,
+                jenis_kelamin,
+                status_kehadiran,
+                keterangan
+            })
             .eq('id', req.params.id)
             .select();
         if (error) throw error;

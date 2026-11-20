@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Layanan Informasi Kepegawaian - Poltekbang Surabaya</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --theme-primary: #0284c7;
+      --theme-primary-dark: #0369a1;
+      --theme-primary-soft: #e0f2fe;
+      --theme-banner-from: #0f294a;
+      --theme-banner-to: #0284c7;
+    }
+
+    body[data-theme="green"] {
+      --theme-primary: #059669;
+      --theme-primary-dark: #047857;
+      --theme-primary-soft: #d1fae5;
+      --theme-banner-from: #064e3b;
+      --theme-banner-to: #059669;
+    }
+
+    body[data-theme="red"] {
+      --theme-primary: #be123c;
+      --theme-primary-dark: #9f1239;
+      --theme-primary-soft: #ffe4e6;
+      --theme-banner-from: #4c0519;
+      --theme-banner-to: #be123c;
+    }
+
+    body[data-theme="purple"] {
+      --theme-primary: #6d28d9;
+      --theme-primary-dark: #5b21b6;
+      --theme-primary-soft: #ede9fe;
+      --theme-banner-from: #2e1065;
+      --theme-banner-to: #6d28d9;
+    }
+
+    .theme-bg { background-color: var(--theme-primary) !important; }
+    .theme-bg-hover:hover { background-color: var(--theme-primary-dark) !important; }
+    .theme-soft-bg { background-color: var(--theme-primary-soft) !important; }
+    .theme-text { color: var(--theme-primary) !important; }
+    .theme-banner {
+      background: linear-gradient(125deg, var(--theme-banner-from), var(--theme-banner-to)) !important;
+    }
+
+    .theme-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.12);
+      border-color: var(--theme-primary) !important;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    @media (min-width: 1024px) {
+      body.sidebar-collapsed #appSidebar { width: 5rem; }
+      body.sidebar-collapsed #mainContentArea { padding-left: 5rem; }
+      body.sidebar-collapsed .sidebar-label,
+      body.sidebar-collapsed #menu4Bidang,
+      body.sidebar-collapsed .sidebar-chevron,
+      body.sidebar-collapsed #sidebarStatusText { display: none !important; }
+      body.sidebar-collapsed .sidebar-header-wrap { justify-content: center; padding-left: 0.75rem; padding-right: 0.75rem; }
+      body.sidebar-collapsed .sidebar-brand-group { display: none; }
+      body.sidebar-collapsed .sidebar-nav-btn { justify-content: center; padding-left: 0; padding-right: 0; }
+      body.sidebar-collapsed #desktopToggleIcon { transform: rotate(180deg); }
+    }
+
+    .pie-donut {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      background: var(--theme-primary-soft);
+      position: relative;
+      flex: none;
+    }
+    .pie-donut::after {
+      content: "";
+      position: absolute;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: #ffffff;
+      top: 57px;
+      left: 57px;
+    }
+  </style>
+</head>
+<body data-theme="blue" class="bg-slate-100/80 font-sans text-slate-800 min-h-screen antialiased transition-colors duration-300">
+
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+  <!-- SIDEBAR -->
+  <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800/80 transform -translate-x-full lg:translate-x-0 transition-all duration-300 ease-in-out shadow-2xl lg:shadow-none">
+    <div class="overflow-y-auto no-scrollbar flex-1">
+      <div class="sidebar-header-wrap p-5 border-b border-slate-800/80 flex items-center justify-between gap-2">
+        <div class="sidebar-brand-group flex items-center gap-3.5 min-w-0">
+          <div class="theme-bg w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ring-1 ring-white/15 shrink-0 transition-colors">
+            <i class="fa-solid fa-users-gear text-white text-base"></i>
+          </div>
+          <div class="min-w-0">
+            <h2 class="text-sm font-extrabold text-white leading-snug truncate">Kepegawaian</h2>
+            <span class="text-[11px] font-medium text-slate-400 block truncate">Poltekbang Surabaya</span>
+          </div>
+        </div>
+
+        <button type="button" onclick="toggleDesktopSidebar()" title="Perkecil / Perlebar Menu Samping" class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/90 theme-bg-hover text-slate-300 hover:text-white border border-slate-700/80 transition cursor-pointer shrink-0">
+          <i id="desktopToggleIcon" class="fa-solid fa-angles-left text-xs transition-transform duration-300"></i>
+        </button>
+
+        <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <!-- MENU NAVIGASI -->
+      <div class="p-4 space-y-2">
+        <a href="/bidang-umum" title="Portal Bidang Umum" class="sidebar-nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800/90 hover:text-white transition">
+          <i class="fa-solid fa-arrow-left w-4 text-center text-amber-400 shrink-0"></i>
+          <span class="sidebar-label truncate">Portal Bidang Umum</span>
+        </a>
+
+        <div class="pt-1">
+          <button type="button" onclick="handle4MenuClick()" title="Menu Bidang Umum" class="sidebar-nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-slate-800/90 text-white hover:bg-slate-700/90 transition cursor-pointer">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-sitemap w-4 text-center text-amber-400 shrink-0"></i>
+              <span class="sidebar-label truncate">Menu Bidang Umum</span>
+            </span>
+            <i class="sidebar-chevron fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+          </button>
+
+          <div id="menu4Bidang" class="pl-3 space-y-1.5 border-l border-slate-700/80 ml-5 mt-2">
+            <a href="/rumah-tangga" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+              <i class="fa-solid fa-building-user text-blue-400 w-4 text-center"></i>
+              <span>1. Rumah Tangga</span>
+            </a>
+            <a href="/bmn" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+              <i class="fa-solid fa-landmark text-emerald-400 w-4 text-center"></i>
+              <span>2. BMN</span>
+            </a>
+
+            <!-- 3. KEPEGAWAIAN DENGAN 2 SUB-MENU TERPISAH -->
+            <div class="space-y-1">
+              <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-cyan-300">
+                <i class="fa-solid fa-users-gear w-4 text-center"></i>
+                <span>3. Kepegawaian</span>
+              </div>
+              <div class="pl-6 space-y-1">
+                <a href="/kepegawaian" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
+                  <span>• Data Pegawai</span>
+                </a>
+                <a href="/layanan-kepegawaian" class="theme-bg flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-white shadow-sm">
+                  <span>• Layanan Informasi</span>
+                </a>
+              </div>
+            </div>
+
+            <a href="/tata-usaha" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition">
+              <i class="fa-solid fa-envelope-open-text text-purple-400 w-4 text-center"></i>
+              <span>4. Tata Usaha</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER SIDEBAR -->
+    <div class="p-4 border-t border-slate-800/80 bg-slate-950/80 space-y-2.5 shrink-0">
+      <a href="/executive?kiosk=1" title="Mode Monitor TV (Kiosk)" class="sidebar-nav-btn w-full py-2.5 px-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-orange-600/20 flex items-center justify-center gap-2 transition">
+        <i class="fa-solid fa-tv shrink-0"></i>
+        <span class="sidebar-label truncate">Mode Monitor TV (Kiosk)</span>
+      </a>
+      <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 pt-1">
+        <span class="flex items-center gap-1.5 mx-auto lg:mx-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+          <span id="sidebarStatusText">Sistem Aktif</span>
+        </span>
+        <span id="sidebarClock" class="sidebar-label font-mono font-bold text-slate-300">--:--</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOP BAR MOBILE -->
+  <div class="lg:hidden sticky top-0 z-30 bg-slate-900 text-white px-4 py-3 flex items-center justify-between shadow-md">
+    <button onclick="toggleMobileSidebar(true)" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl">
+      <i class="fa-solid fa-bars text-sm"></i>
+    </button>
+    <span class="font-extrabold text-xs tracking-wide">Layanan Informasi Kepegawaian</span>
+    <span class="w-8"></span>
+  </div>
+
+  <!-- KONTEN UTAMA -->
+  <div id="mainContentArea" class="lg:pl-64 transition-all duration-300 ease-in-out">
+    <div class="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+
+      <!-- HEADER + TEMA WARNA + TOMBOL PINDAH KE DATA PEGAWAI -->
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+        <div class="flex items-center gap-4">
+          <div class="theme-bg p-3.5 rounded-xl text-white shadow-md transition-colors">
+            <i class="fa-solid fa-circle-info text-2xl"></i>
+          </div>
+          <div>
+            <span class="theme-text text-[10px] font-bold uppercase tracking-widest transition-colors">BIDANG UMUM • SDM & APARATUR</span>
+            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Portal Layanan Informasi Kepegawaian</h1>
+            <p class="text-xs text-slate-500">Politeknik Penerbangan Surabaya • Panduan Layanan, Regulasi, Persyaratan & Pengajuan PIC</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-between lg:justify-end">
+          <!-- PEMILIH VARIAN WARNA TEMA -->
+          <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
+            <span class="text-[11px] font-bold text-slate-500 mr-0.5"><i class="fa-solid fa-palette mr-1"></i>Tema:</span>
+            <button type="button" onclick="setThemeVariant('blue')" data-theme-dot="blue" title="Tema Biru" class="w-5 h-5 rounded-full bg-sky-600 ring-2 ring-offset-2 ring-sky-600 cursor-pointer transition transform hover:scale-110"></button>
+            <button type="button" onclick="setThemeVariant('green')" data-theme-dot="green" title="Tema Hijau" class="w-5 h-5 rounded-full bg-emerald-600 opacity-75 hover:opacity-100 cursor-pointer transition transform hover:scale-110"></button>
+            <button type="button" onclick="setThemeVariant('red')" data-theme-dot="red" title="Tema Merah" class="w-5 h-5 rounded-full bg-rose-700 opacity-75 hover:opacity-100 cursor-pointer transition transform hover:scale-110"></button>
+            <button type="button" onclick="setThemeVariant('purple')" data-theme-dot="purple" title="Tema Ungu" class="w-5 h-5 rounded-full bg-violet-700 opacity-75 hover:opacity-100 cursor-pointer transition transform hover:scale-110"></button>
+          </div>
+
+          <a href="/kepegawaian" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-users"></i> Data Pegawai
+          </a>
+        </div>
+      </div>
+
+      <!-- BANNER PORTAL INFORMASI -->
+      <div class="theme-banner text-white rounded-2xl p-6 md:p-7 shadow-md transition-all">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-2">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-lg">✦</div>
+              <div class="text-[11px] tracking-wider uppercase text-white/80">
+                POLITEKNIK PENERBANGAN SURABAYA<br>
+                <strong class="text-white">PORTAL INFORMASI KEPEGAWAIAN</strong>
+              </div>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight pt-1">Informasi & Pengajuan Layanan</h2>
+            <p class="text-xs md:text-sm text-white/90 max-w-2xl">
+              Temukan informasi layanan, regulasi, persyaratan berkas, kontak PIC pengelola, serta pengajuan layanan kepegawaian dalam satu tempat.
+            </p>
+          </div>
+          <button type="button" onclick="loadPortalSheets(true)" class="self-start md:self-center px-4 py-2.5 bg-white/15 hover:bg-white/25 text-white border border-white/25 rounded-xl text-xs font-bold transition cursor-pointer inline-flex items-center gap-2 shrink-0">
+            <i class="fa-solid fa-rotate"></i> Sync Spreadsheet
+          </button>
+        </div>
+      </div>
+
+      <!-- INFO NOTICE -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl px-4 py-3.5 text-xs text-slate-600 shadow-2xs">
+        ℹ️ Informasi pada portal ini terhubung langsung dengan database layanan kepegawaian (otomatis diperbarui saat spreadsheet diubah).
+      </div>
+
+      <!-- RINGKASAN PENGAJUAN & PIE CHART -->
+      <section class="space-y-4">
+        <div>
+          <h3 class="text-lg font-extrabold text-slate-900">Ringkasan Pengajuan</h3>
+          <p id="portalDashboardSubtitle" class="text-xs text-slate-500">Tahun berjalan</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="grid grid-cols-2 lg:grid-cols-1 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Pengajuan Bulan Ini</div>
+              <div id="portalTotalBulan" class="theme-text text-3xl font-extrabold mt-2 transition-colors">0</div>
+              <div id="portalBulanLabel" class="text-xs text-slate-500 mt-1.5">-</div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Pengajuan Tahun Ini</div>
+              <div id="portalTotalTahun" class="theme-text text-3xl font-extrabold mt-2 transition-colors">0</div>
+              <div id="portalTahunLabel" class="text-xs text-slate-500 mt-1.5">-</div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+            <h4 class="text-base font-extrabold text-slate-900">Pengajuan per Layanan</h4>
+            <p id="portalChartSubtitle" class="text-xs text-slate-500 mb-4">Tahun berjalan</p>
+            <div id="portalChartArea" class="flex flex-col sm:flex-row items-center justify-center gap-8 py-2">
+              <p class="text-xs text-slate-400">Memuat grafik pengajuan...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOOLBAR DAFTAR LAYANAN -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-1">
+        <div class="flex items-center gap-2.5">
+          <h2 class="text-xl font-extrabold text-slate-900">Daftar Layanan</h2>
+          <span id="infoJumlahLayanan" class="theme-soft-bg theme-text px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-colors">Memuat...</span>
+        </div>
+        <input type="search" id="searchLayananInput" oninput="renderPortalCards()" placeholder="Cari nama layanan..." class="w-full sm:w-80 bg-white border border-slate-200 text-slate-800 text-xs rounded-xl px-4 py-3 shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500">
+      </div>
+
+      <!-- GRID KARTU LAYANAN BERBEDA LATAR & ILUSTRASI -->
+      <div id="gridLayananCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="col-span-full bg-white rounded-2xl border border-slate-200 p-10 text-center text-xs text-slate-400">
+          <i class="theme-text fa-solid fa-spinner animate-spin text-lg mb-2 block"></i>
+          Memuat informasi layanan dari Google Sheets...
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL LAYANAN & AJUKAN -->
+  <div id="portalDetailBackdrop" onclick="if(event.target===this) closePortalDetail()" class="fixed inset-0 bg-slate-900/65 backdrop-blur-xs hidden flex justify-center items-start z-50 p-4 overflow-y-auto">
+    <section class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl my-6 overflow-hidden">
+      <div class="theme-banner text-white p-6 relative">
+        <button type="button" onclick="closePortalDetail()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 text-white text-xl flex items-center justify-center cursor-pointer">
+          &times;
+        </button>
+        <h2 id="portalModalTitle" class="text-xl md:text-2xl font-extrabold pr-10 leading-snug">Judul Layanan</h2>
+        <p id="portalModalDesc" class="text-xs md:text-sm text-white/90 mt-2 leading-relaxed"></p>
+      </div>
+      <div id="portalModalBody" class="p-6 text-xs text-slate-700 space-y-5"></div>
+    </section>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+  <script>
+    const SPREADSHEET_ID = "1Fl3Hm538x7hdtl83_lTetU9P-NRGZ0wszGPBDOyJjYc";
+
+    let portal = {
+      services: [],
+      requirements: [],
+      pic: [],
+      info: [],
+      dashboard: null
+    };
+
+    const THEME_PALETTES = {
+      blue:   ['#0284c7', '#38bdf8', '#0f294a', '#7dd3fc', '#0369a1', '#bae6fd'],
+      green:  ['#059669', '#34d399', '#064e3b', '#6ee7b7', '#047857', '#a7f3d0'],
+      red:    ['#be123c', '#fb7185', '#4c0519', '#fda4af', '#9f1239', '#fecdd3'],
+      purple: ['#6d28d9', '#a78bfa', '#2e1065', '#c4b5fd', '#5b21b6', '#ddd6fe']
+    };
+
+    const CARD_COLORS = [
+      { bg: 'bg-blue-50/70 border-blue-100', hover: 'hover:border-blue-300 hover:bg-blue-50/90', text: 'text-blue-700', badge: 'bg-blue-100/90 text-blue-800' },
+      { bg: 'bg-emerald-50/70 border-emerald-100', hover: 'hover:border-emerald-300 hover:bg-emerald-50/90', text: 'text-emerald-700', badge: 'bg-emerald-100/90 text-emerald-800' },
+      { bg: 'bg-rose-50/70 border-rose-100', hover: 'hover:border-rose-300 hover:bg-rose-50/90', text: 'text-rose-700', badge: 'bg-rose-100/90 text-rose-800' },
+      { bg: 'bg-purple-50/70 border-purple-100', hover: 'hover:border-purple-300 hover:bg-purple-50/90', text: 'text-purple-700', badge: 'bg-purple-100/90 text-purple-800' },
+      { bg: 'bg-amber-50/60 border-amber-100', hover: 'hover:border-amber-300 hover:bg-amber-50/80', text: 'text-amber-700', badge: 'bg-amber-100/90 text-amber-800' },
+      { bg: 'bg-cyan-50/70 border-cyan-100', hover: 'hover:border-cyan-300 hover:bg-cyan-50/90', text: 'text-cyan-700', badge: 'bg-cyan-100/90 text-cyan-800' },
+      { bg: 'bg-indigo-50/70 border-indigo-100', hover: 'hover:border-indigo-300 hover:bg-indigo-50/90', text: 'text-indigo-700', badge: 'bg-indigo-100/90 text-indigo-800' },
+      { bg: 'bg-teal-50/70 border-teal-100', hover: 'hover:border-teal-300 hover:bg-teal-50/90', text: 'text-teal-700', badge: 'bg-teal-100/90 text-teal-800' }
+    ];
+
+    const CARD_ICONS = [
+      'fa-solid fa-graduation-cap',
+      'fa-solid fa-id-card-clip',
+      'fa-solid fa-award',
+      'fa-solid fa-user-tie',
+      'fa-solid fa-book-open-reader',
+      'fa-solid fa-rotate-left',
+      'fa-solid fa-file-signature',
+      'fa-solid fa-briefcase',
+      'fa-solid fa-arrow-up-right-dots',
+      'fa-solid fa-hourglass-half',
+      'fa-solid fa-shield-halved',
+      'fa-solid fa-hospital-user'
+    ];
+
+    function setThemeVariant(variant) {
+      const theme = THEME_PALETTES[variant] ? variant : 'blue';
+      document.body.setAttribute('data-theme', theme);
+      localStorage.setItem('kepeg_theme_variant', theme);
+
+      document.querySelectorAll('[data-theme-dot]').forEach(btn => {
+        const isCurrent = btn.getAttribute('data-theme-dot') === theme;
+        btn.classList.toggle('ring-2', isCurrent);
+        btn.classList.toggle('ring-offset-2', isCurrent);
+        btn.classList.toggle('ring-slate-400', isCurrent);
+        btn.classList.toggle('opacity-75', !isCurrent);
+      });
+
+      if (portal.dashboard) renderPortalDashboard();
+    }
+
+    const escHtml = (s) => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const pVal = (obj, key) => (obj && obj[key] != null ? String(obj[key]).trim() : '');
+
+    function toggleMobileSidebar(show) {
+      document.getElementById('appSidebar').classList.toggle('-translate-x-full', !show);
+      document.getElementById('sidebarBackdrop').classList.toggle('hidden', !show);
+    }
+
+    function toggleDesktopSidebar() {
+      const collapsed = document.body.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('sidebar_collapsed', collapsed ? '1' : '0');
+    }
+
+    function handle4MenuClick() {
+      if (document.body.classList.contains('sidebar-collapsed')) {
+        document.body.classList.remove('sidebar-collapsed');
+        localStorage.setItem('sidebar_collapsed', '0');
+        document.getElementById('menu4Bidang').classList.remove('hidden');
+      } else {
+        document.getElementById('menu4Bidang').classList.toggle('hidden');
+      }
+    }
+
+    if (localStorage.getItem('sidebar_collapsed') === '1') {
+      document.body.classList.add('sidebar-collapsed');
+    }
+
+    setInterval(() => {
+      const el = document.getElementById('sidebarClock');
+      if (el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }, 1000);
+
+    function showToast(msg, isErr = false) {
+      const t = document.createElement('div');
+      t.className = `${isErr ? 'bg-rose-600' : 'bg-emerald-600'} text-white px-4 py-3 rounded-xl shadow-lg text-xs font-bold`;
+      t.innerText = msg;
+      document.getElementById('toastContainer').appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+
+    async function fetchSheetTab(sheetName) {
+      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&_=${Date.now()}`;
+      const res = await fetch(url);
+      const raw = await res.text();
+      const jsonStr = raw.substring(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
+      const parsed = JSON.parse(jsonStr);
+      const cols = parsed.table.cols.map((c, idx) => (c.label || `COL_${idx}`).trim());
+
+      return (parsed.table.rows || [])
+        .map(r => {
+          const obj = {};
+          cols.forEach((col, i) => {
+            const cell = r.c[i];
+            const val = cell ? (cell.f != null ? String(cell.f) : (cell.v != null ? String(cell.v) : '')) : '';
+            obj[col] = val.trim();
+          });
+          return obj;
+        })
+        .filter(row => Object.values(row).some(v => v !== ''));
+    }
+
+    async function loadPortalSheets(notify = false) {
+      const infoBadge = document.getElementById('infoJumlahLayanan');
+      infoBadge.innerText = 'Menyinkronkan...';
+
+      try {
+        const [services, requirements, pic, info, logs] = await Promise.all([
+          fetchSheetTab('MASTER_LAYANAN'),
+          fetchSheetTab('MASTER_PERSYARATAN').catch(() => []),
+          fetchSheetTab('MASTER_PIC').catch(() => []),
+          fetchSheetTab('MASTER_INFO').catch(() => []),
+          fetchSheetTab('LOG_CEK').catch(() => [])
+        ]);
+
+        const now = new Date();
+        const tahunSekarang = String(now.getFullYear());
+        const bulanAngka = String(now.getMonth() + 1);
+        const bulanPad = bulanAngka.padStart(2, '0');
+        const bulanNamaId = now.toLocaleDateString('id-ID', { month: 'long' }).toLowerCase();
+        const bulanNamaEn = now.toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
+
+        let totalBulan = 0;
+        let totalTahun = 0;
+        const perLayanan = {};
+
+        logs.forEach(row => {
+          const tahun = pVal(row, 'TAHUN');
+          if (tahun !== tahunSekarang) return;
+
+          totalTahun++;
+          const b = pVal(row, 'BULAN').toLowerCase();
+          if (b === bulanNamaId || b === bulanNamaEn || b === bulanAngka || b === bulanPad) {
+            totalBulan++;
+          }
+
+          const namaLayanan = pVal(row, 'NAMA_LAYANAN');
+          if (namaLayanan) {
+            perLayanan[namaLayanan] = (perLayanan[namaLayanan] || 0) + 1;
+          }
+        });
+
+        const hasilPerLayanan = Object.keys(perLayanan)
+          .map(nama => ({ nama, jumlah: perLayanan[nama] }))
+          .sort((a, b) => b.jumlah - a.jumlah);
+
+        portal = {
+          services: services.map((s, idx) => ({ ...s, __ROW_INDEX: idx })),
+          requirements,
+          pic,
+          info,
+          dashboard: {
+            tahun: tahunSekarang,
+            bulan: now.toLocaleDateString('id-ID', { month: 'long' }),
+            totalBulan,
+            totalTahun,
+            perLayanan: hasilPerLayanan
+          }
+        };
+
+        renderPortalDashboard();
+        renderPortalCards();
+        if (notify) showToast('Data layanan berhasil disinkronkan dari Google Sheets!');
+      } catch (err) {
+        console.error('Gagal memuat Google Sheets:', err);
+        infoBadge.innerText = 'Gagal Sync';
+        document.getElementById('gridLayananCards').innerHTML = `
+          <div class="col-span-full bg-amber-50 border border-amber-200 rounded-2xl p-6 text-xs text-amber-900 space-y-2">
+            <p class="font-extrabold text-amber-800"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Google Sheets Belum Dibuka Akses Lihat (Viewer)</p>
+            <p>Pastikan pada Google Sheets Anda klik <strong>Bagikan (Share) &rarr; Akses Umum: Siapa saja yang memiliki link (Pelihat / Viewer)</strong>, lalu klik tombol <strong>Sync Spreadsheet</strong>.</p>
+          </div>`;
+      }
+    }
+
+    function renderPortalDashboard() {
+      const d = portal.dashboard;
+      if (!d) return;
+
+      document.getElementById('portalTotalBulan').textContent = d.totalBulan || 0;
+      document.getElementById('portalTotalTahun').textContent = d.totalTahun || 0;
+      document.getElementById('portalBulanLabel').textContent = d.bulan || '-';
+      document.getElementById('portalTahunLabel').textContent = 'Tahun ' + d.tahun;
+      document.getElementById('portalDashboardSubtitle').textContent = 'Ringkasan pengajuan tahun ' + d.tahun;
+      document.getElementById('portalChartSubtitle').textContent = 'Distribusi pengajuan per layanan tahun ' + d.tahun;
+
+      const data = d.perLayanan || [];
+      const area = document.getElementById('portalChartArea');
+
+      if (!data.length) {
+        area.innerHTML = `<div class="text-center py-8 text-xs text-slate-400">Belum ada pengajuan pada tahun ${escHtml(d.tahun)}.</div>`;
+        return;
+      }
+
+      const activeTheme = document.body.getAttribute('data-theme') || 'blue';
+      const colors = THEME_PALETTES[activeTheme] || THEME_PALETTES.blue;
+      const total = data.reduce((sum, item) => sum + Number(item.jumlah || 0), 0);
+
+      let current = 0;
+      const segments = data.map((item, idx) => {
+        const start = current;
+        const percent = (Number(item.jumlah) / total) * 100;
+        current += percent;
+        return `${colors[idx % colors.length]} ${start}% ${current}%`;
+      }).join(',');
+
+      area.innerHTML = `
+        <div class="pie-donut" style="background: conic-gradient(${segments});"></div>
+        <div class="flex flex-col gap-2 min-w-[230px] max-w-md w-full">
+          ${data.map((item, idx) => {
+            const percent = total ? ((Number(item.jumlah) / total) * 100).toFixed(1) : 0;
+            return `
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${colors[idx % colors.length]};"></span>
+                <span class="flex-1 text-slate-700 truncate">${escHtml(item.nama)}</span>
+                <span class="font-extrabold text-slate-900">${item.jumlah}</span>
+                <span class="text-slate-400">(${percent}%)</span>
+              </div>`;
+          }).join('')}
+        </div>`;
+    }
+
+    function renderPortalCards() {
+      const q = (document.getElementById('searchLayananInput')?.value || '').toLowerCase().trim();
+
+      const list = (portal.services || [])
+        .filter(s => {
+          const active = !pVal(s, 'STATUS') || /aktif|ya|true/i.test(pVal(s, 'STATUS'));
+          const nama = pVal(s, 'NAMA_LAYANAN').toLowerCase();
+          const desk = pVal(s, 'DESKRIPSI_SINGKAT').toLowerCase();
+          return active && (!q || nama.includes(q) || desk.includes(q));
+        })
+        .sort((a, b) => (Number(pVal(a, 'URUTAN')) || 999) - (Number(pVal(b, 'URUTAN')) || 999));
+
+      document.getElementById('infoJumlahLayanan').textContent = `${list.length} Layanan`;
+
+      const grid = document.getElementById('gridLayananCards');
+      if (!list.length) {
+        grid.innerHTML = `<div class="col-span-full bg-white rounded-2xl border border-slate-200 p-8 text-center text-xs text-slate-400">Belum ada data layanan yang dapat ditampilkan.</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map((s, i) => {
+        const style = CARD_COLORS[i % CARD_COLORS.length];
+        const iconClass = CARD_ICONS[i % CARD_ICONS.length] || 'fa-solid fa-file-invoice';
+
+        return `
+          <article onclick="openPortalDetail(${s.__ROW_INDEX})" class="theme-card ${style.bg} ${style.hover} border rounded-2xl p-6 flex flex-col justify-between shadow-2xs transition-all duration-300 cursor-pointer group relative overflow-hidden">
+            <div class="absolute -top-3 -right-3 w-16 h-16 rounded-full bg-black/[0.02] group-hover:bg-black/[0.04] transition-all"></div>
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="${style.badge} font-bold text-xs px-3 py-1 rounded-lg">
+                  ${String(i + 1).padStart(2, '0')}
+                </span>
+                <div class="w-10 h-10 rounded-xl bg-white/80 ${style.text} flex items-center justify-center shadow-2xs text-lg transition-transform group-hover:scale-110">
+                  <i class="${iconClass}"></i>
+                </div>
+              </div>
+              <h3 class="text-base font-bold text-slate-900 leading-snug mb-2">
+                ${escHtml(pVal(s, 'NAMA_LAYANAN') || 'Layanan')}
+              </h3>
+              <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                ${escHtml(pVal(s, 'DESKRIPSI_SINGKAT') || 'Informasi layanan dan persyaratan pengusulan.')}
+              </p>
+            </div>
+            <div class="mt-auto border-t border-slate-200/60 pt-3.5 flex justify-between items-center gap-2 text-xs text-slate-500">
+              <span class="font-medium">${escHtml(pVal(s, 'PERIODE_PENGUSULAN') || 'Periode: lihat detail')}</span>
+              <span class="${style.text} font-bold whitespace-nowrap group-hover:translate-x-1 transition-transform">
+                Lihat detail &rarr;
+              </span>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function portalLinkHtml(url, label) {
+      if (!url || !/^https?:\/\//i.test(url)) return '';
+      return `
+        <a href="${escHtml(url)}" target="_blank" rel="noopener" class="theme-soft-bg theme-text inline-block no-underline rounded-lg px-2.5 py-1.5 text-xs font-bold mt-2 transition hover:opacity-85">
+          &#8599; ${escHtml(label || 'Buka tautan')}
+        </a>`;
+    }
+
+    function openPortalDetail(rowIndex) {
+      const s = (portal.services || [])[Number(rowIndex)];
+      if (!s) return;
+
+      const id = pVal(s, 'ID_LAYANAN');
+      document.getElementById('portalModalTitle').textContent = pVal(s, 'NAMA_LAYANAN') || 'Layanan';
+      document.getElementById('portalModalDesc').textContent = pVal(s, 'DESKRIPSI_SINGKAT');
+
+      const fields = [
+        ['Periode Pengusulan', pVal(s, 'PERIODE_PENGUSULAN')],
+        ['Batas Pengusulan', pVal(s, 'BATAS_PENGUSULAN')],
+        ['Waktu Proses', pVal(s, 'WAKTU_PROSES')],
+        ['Status Layanan', pVal(s, 'STATUS')]
+      ].filter(x => x[1]);
+
+      let html = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">`;
+      html += fields.length
+        ? fields.map(f => `
+            <div class="border border-slate-200 rounded-xl p-3.5">
+              <div class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">${escHtml(f[0])}</div>
+              <div class="text-sm text-slate-800 whitespace-pre-line">${escHtml(f[1])}</div>
+            </div>`).join('')
+        : `<div class="text-slate-400 col-span-full">Informasi jadwal belum diisi.</div>`;
+      html += `</div>`;
+
+      const law = pVal(s, 'DASAR_HUKUM');
+      const lawLink = pVal(s, 'LINK_DASAR_HUKUM');
+      html += `<div><h3 class="text-base font-bold text-slate-900 mb-2">Dasar Hukum</h3>`;
+      html += (law || lawLink)
+        ? `<div class="border border-slate-200 rounded-xl p-3.5"><div class="text-sm whitespace-pre-line">${escHtml(law || 'Dokumen dasar hukum')}</div>${portalLinkHtml(lawLink, 'Lihat dasar hukum')}</div>`
+        : `<p class="text-slate-400">Informasi dasar hukum dan tautan dokumen akan ditambahkan.</p>`;
+      html += `</div>`;
+
+      const reqs = (portal.requirements || [])
+        .filter(r => pVal(r, 'ID_LAYANAN') === id && (!pVal(r, 'STATUS') || /aktif|ya|true/i.test(pVal(r, 'STATUS'))))
+        .sort((a, b) => (Number(pVal(a, 'URUTAN_TAMPIL')) || 999) - (Number(pVal(b, 'URUTAN_TAMPIL')) || 999));
+
+      html += `<div><h3 class="text-base font-bold text-slate-900 mb-2">Persyaratan</h3>`;
+      if (reqs.length) {
+        html += `<ul class="divide-y divide-slate-100">` + reqs.map(r => `
+          <li class="py-3 flex gap-2.5 items-start text-sm">
+            <span class="w-4 h-4 border-2 border-slate-300 rounded-sm shrink-0 mt-1"></span>
+            <div>
+              <strong class="text-slate-900">${escHtml(pVal(r, 'PERSYARATAN') || 'Persyaratan')}</strong>
+              ${pVal(r, 'FORMAT_FILE') ? `<span class="block text-xs text-slate-500 mt-1">Jenis File : ${escHtml(pVal(r, 'FORMAT_FILE'))}</span>` : ''}
+              ${pVal(r, 'BATAS_FILE') ? `<span class="block text-xs text-slate-500">Ukuran File : ${escHtml(pVal(r, 'BATAS_FILE'))}</span>` : ''}
+              ${pVal(r, 'KETERANGAN') ? `<span class="block text-xs text-slate-500 mt-1">${escHtml(pVal(r, 'KETERANGAN'))}</span>` : ''}
+              ${portalLinkHtml(pVal(r, 'LINK_TEMPLATE'), pVal(r, 'LABEL_LINK') || 'Lihat format dokumen')}
+            </div>
+          </li>`).join('') + `</ul>`;
+      } else {
+        html += `<p class="text-slate-400">Daftar persyaratan akan ditampilkan di sini.</p>`;
+      }
+      html += `</div>`;
+
+      const pics = (portal.pic || [])
+        .filter(p => pVal(p, 'ID_LAYANAN') === id && (!pVal(p, 'STATUS') || /aktif|ya|true/i.test(pVal(p, 'STATUS'))))
+        .sort((a, b) => (Number(pVal(a, 'URUTAN')) || 999) - (Number(pVal(b, 'URUTAN')) || 999));
+
+      html += `<div><h3 class="text-base font-bold text-slate-900 mb-2">Kontak Pengelola</h3>`;
+      if (pics.length) {
+        html += pics.map(p => `
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 mt-2 text-xs leading-relaxed">
+            <strong class="text-sm text-slate-900">${escHtml(pVal(p, 'NAMA_PIC'))}</strong>
+            ${pVal(p, 'JABATAN') ? `<br>${escHtml(pVal(p, 'JABATAN'))}` : ''}
+            ${pVal(p, 'UNIT') ? `<br>${escHtml(pVal(p, 'UNIT'))}` : ''}
+            ${pVal(p, 'NO_HP') ? `<br>Telepon/WA: <strong class="text-emerald-700">${escHtml(pVal(p, 'NO_HP'))}</strong>` : ''}
+            ${pVal(p, 'EMAIL') ? `<br>Email: ${escHtml(pVal(p, 'EMAIL'))}` : ''}
+          </div>`).join('');
+      } else {
+        html += `<p class="text-slate-400">Informasi kontak pengelola akan ditambahkan.</p>`;
+      }
+      html += `</div>`;
+
+      if (pVal(s, 'CATATAN')) {
+        html += `<div><h3 class="text-base font-bold text-slate-900 mb-1">Catatan</h3><p class="text-slate-500 whitespace-pre-line">${escHtml(pVal(s, 'CATATAN'))}</p></div>`;
+      }
+
+      const folderUrl = pVal(s, 'LINK_FOLDER_PENGAJUAN_AKTIF');
+      if (folderUrl) {
+        html += `
+          <div class="theme-soft-bg mt-4 p-4 border border-slate-200 rounded-2xl space-y-3">
+            <div>
+              <div class="font-bold text-sm text-slate-900">📁 Ajukan Layanan</div>
+              <div class="text-xs text-slate-600 mt-1">
+                Isi nama pegawai untuk membuka folder pengunggahan berkas dan menyampaikan pengajuan kepada PIC melalui WhatsApp.
+              </div>
+            </div>
+            <button type="button" onclick="document.getElementById('applyFormSelf').classList.remove('hidden'); this.classList.add('hidden'); document.getElementById('namaPegawaiSelf').focus();" class="theme-bg theme-bg-hover w-full py-3 text-white text-sm font-bold rounded-xl transition cursor-pointer">
+              Ajukan Layanan
+            </button>
+            <div id="applyFormSelf" class="hidden space-y-2.5">
+              <input id="namaPegawaiSelf" type="text" placeholder="Masukkan nama pegawai" class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <div class="flex flex-col sm:flex-row gap-2">
+                <a href="${escHtml(folderUrl)}" target="_blank" rel="noopener" class="flex-1 py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-xs rounded-xl text-center transition">
+                  <i class="fa-brands fa-google-drive mr-1"></i> 1. Buka Folder Upload Berkas
+                </a>
+                <button type="button" onclick="kirimPengajuanWaMandiri(${rowIndex})" class="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition cursor-pointer">
+                  <i class="fa-brands fa-whatsapp mr-1"></i> 2. Ajukan & Buka WhatsApp PIC
+                </button>
+              </div>
+              <div id="applyErrorSelf" class="text-rose-600 text-xs font-bold"></div>
+            </div>
+          </div>`;
+      }
+
+      document.getElementById('portalModalBody').innerHTML = html;
+      document.getElementById('portalDetailBackdrop').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePortalDetail() {
+      document.getElementById('portalDetailBackdrop').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function normalizePhoneId(phone) {
+      let nomor = String(phone || '').replace(/\D/g, '');
+      if (nomor.startsWith('0')) nomor = '62' + nomor.substring(1);
+      if (nomor.startsWith('620')) nomor = '62' + nomor.substring(3);
+      return nomor;
+    }
+
+    async function kirimPengajuanWaMandiri(rowIndex) {
+      const s = (portal.services || [])[Number(rowIndex)];
+      const input = document.getElementById('namaPegawaiSelf');
+      const errBox = document.getElementById('applyErrorSelf');
+      const nama = (input?.value || '').trim();
+
+      if (!nama) {
+        errBox.textContent = 'Nama pegawai wajib diisi.';
+        input?.focus();
+        return;
+      }
+      errBox.textContent = '';
+
+      const idLayanan = pVal(s, 'ID_LAYANAN');
+      const namaLayanan = pVal(s, 'NAMA_LAYANAN');
+      const folderUrl = pVal(s, 'LINK_FOLDER_PENGAJUAN_AKTIF');
+
+      const pics = (portal.pic || [])
+        .filter(p => pVal(p, 'ID_LAYANAN') === idLayanan && (!pVal(p, 'STATUS') || /aktif|ya|true/i.test(pVal(p, 'STATUS'))))
+        .sort((a, b) => (Number(pVal(a, 'URUTAN')) || 999) - (Number(pVal(b, 'URUTAN')) || 999));
+
+      const pic = pics.length ? pics[0] : null;
+      if (!pic || !pVal(pic, 'NO_HP')) {
+        errBox.textContent = 'Nomor WhatsApp PIC belum tersedia pada tab MASTER_PIC.';
+        return;
+      }
+
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const tanggal = `${dd}-${mm}-${yyyy}`;
+
+      const nomorHp = normalizePhoneId(pVal(pic, 'NO_HP'));
+      const pesan =
+`Halo, Bapak/Ibu PIC ${namaLayanan}.
+
+Berikut kami sampaikan pengajuan layanan:
+
+> Layanan: ${namaLayanan}
+> Nama Pegawai: ${nama}
+> Tanggal Pengajuan: ${tanggal}
+> Berkas Pendukung: ${folderUrl}
+
+Mohon dapat ditindaklanjuti sesuai ketentuan yang berlaku.
+
+Terima kasih atas perhatian dan bantuannya. 🙏`;
+
+      if (window.catatLogAktivitas) {
+        await window.catatLogAktivitas({ modul: 'Kepegawaian', aksi: 'AJUKAN_LAYANAN', targetData: `${nama} - ${namaLayanan}` });
+      }
+
+      const waUrl = `https://wa.me/${nomorHp}?text=${encodeURIComponent(pesan)}`;
+      window.open(waUrl, '_blank', 'noopener');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('kepeg_theme_variant') || 'blue';
+      setThemeVariant(savedTheme);
+      loadPortalSheets(false);
+    });
+  </script>
+</body>
+</html>
