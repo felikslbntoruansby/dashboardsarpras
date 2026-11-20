@@ -70,12 +70,12 @@
     .theme-banner {
       background: linear-gradient(125deg, var(--theme-banner-from), var(--theme-banner-to)) !important;
     }
+
+    /* Efek hover pada kartu visual bervariasi */
     .theme-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.12);
       border-color: var(--theme-primary) !important;
-    }
-    .theme-card:hover .theme-card-badge {
-      background-color: var(--theme-primary) !important;
-      color: #ffffff !important;
     }
 
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -84,7 +84,7 @@
     /* Mode Sidebar Diciutkan (Mini Sidebar) di Desktop/Laptop */
     @media (min-width: 1024px) {
       body.sidebar-collapsed #appSidebar {
-        width: 5rem; /* 80px */
+        width: 5rem;
       }
       body.sidebar-collapsed #mainContentArea {
         padding-left: 5rem;
@@ -143,7 +143,6 @@
   <aside id="appSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800/80 transform -translate-x-full lg:translate-x-0 transition-all duration-300 ease-in-out shadow-2xl lg:shadow-none">
     
     <div class="overflow-y-auto no-scrollbar flex-1">
-      <!-- HEADER SIDEBAR + TOMBOL GESER LAPTOP -->
       <div class="sidebar-header-wrap p-5 border-b border-slate-800/80 flex items-center justify-between gap-2">
         <div class="sidebar-brand-group flex items-center gap-3.5 min-w-0">
           <div class="theme-bg w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ring-1 ring-white/15 shrink-0 transition-colors">
@@ -307,9 +306,9 @@
           <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between gap-3 bg-slate-50/70">
             <div class="relative flex-1 max-w-md">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-              <input type="text" id="searchInput" oninput="renderTable()" placeholder="Cari NIP/NIK, nama pegawai, jabatan, unit..." class="w-full bg-white border border-slate-300 text-xs rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <input type="text" id="searchInput" oninput="renderTable()" placeholder="Cari NIP/NIK, nama pegawai, jabatan, unit..." class="w-full bg-white border border-slate-300 text-xs rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
             </div>
-            <select id="filterStatus" onchange="renderTable()" class="bg-white border border-slate-300 text-xs font-semibold rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <select id="filterStatus" onchange="renderTable()" class="bg-white border border-slate-300 text-xs font-semibold rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
               <option value="ALL">Semua Status Kepegawaian</option>
               <option value="PNS">PNS</option>
               <option value="PPPK">PPPK</option>
@@ -345,7 +344,7 @@
       <!-- ========================================================================= -->
       <div id="panel-LAYANAN" class="hidden space-y-6">
 
-        <!-- BANNER PORTAL INFORMASI (MENGIKUTI WARNA TEMA AKTIF) -->
+        <!-- BANNER PORTAL INFORMASI -->
         <div class="theme-banner text-white rounded-2xl p-6 md:p-7 shadow-md transition-all">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="space-y-2">
@@ -372,7 +371,7 @@
           ℹ️ Informasi pada portal ini terhubung langsung dengan database layanan kepegawaian (otomatis diperbarui saat spreadsheet diubah).
         </div>
 
-        <!-- RINGKASAN PENGAJUAN & PIE CHART (DARI LOG_CEK) -->
+        <!-- RINGKASAN PENGAJUAN -->
         <section class="space-y-4">
           <div>
             <h3 class="text-lg font-extrabold text-slate-900">Ringkasan Pengajuan</h3>
@@ -412,8 +411,8 @@
           <input type="search" id="searchLayananInput" oninput="renderPortalCards()" placeholder="Cari nama layanan..." class="w-full sm:w-80 bg-white border border-slate-200 text-slate-800 text-xs rounded-xl px-4 py-3 shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500">
         </div>
 
-        <!-- GRID KARTU LAYANAN -->
-        <div id="gridLayananCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- GRID KARTU LAYANAN BERBEDA LATAR & ILUSTRASI TIAP NOMOR (IMAGE_9.PNG) -->
+        <div id="gridLayananCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <div class="col-span-full bg-white rounded-2xl border border-slate-200 p-10 text-center text-xs text-slate-400">
             <i class="theme-text fa-solid fa-spinner animate-spin text-lg mb-2 block"></i>
             Memuat informasi layanan dari Google Sheets...
@@ -518,6 +517,34 @@
       purple: ['#6d28d9', '#a78bfa', '#2e1065', '#c4b5fd', '#5b21b6', '#ddd6fe']
     };
 
+    // Variasi warna latar & gradasi berurutan agar estetik
+    const CARD_COLORS = [
+      { bg: 'bg-blue-50/70 border-blue-100', hover: 'hover:border-blue-300 hover:bg-blue-50/90', text: 'text-blue-700', badge: 'bg-blue-100/90 text-blue-800' },
+      { bg: 'bg-emerald-50/70 border-emerald-100', hover: 'hover:border-emerald-300 hover:bg-emerald-50/90', text: 'text-emerald-700', badge: 'bg-emerald-100/90 text-emerald-800' },
+      { bg: 'bg-rose-50/70 border-rose-100', hover: 'hover:border-rose-300 hover:bg-rose-50/90', text: 'text-rose-700', badge: 'bg-rose-100/90 text-rose-800' },
+      { bg: 'bg-purple-50/70 border-purple-100', hover: 'hover:border-purple-300 hover:bg-purple-50/90', text: 'text-purple-700', badge: 'bg-purple-100/90 text-purple-800' },
+      { bg: 'bg-amber-50/60 border-amber-100', hover: 'hover:border-amber-300 hover:bg-amber-50/80', text: 'text-amber-700', badge: 'bg-amber-100/90 text-amber-800' },
+      { bg: 'bg-cyan-50/70 border-cyan-100', hover: 'hover:border-cyan-300 hover:bg-cyan-50/90', text: 'text-cyan-700', badge: 'bg-cyan-100/90 text-cyan-800' },
+      { bg: 'bg-indigo-50/70 border-indigo-100', hover: 'hover:border-indigo-300 hover:bg-indigo-50/90', text: 'text-indigo-700', badge: 'bg-indigo-100/90 text-indigo-800' },
+      { bg: 'bg-teal-50/70 border-teal-100', hover: 'hover:border-teal-300 hover:bg-teal-50/90', text: 'text-teal-700', badge: 'bg-teal-100/90 text-teal-800' }
+    ];
+
+    // Daftar Ilustrasi Administratif & Gambar Ikon Kepegawaian (Satu Per Nomor)
+    const CARD_ICONS = [
+      'fa-solid fa-graduation-cap',      // 01. Ujian Dinas
+      'fa-solid fa-id-card-clip',        // 02. Penyesuaian Ijazah
+      'fa-solid fa-award',               // 03. Gelar Akademik
+      'fa-solid fa-user-tie',            // 04. Gelar Profesi
+      'fa-solid fa-book-open-reader',    // 05. Tugas Belajar
+      'fa-solid fa-rotate-left',         // 06. Pengaktifan Tugas Belajar
+      'fa-solid fa-file-signature',      // 07. Mutasi
+      'fa-solid fa-briefcase',           // 08. Jabatan Fungsional
+      'fa-solid fa-arrow-up-right-dots', // 09. Kenaikan Pangkat
+      'fa-solid fa-hourglass-half',      // 10. Masa Kerja
+      'fa-solid fa-shield-halved',       // 11. Karpeg/Taspen
+      'fa-solid fa-hospital-user'        // 12. BPJS/Kesehatan
+    ];
+
     function setThemeVariant(variant) {
       const theme = THEME_PALETTES[variant] ? variant : 'blue';
       document.body.setAttribute('data-theme', theme);
@@ -602,7 +629,7 @@
     }
 
     // =========================================================================
-    // PEMBACAAN LANGSUNG 5 TAB GOOGLE SHEETS (MANDIRI TANPA APPS SCRIPT)
+    // PEMBACAAN LANGSUNG 5 TAB GOOGLE SHEETS
     // =========================================================================
     async function fetchSheetTab(sheetName) {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&_=${Date.now()}`;
@@ -765,23 +792,48 @@
         return;
       }
 
-      grid.innerHTML = list.map((s, i) => `
-        <article onclick="openPortalDetail(${s.__ROW_INDEX})" class="theme-card bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col min-h-[220px] shadow-2xs hover:shadow-lg transition-all cursor-pointer group">
-          <div class="theme-card-badge theme-soft-bg theme-text w-9 h-9 grid place-items-center rounded-xl font-bold text-sm mb-4 transition-colors">
-            ${String(i + 1).padStart(2, '0')}
-          </div>
-          <h3 class="text-base font-bold text-slate-900 leading-snug mb-2 transition">
-            ${escHtml(pVal(s, 'NAMA_LAYANAN') || 'Layanan')}
-          </h3>
-          <p class="text-xs text-slate-500 leading-relaxed mb-4">
-            ${escHtml(pVal(s, 'DESKRIPSI_SINGKAT') || 'Informasi layanan dan persyaratan pengusulan.')}
-          </p>
-          <div class="mt-auto border-t border-slate-100 pt-3 flex justify-between items-center gap-2 text-xs text-slate-500">
-            <span>${escHtml(pVal(s, 'PERIODE_PENGUSULAN') || 'Periode: lihat detail')}</span>
-            <span class="theme-text font-bold whitespace-nowrap group-hover:translate-x-0.5 transition-transform">Lihat detail &rarr;</span>
-          </div>
-        </article>
-      `).join('');
+      grid.innerHTML = list.map((s, i) => {
+        // Rotasikan warna latar kartu secara bervariasi agar berbeda-beda
+        const style = CARD_COLORS[i % CARD_COLORS.length];
+        const iconClass = CARD_ICONS[i % CARD_ICONS.length] || 'fa-solid fa-file-invoice';
+
+        return `
+          <article onclick="openPortalDetail(${s.__ROW_INDEX})" class="theme-card ${style.bg} ${style.hover} border rounded-2xl p-6 flex flex-col justify-between shadow-2xs transition-all duration-300 cursor-pointer group relative overflow-hidden">
+            <!-- Pola background estetik di pojok kanan atas kartu -->
+            <div class="absolute -top-3 -right-3 w-16 h-16 rounded-full bg-black/[0.02] group-hover:bg-black/[0.04] transition-all"></div>
+
+            <div>
+              <!-- Nomor Layanan + Ikon Unik Visual (Masing-masing memiliki visual representatif) -->
+              <div class="flex items-center justify-between mb-4">
+                <span class="${style.badge} font-bold text-xs px-3 py-1 rounded-lg">
+                  ${String(i + 1).padStart(2, '0')}
+                </span>
+                <div class="w-10 h-10 rounded-xl bg-white/80 ${style.text} flex items-center justify-center shadow-2xs text-lg transition-transform group-hover:scale-110">
+                  <i class="${iconClass}"></i>
+                </div>
+              </div>
+
+              <!-- Judul Layanan -->
+              <h3 class="text-base font-bold text-slate-900 leading-snug mb-2 group-hover:text-slate-900">
+                ${escHtml(pVal(s, 'NAMA_LAYANAN') || 'Layanan')}
+              </h3>
+
+              <!-- Deskripsi Singkat -->
+              <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                ${escHtml(pVal(s, 'DESKRIPSI_SINGKAT') || 'Informasi layanan dan persyaratan pengusulan.')}
+              </p>
+            </div>
+
+            <!-- Periode & Tombol Detail -->
+            <div class="mt-auto border-t border-slate-200/60 pt-3.5 flex justify-between items-center gap-2 text-xs text-slate-500">
+              <span class="font-medium">${escHtml(pVal(s, 'PERIODE_PENGUSULAN') || 'Periode: lihat detail')}</span>
+              <span class="${style.text} font-bold whitespace-nowrap group-hover:translate-x-1 transition-transform">
+                Lihat detail &rarr;
+              </span>
+            </div>
+          </article>
+        `;
+      }).join('');
     }
 
     function portalLinkHtml(url, label) {
