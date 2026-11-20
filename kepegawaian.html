@@ -149,7 +149,7 @@
   <div id="mainContentArea" class="lg:pl-64 transition-all duration-300 ease-in-out">
     <div class="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
 
-      <!-- HEADER (TULISAN "SUB-BAGIAN" DIHAPUS) -->
+      <!-- HEADER -->
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
         <div class="flex items-center gap-4">
           <div class="bg-gradient-to-tr from-cyan-600 to-sky-500 p-3.5 rounded-xl text-white shadow-md shadow-cyan-600/20">
@@ -158,10 +158,10 @@
           <div>
             <span class="text-[10px] font-bold uppercase tracking-widest text-cyan-600">BIDANG UMUM • SDM & APARATUR</span>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Dashboard Kepegawaian</h1>
-            <p class="text-xs text-slate-500">Politeknik Penerbangan Surabaya • Data Pegawai PNS, PPPK, PPNPN & Status Kehadiran</p>
+            <p class="text-xs text-slate-500">Politeknik Penerbangan Surabaya • Data Pegawai PNS, PPPK, PPNPN & Layanan Informasi Kepegawaian</p>
           </div>
         </div>
-        <div class="flex flex-wrap gap-2">
+        <div id="headerPegawaiActions" class="flex flex-wrap gap-2">
           <button type="button" onclick="openModal()" class="role-admin-only px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-700 hover:to-sky-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition cursor-pointer">
             <i class="fa-solid fa-user-plus"></i> Tambah Pegawai
           </button>
@@ -171,66 +171,142 @@
         </div>
       </div>
 
-      <!-- KPI CARDS -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-          <p class="text-xs font-bold text-slate-500 uppercase">Total Pegawai</p>
-          <h3 class="text-3xl font-black text-cyan-600 mt-2" id="kpi-total">0</h3>
+      <!-- TAB MENU KEPEGAWAIAN (DATA PEGAWAI & LAYANAN INFORMASI DARI GOOGLE SHEETS) -->
+      <div class="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/90 shadow-sm">
+        <button type="button" onclick="switchKepegTab('PEGAWAI')" id="tabBtn-PEGAWAI" class="px-4 py-2.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-cyan-600 to-sky-600 text-white shadow-sm transition cursor-pointer flex items-center gap-2">
+          <i class="fa-solid fa-users"></i> Data Pegawai & Kehadiran
+        </button>
+        <button type="button" onclick="switchKepegTab('LAYANAN')" id="tabBtn-LAYANAN" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer flex items-center gap-2">
+          <i class="fa-solid fa-circle-info text-cyan-600"></i> Layanan Informasi Kepegawaian
+          <span id="tabBadgeLayanan" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100 text-sky-700">Live Sheets</span>
+        </button>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- BAGIAN 1: DATA PEGAWAI & KEHADIRAN (TAMPILAN ASLI)                        -->
+      <!-- ========================================================================= -->
+      <div id="panel-PEGAWAI" class="space-y-6">
+        <!-- KPI CARDS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+            <p class="text-xs font-bold text-slate-500 uppercase">Total Pegawai</p>
+            <h3 class="text-3xl font-black text-cyan-600 mt-2" id="kpi-total">0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+            <p class="text-xs font-bold text-slate-500 uppercase">PNS / PPPK</p>
+            <h3 class="text-3xl font-black text-blue-600 mt-2" id="kpi-asn">0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+            <p class="text-xs font-bold text-slate-500 uppercase">PPNPN / Kontrak</p>
+            <h3 class="text-3xl font-black text-indigo-600 mt-2" id="kpi-nonasn">0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+            <p class="text-xs font-bold text-slate-500 uppercase">Cuti / Dinas Luar</p>
+            <h3 class="text-3xl font-black text-amber-600 mt-2" id="kpi-cuti">0</h3>
+          </div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-          <p class="text-xs font-bold text-slate-500 uppercase">PNS / PPPK</p>
-          <h3 class="text-3xl font-black text-blue-600 mt-2" id="kpi-asn">0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-          <p class="text-xs font-bold text-slate-500 uppercase">PPNPN / Kontrak</p>
-          <h3 class="text-3xl font-black text-indigo-600 mt-2" id="kpi-nonasn">0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-          <p class="text-xs font-bold text-slate-500 uppercase">Cuti / Dinas Luar</p>
-          <h3 class="text-3xl font-black text-amber-600 mt-2" id="kpi-cuti">0</h3>
+
+        <!-- FILTER & TABEL -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between gap-3 bg-slate-50/70">
+            <div class="relative flex-1 max-w-md">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="searchInput" oninput="renderTable()" placeholder="Cari NIP/NIK, nama pegawai, jabatan, unit..." class="w-full bg-white border border-slate-300 text-xs rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+            </div>
+            <select id="filterStatus" onchange="renderTable()" class="bg-white border border-slate-300 text-xs font-semibold rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+              <option value="ALL">Semua Status Kepegawaian</option>
+              <option value="PNS">PNS</option>
+              <option value="PPPK">PPPK</option>
+              <option value="PPNPN">PPNPN / Kontrak</option>
+            </select>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
+              <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
+                <tr>
+                  <th class="px-4 py-3.5 text-center">No</th>
+                  <th class="px-4 py-3.5">NIP / NIK</th>
+                  <th class="px-4 py-3.5">Nama Lengkap</th>
+                  <th class="px-4 py-3.5">Pangkat / Gol</th>
+                  <th class="px-4 py-3.5">Jabatan</th>
+                  <th class="px-4 py-3.5">Unit Kerja</th>
+                  <th class="px-4 py-3.5 text-center">Jenis</th>
+                  <th class="px-4 py-3.5 text-center">Status</th>
+                  <th class="px-4 py-3.5 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-data" class="divide-y divide-slate-200">
+                <tr><td colspan="9" class="text-center py-6 text-slate-400">Memuat data kepegawaian...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- FILTER & TABEL -->
-      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
-        <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between gap-3 bg-slate-50/70">
-          <div class="relative flex-1 max-w-md">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="searchInput" oninput="renderTable()" placeholder="Cari NIP/NIK, nama pegawai, jabatan, unit..." class="w-full bg-white border border-slate-300 text-xs rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+      <!-- ========================================================================= -->
+      <!-- BAGIAN 2: LAYANAN INFORMASI KEPEGAWAIAN (OTOMATIS DARI GOOGLE SHEETS)     -->
+      <!-- ========================================================================= -->
+      <div id="panel-LAYANAN" class="hidden space-y-5">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-lg font-extrabold text-slate-900">Daftar Layanan</h2>
+            <span id="infoJumlahLayanan" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-100 text-sky-700">Memuat...</span>
           </div>
-          <select id="filterStatus" onchange="renderTable()" class="bg-white border border-slate-300 text-xs font-semibold rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-            <option value="ALL">Semua Status Kepegawaian</option>
-            <option value="PNS">PNS</option>
-            <option value="PPPK">PPPK</option>
-            <option value="PPNPN">PPNPN / Kontrak</option>
-          </select>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="relative flex-1 sm:w-72">
+              <input type="text" id="searchLayananInput" oninput="renderLayananCards()" placeholder="Cari nama layanan..." class="w-full bg-white border border-slate-200 text-slate-800 text-xs rounded-xl px-4 py-2.5 shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500">
+            </div>
+            <button type="button" onclick="loadLayananFromSheets(true)" title="Sinkronisasi Ulang dari Google Sheets" class="px-3.5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate text-sky-600"></i>
+              <span class="hidden sm:inline">Sync</span>
+            </button>
+          </div>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left text-slate-700 whitespace-nowrap">
-            <thead class="text-[11px] text-slate-600 uppercase bg-slate-100 border-b border-slate-200">
-              <tr>
-                <th class="px-4 py-3.5 text-center">No</th>
-                <th class="px-4 py-3.5">NIP / NIK</th>
-                <th class="px-4 py-3.5">Nama Lengkap</th>
-                <th class="px-4 py-3.5">Pangkat / Gol</th>
-                <th class="px-4 py-3.5">Jabatan</th>
-                <th class="px-4 py-3.5">Unit Kerja</th>
-                <th class="px-4 py-3.5 text-center">Jenis</th>
-                <th class="px-4 py-3.5 text-center">Status</th>
-                <th class="px-4 py-3.5 text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-data" class="divide-y divide-slate-200">
-              <tr><td colspan="9" class="text-center py-6 text-slate-400">Memuat data kepegawaian...</td></tr>
-            </tbody>
-          </table>
+        <!-- GRID KARTU LAYANAN OTOMATIS DARI SPREADSHEET -->
+        <div id="gridLayananCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div class="col-span-full bg-white rounded-2xl border border-slate-200 p-10 text-center text-xs text-slate-400">
+            <i class="fa-solid fa-spinner animate-spin text-sky-600 text-lg mb-2 block"></i>
+            Memuat daftar layanan dari Google Sheets...
+          </div>
         </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL LAYANAN INFORMASI (OTOMATIS DARI KOLOM SPREADSHEET) -->
+  <div id="detailLayananModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden">
+      <div class="p-5 border-b border-slate-200/80 flex items-start justify-between gap-3 bg-slate-50/80">
+        <div class="flex items-center gap-3.5">
+          <span id="detailNomorBadge" class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 font-extrabold text-sm flex items-center justify-center shrink-0">01</span>
+          <div>
+            <h3 id="detailJudulLayanan" class="text-base font-extrabold text-slate-900 leading-snug">Nama Layanan</h3>
+            <p id="detailPeriodeLayanan" class="text-xs font-semibold text-sky-700 mt-0.5">Periode: -</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeDetailLayananModal()" class="w-8 h-8 rounded-lg bg-slate-200/70 hover:bg-slate-300 text-slate-600 flex items-center justify-center cursor-pointer shrink-0">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="detailBodyLayanan" class="p-5 overflow-y-auto space-y-3.5 text-xs text-slate-700 leading-relaxed">
+        <!-- Otomatis terisi dari kolom spreadsheet -->
+      </div>
+
+      <div class="p-4 border-t border-slate-200/80 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+        <div id="detailLinkActions" class="flex flex-wrap items-center gap-2"></div>
+        <button type="button" onclick="closeDetailLayananModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl cursor-pointer ml-auto">
+          Tutup
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL FORM PEGAWAI -->
+  <!-- MODAL FORM PEGAWAI (TAMPILAN ASLI) -->
   <div id="formModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex justify-center items-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg p-6">
       <h3 id="modalTitle" class="text-lg font-extrabold text-slate-900 mb-4">Tambah Data Pegawai</h3>
@@ -291,6 +367,10 @@
 
   <script>
     let pegawaiList = [];
+    let layananSheetsList = [];
+    const SPREADSHEET_ID = "1Fl3Hm538x7hdtl83_lTetU9P-NRGZ0wszGPBDOyJjYc";
+    const SHEET_GID_LAYANAN = "1599911655";
+
     const escHtml = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
     function toggleMobileSidebar(show) {
@@ -334,6 +414,173 @@
       setTimeout(() => t.remove(), 3500);
     }
 
+    // Switch antara Tab Data Pegawai dan Tab Layanan Informasi
+    function switchKepegTab(tabName) {
+      const panelPegawai = document.getElementById('panel-PEGAWAI');
+      const panelLayanan = document.getElementById('panel-LAYANAN');
+      const btnPegawai = document.getElementById('tabBtn-PEGAWAI');
+      const btnLayanan = document.getElementById('tabBtn-LAYANAN');
+      const headerActions = document.getElementById('headerPegawaiActions');
+
+      if (tabName === 'LAYANAN') {
+        panelPegawai.classList.add('hidden');
+        panelLayanan.classList.remove('hidden');
+        if (headerActions) headerActions.classList.add('hidden');
+        btnLayanan.className = "px-4 py-2.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-cyan-600 to-sky-600 text-white shadow-sm transition cursor-pointer flex items-center gap-2";
+        btnPegawai.className = "px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer flex items-center gap-2";
+        if (!layananSheetsList.length) loadLayananFromSheets(false);
+      } else {
+        panelLayanan.classList.add('hidden');
+        panelPegawai.classList.remove('hidden');
+        if (headerActions) headerActions.classList.remove('hidden');
+        btnPegawai.className = "px-4 py-2.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-cyan-600 to-sky-600 text-white shadow-sm transition cursor-pointer flex items-center gap-2";
+        btnLayanan.className = "px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer flex items-center gap-2";
+      }
+    }
+
+    // =========================================================================
+    // SINKRONISASI OTOMATIS DARI GOOGLE SHEETS (gid=1599911655)
+    // =========================================================================
+    async function loadLayananFromSheets(notify = false) {
+      const grid = document.getElementById('gridLayananCards');
+      const infoBadge = document.getElementById('infoJumlahLayanan');
+      const tabBadge = document.getElementById('tabBadgeLayanan');
+      infoBadge.innerText = 'Sinkronisasi...';
+
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID_LAYANAN}&_=${Date.now()}`;
+        const res = await fetch(url);
+        const text = await res.text();
+
+        const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+        const parsed = JSON.parse(jsonText);
+        const cols = parsed.table.cols.map((c, idx) => (c.label || `Kolom_${idx + 1}`).trim());
+        const rows = parsed.table.rows || [];
+
+        layananSheetsList = rows.map((r, rowIndex) => {
+          const record = {};
+          const fields = [];
+          cols.forEach((colName, colIdx) => {
+            const cell = r.c[colIdx];
+            const val = cell ? (cell.f !== undefined && cell.f !== null ? String(cell.f) : (cell.v !== null && cell.v !== undefined ? String(cell.v) : '')) : '';
+            const cleanVal = val.trim();
+            record[colName] = cleanVal;
+            if (colName && cleanVal) {
+              fields.push({ label: colName, value: cleanVal });
+            }
+          });
+
+          const getByKeywords = (keywords) => {
+            const matchedCol = cols.find(c => keywords.some(k => c.toLowerCase().includes(k)));
+            return matchedCol ? record[matchedCol] : '';
+          };
+
+          const rawNo = getByKeywords(['no', 'nomor', 'kode', 'id']) || String(rowIndex + 1);
+          const nomorFormatted = /^\d+$/.test(rawNo) ? rawNo.padStart(2, '0') : rawNo;
+
+          return {
+            nomor: nomorFormatted,
+            judul: getByKeywords(['nama layanan', 'layanan', 'judul', 'jenis', 'menu']) || record[cols[1]] || record[cols[0]] || `Layanan #${rowIndex + 1}`,
+            deskripsi: getByKeywords(['deskripsi', 'keterangan', 'uraian', 'ringkasan', 'penjelasan', 'informasi']) || '',
+            periode: getByKeywords(['periode', 'jadwal', 'waktu', 'batas']) || 'Periode: lihat detail',
+            fields: fields
+          };
+        }).filter(item => item.judul && item.judul.toLowerCase() !== 'nama layanan');
+
+        infoBadge.innerText = `${layananSheetsList.length} Layanan`;
+        if (tabBadge) tabBadge.innerText = `${layananSheetsList.length} Layanan`;
+        renderLayananCards();
+        if (notify) showToast('Daftar Layanan berhasil disinkronkan dari Google Sheets!');
+      } catch (err) {
+        console.error('Gagal baca Google Sheets:', err);
+        infoBadge.innerText = 'Gagal Sync';
+        grid.innerHTML = `
+          <div class="col-span-full bg-amber-50 border border-amber-200 rounded-2xl p-6 text-xs text-amber-900 space-y-2">
+            <p class="font-extrabold text-amber-800"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Spreadsheet Belum Dibuka Akses Lihat (Viewer)</p>
+            <p>Pastikan di Google Sheets Anda klik <strong>Bagikan (Share) &rarr; Akses Umum: Siapa saja yang memiliki link (Pelihat / Viewer)</strong>, lalu klik tombol <strong>Sync</strong>.</p>
+          </div>`;
+      }
+    }
+
+    function renderLayananCards() {
+      const grid = document.getElementById('gridLayananCards');
+      const keyword = (document.getElementById('searchLayananInput')?.value || '').toLowerCase();
+
+      const filtered = layananSheetsList.filter(item =>
+        item.judul.toLowerCase().includes(keyword) ||
+        item.deskripsi.toLowerCase().includes(keyword) ||
+        item.periode.toLowerCase().includes(keyword)
+      );
+
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="col-span-full bg-white rounded-2xl border border-slate-200 p-8 text-center text-xs text-slate-400">Tidak ada layanan yang cocok dengan pencarian "${escHtml(keyword)}".</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const realIdx = layananSheetsList.indexOf(item);
+        return `
+          <div onclick="openDetailLayananModal(${realIdx})" class="bg-white rounded-2xl border border-slate-200/90 hover:border-sky-300 shadow-2xs hover:shadow-md transition-all p-6 flex flex-col justify-between cursor-pointer group">
+            <div>
+              <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-sky-50 text-sky-600 font-extrabold text-xs mb-4 group-hover:bg-sky-600 group-hover:text-white transition">
+                ${escHtml(item.nomor)}
+              </span>
+              <h3 class="text-base font-extrabold text-slate-900 leading-snug mb-2 group-hover:text-sky-700 transition">
+                ${escHtml(item.judul)}
+              </h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                ${escHtml(item.deskripsi || 'Informasi layanan dan persyaratan pengusulan.')}
+              </p>
+            </div>
+
+            <div class="pt-4 mt-5 border-t border-slate-100 flex items-center justify-between gap-3 text-[11px]">
+              <span class="text-slate-500 leading-tight">${escHtml(item.periode)}</span>
+              <span class="text-sky-600 font-bold whitespace-nowrap group-hover:translate-x-0.5 transition-transform">
+                Lihat detail &rarr;
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openDetailLayananModal(idx) {
+      const item = layananSheetsList[idx];
+      if (!item) return;
+
+      document.getElementById('detailNomorBadge').innerText = item.nomor;
+      document.getElementById('detailJudulLayanan').innerText = item.judul;
+      document.getElementById('detailPeriodeLayanan').innerText = item.periode;
+
+      const bodyEl = document.getElementById('detailBodyLayanan');
+      const linkActionsEl = document.getElementById('detailLinkActions');
+      linkActionsEl.innerHTML = '';
+
+      bodyEl.innerHTML = item.fields.map(f => {
+        if (/^https?:\/\//i.test(f.value)) {
+          linkActionsEl.innerHTML += `
+            <a href="${escHtml(f.value)}" target="_blank" rel="noopener" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl inline-flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-up-right-from-square"></i> ${escHtml(f.label)}
+            </a>`;
+          return '';
+        }
+        return `
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">${escHtml(f.label)}</span>
+            <div class="text-slate-800 whitespace-pre-line">${escHtml(f.value)}</div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('detailLayananModal').classList.remove('hidden');
+    }
+
+    function closeDetailLayananModal() {
+      document.getElementById('detailLayananModal').classList.add('hidden');
+    }
+
+    // =========================================================================
+    // DATA PEGAWAI SUPABASE (KODE ASLI ANDA)
+    // =========================================================================
     async function loadData() {
       const res = await fetch('/api/kepegawaian');
       pegawaiList = await res.json();
@@ -453,7 +700,10 @@
       doc.save('Daftar_Pegawai_Poltekbang.pdf');
     }
 
-    document.addEventListener('DOMContentLoaded', loadData);
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      loadLayananFromSheets(false);
+    });
   </script>
   <script src="auth-audit.js"></script>
 </body>
