@@ -702,33 +702,26 @@
         html += `<div><h3 class="text-base font-bold text-slate-900 mb-1">Catatan</h3><p class="text-slate-500 whitespace-pre-line">${escHtml(pVal(s, 'CATATAN'))}</p></div>`;
       }
 
-      const folderUrl = pVal(s, 'LINK_FOLDER_PENGAJUAN_AKTIF');
-      if (folderUrl) {
-        html += `
-          <div class="theme-soft-bg mt-4 p-4 border border-slate-200 rounded-2xl space-y-3">
-            <div>
-              <div class="font-bold text-sm text-slate-900">📁 Ajukan Layanan</div>
-              <div class="text-xs text-slate-600 mt-1">
-                Isi nama pegawai untuk membuka folder pengunggahan berkas dan menyampaikan pengajuan kepada PIC melalui WhatsApp.
-              </div>
+      // TOMBOL "1. BUKA FOLDER UPLOAD BERKAS" DI-HIDE DI SEMUA LAYANAN, HANYA 1 TOMBOL PENUH
+      html += `
+        <div class="theme-soft-bg mt-4 p-4 border border-slate-200 rounded-2xl space-y-3">
+          <div>
+            <div class="font-bold text-sm text-slate-900">📨 Ajukan Layanan</div>
+            <div class="text-xs text-slate-600 mt-1">
+              Isi nama pegawai di bawah ini untuk menyampaikan pengajuan layanan kepada PIC melalui WhatsApp.
             </div>
-            <button type="button" onclick="document.getElementById('applyFormSelf').classList.remove('hidden'); this.classList.add('hidden'); document.getElementById('namaPegawaiSelf').focus();" class="theme-bg theme-bg-hover w-full py-3 text-white text-sm font-bold rounded-xl transition cursor-pointer">
-              Ajukan Layanan
+          </div>
+          <button type="button" onclick="document.getElementById('applyFormSelf').classList.remove('hidden'); this.classList.add('hidden'); document.getElementById('namaPegawaiSelf').focus();" class="theme-bg theme-bg-hover w-full py-3 text-white text-sm font-bold rounded-xl transition cursor-pointer">
+            Ajukan Layanan
+          </button>
+          <div id="applyFormSelf" class="hidden space-y-2.5">
+            <input id="namaPegawaiSelf" type="text" placeholder="Masukkan nama pegawai" class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <button type="button" onclick="kirimPengajuanWaMandiri(${rowIndex})" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition cursor-pointer flex items-center justify-center gap-2">
+              <i class="fa-brands fa-whatsapp text-sm"></i> Ajukan & Buka WhatsApp PIC
             </button>
-            <div id="applyFormSelf" class="hidden space-y-2.5">
-              <input id="namaPegawaiSelf" type="text" placeholder="Masukkan nama pegawai" class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
-              <div class="flex flex-col sm:flex-row gap-2">
-                <a href="${escHtml(folderUrl)}" target="_blank" rel="noopener" class="flex-1 py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-xs rounded-xl text-center transition">
-                  <i class="fa-brands fa-google-drive mr-1"></i> 1. Buka Folder Upload Berkas
-                </a>
-                <button type="button" onclick="kirimPengajuanWaMandiri(${rowIndex})" class="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition cursor-pointer">
-                  <i class="fa-brands fa-whatsapp mr-1"></i> 2. Ajukan & Buka WhatsApp PIC
-                </button>
-              </div>
-              <div id="applyErrorSelf" class="text-rose-600 text-xs font-bold"></div>
-            </div>
-          </div>`;
-      }
+            <div id="applyErrorSelf" class="text-rose-600 text-xs font-bold"></div>
+          </div>
+        </div>`;
 
       document.getElementById('portalModalBody').innerHTML = html;
       document.getElementById('portalDetailBackdrop').classList.remove('hidden');
@@ -774,12 +767,27 @@
         return;
       }
 
+      // Perbarui angka total pengajuan & pie chart secara langsung di halaman
+      if (portal.dashboard) {
+        portal.dashboard.totalBulan = (portal.dashboard.totalBulan || 0) + 1;
+        portal.dashboard.totalTahun = (portal.dashboard.totalTahun || 0) + 1;
+        const found = (portal.dashboard.perLayanan || []).find(x => x.nama === namaLayanan);
+        if (found) {
+          found.jumlah += 1;
+        } else {
+          portal.dashboard.perLayanan.push({ nama: namaLayanan, jumlah: 1 });
+        }
+        renderPortalDashboard();
+      }
+
       const now = new Date();
       const dd = String(now.getDate()).padStart(2, '0');
       const mm = String(now.getMonth() + 1).padStart(2, '0');
       const yyyy = now.getFullYear();
       const tanggal = `${dd}-${mm}-${yyyy}`;
 
+      // Link Drive tetap disertakan dalam pesan WhatsApp PIC jika ada
+      const barisDrive = folderUrl ? `\n> Berkas Pendukung: ${folderUrl}` : '';
       const nomorHp = normalizePhoneId(pVal(pic, 'NO_HP'));
       const pesan =
 `Halo, Bapak/Ibu PIC ${namaLayanan}.
@@ -788,8 +796,7 @@ Berikut kami sampaikan pengajuan layanan:
 
 > Layanan: ${namaLayanan}
 > Nama Pegawai: ${nama}
-> Tanggal Pengajuan: ${tanggal}
-> Berkas Pendukung: ${folderUrl}
+> Tanggal Pengajuan: ${tanggal}${barisDrive}
 
 Mohon dapat ditindaklanjuti sesuai ketentuan yang berlaku.
 
